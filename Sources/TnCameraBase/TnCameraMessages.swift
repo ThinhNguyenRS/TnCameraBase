@@ -111,5 +111,11 @@ public struct TnCameraMessageSetZoomFactorRequest: TnCameraMessageProtocol {
     public let value: CGFloat
     public let adjust: Bool
     public let withRate: Float
+    
+    public init(value: CGFloat, adjust: Bool, withRate: Float) {
+        self.value = value
+        self.adjust = adjust
+        self.withRate = withRate
+    }
 }
 
