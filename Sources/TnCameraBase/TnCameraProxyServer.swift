@@ -28,9 +28,14 @@ public class TnCameraProxyServer: TnLoggable {
         }
     }
     
-//    var settings: TnCameraSettings {
-//        cameraManager.settings
-//    }
+    public var bleDelegate: TnBluetoothClientDelegate? {
+        get {
+            ble.delegate
+        }
+        set {
+            ble.delegate = newValue
+        }
+    }
 }
 
 // MARK: TnBluetoothServerDelegate

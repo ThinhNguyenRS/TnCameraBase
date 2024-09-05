@@ -28,6 +28,15 @@ public class TnCameraProxyClient: NSObject, ObservableObject, TnLoggable {
         self.bluetooth = bluetooth
         self.ble = .init(info: bluetooth)
     }
+    
+    public var bleDelegate: TnBluetoothClientDelegate? {
+        get {
+            ble.delegate
+        }
+        set {
+            ble.delegate = newValue
+        }
+    }
 }
 
 // MARK: CameraManagerProxyProtocol
