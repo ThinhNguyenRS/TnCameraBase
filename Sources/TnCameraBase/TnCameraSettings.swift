@@ -19,61 +19,61 @@ public enum CameraStatus: Int, Comparable, Codable {
 }
 
 public struct TnCameraSettings: Codable {
-    var presets: [AVCaptureSession.Preset] = [.photo, .hd4K3840x2160]
-    var preset: AVCaptureSession.Preset = .hd4K3840x2160
-    var cameraPosition: AVCaptureDevice.Position = .back
+    public var presets: [AVCaptureSession.Preset] = [.photo, .hd4K3840x2160]
+    public var preset: AVCaptureSession.Preset = .hd4K3840x2160
+    public var cameraPosition: AVCaptureDevice.Position = .back
 
-    var cameraType: AVCaptureDevice.DeviceType = .builtInTripleCamera /*.builtInWideAngleCamera*/ /*.builtInUltraWideCamera*/
-    var cameraTypes: [AVCaptureDevice.DeviceType] = []
+    public var cameraType: AVCaptureDevice.DeviceType = .builtInTripleCamera /*.builtInWideAngleCamera*/ /*.builtInUltraWideCamera*/
+    public var cameraTypes: [AVCaptureDevice.DeviceType] = []
     
     
-    var flashModes: [AVCaptureDevice.FlashMode] = []
-    var flashMode: AVCaptureDevice.FlashMode = .auto
-    var flashSupported: Bool {
+    public var flashModes: [AVCaptureDevice.FlashMode] = []
+    public var flashMode: AVCaptureDevice.FlashMode = .auto
+    public var flashSupported: Bool {
         !flashModes.isEmpty
     }
     
     
-    var torchSupported = false
-    var torchMode: AVCaptureDevice.TorchMode = .auto
+    public var torchSupported = false
+    public var torchMode: AVCaptureDevice.TorchMode = .auto
     
-    var focusEnabled = false
-    var focusPoint = CGPoint()
+    public var focusEnabled = false
+    public var focusPoint = CGPoint()
     
-    var zoomFactor: CGFloat = 1.0
-    var zoomRange: ClosedRange<CGFloat> = 0...1
-    var zoomRelativeFactors: [CGFloat] = []
-    var zoomMainFactor: CGFloat = 2
+    public var zoomFactor: CGFloat = 1.0
+    public var zoomRange: ClosedRange<CGFloat> = 0...1
+    public var zoomRelativeFactors: [CGFloat] = []
+    public var zoomMainFactor: CGFloat = 2
     
-    var livephoto: Bool = false
-    var livephotoSupported: Bool = false
+    public var livephoto: Bool = false
+    public var livephotoSupported: Bool = false
     
-    var hdr: TnTripleState = .auto
-    var hdrSupported = false
+    public var hdr: TnTripleState = .auto
+    public var hdrSupported = false
     
     
-    var exposureSupported = false
-    var exposureModes: [AVCaptureDevice.ExposureMode] = []
-    var exposureMode: AVCaptureDevice.ExposureMode = .locked
+    public var exposureSupported = false
+    public var exposureModes: [AVCaptureDevice.ExposureMode] = []
+    public var exposureMode: AVCaptureDevice.ExposureMode = .locked
     
-    var isoSupported = false
-    var iso: Float = 0
-    var isoRange: ClosedRange<Float> = 0...0
+    public var isoSupported = false
+    public var iso: Float = 0
+    public var isoRange: ClosedRange<Float> = 0...0
     
-    var exposureDuration: Double = .zero
-    var exposureDurationRange: ClosedRange<Double> = .zero ... .zero
+    public var exposureDuration: Double = .zero
+    public var exposureDurationRange: ClosedRange<Double> = .zero ... .zero
     
-    var depthSupported = false
-    var depth = false
+    public var depthSupported = false
+    public var depth = false
     
-    var portraitSupported = false
-    var portrait = false
+    public var portraitSupported = false
+    public var portrait = false
     
-    var quality: AVCapturePhotoOutput.QualityPrioritization = .quality
+    public var quality: AVCapturePhotoOutput.QualityPrioritization = .quality
     
-    var focusMode: AVCaptureDevice.FocusMode = .autoFocus
-    var focusModes: [AVCaptureDevice.FocusMode] = []
+    public var focusMode: AVCaptureDevice.FocusMode = .autoFocus
+    public var focusModes: [AVCaptureDevice.FocusMode] = []
     
-    var wideColor = true
+    public var wideColor = true
 }
 
