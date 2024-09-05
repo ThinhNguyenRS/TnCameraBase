@@ -13,7 +13,7 @@ import UIKit
 import TnIosPackage
 
 public class TnCameraLocal: NSObject, ObservableObject, TnLoggable {
-    static let shared = TnCameraLocal()
+    public static let shared = TnCameraLocal()
     private override init() {
     }
     public let LOG_NAME = "CameraLocal"
