@@ -28,7 +28,7 @@ public class TnCameraProxyServer: TnLoggable {
         }
     }
     
-    public var bleDelegate: TnBluetoothClientDelegate? {
+    public var bleDelegate: TnBluetoothServerDelegate? {
         get {
             ble.delegate
         }
