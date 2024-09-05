@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum TnCameraSettingsViewType: Int {
+public enum TnCameraSettingsViewType: Int {
     case none
     case main
     case flash
@@ -27,7 +27,7 @@ enum TnCameraSettingsViewType: Int {
 }
 
 extension TnCameraSettingsViewType: Comparable {
-    static func < (lhs: TnCameraSettingsViewType, rhs: TnCameraSettingsViewType) -> Bool {
+    public static func < (lhs: TnCameraSettingsViewType, rhs: TnCameraSettingsViewType) -> Bool {
         lhs.rawValue < rhs.rawValue
     }
 }

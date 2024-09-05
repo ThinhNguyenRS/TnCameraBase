@@ -18,12 +18,12 @@ public protocol TnCameraViewModelDelegate {
 
 public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {
     public let LOG_NAME = "CameraViewModel"
-    @Published var status: TnCameraStatus = .none
-    @Published var settings: TnCameraSettings = .init()
-    @Published var settingsType: TnCameraSettingsViewType = .none
+    @Published public var status: TnCameraStatus = .none
+    @Published public var settings: TnCameraSettings = .init()
+    @Published public var settingsType: TnCameraSettingsViewType = .none
 
-    @Published var orientation: UIDeviceOrientation = .unknown
-    @Published var orientationAngle: Angle = .zero
+    @Published public var orientation: UIDeviceOrientation = .unknown
+    @Published public var orientationAngle: Angle = .zero
     
     private var cancelables: Set<AnyCancellable> = []
     
