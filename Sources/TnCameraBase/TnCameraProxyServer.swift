@@ -68,7 +68,7 @@ extension TnCameraProxyServer {
         }
     }
     
-    func sendImage() {
+    public func sendImage() {
 //        send(MsgGetImageResponse(ciImage: cameraManager.currentCiImage, scale: 0.25, compressionQuality: 0.5))
         send(TnCameraMessageImageResponse(ciImage: cameraManager.currentCiImage, scale: 1, compressionQuality: 0.75))
     }
