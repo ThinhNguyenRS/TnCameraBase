@@ -19,6 +19,9 @@ public enum CameraStatus: Int, Comparable, Codable {
 }
 
 public struct TnCameraSettings: Codable {
+    public init() {
+    }
+    
     public var presets: [AVCaptureSession.Preset] = [.photo, .hd4K3840x2160]
     public var preset: AVCaptureSession.Preset = .hd4K3840x2160
     public var cameraPosition: AVCaptureDevice.Position = .back
