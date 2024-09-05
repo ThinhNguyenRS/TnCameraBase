@@ -16,10 +16,16 @@ import TnIosPackage
 public protocol TnCameraProtocol {
     var currentCiImagePublisher: Published<CIImage?>.Publisher {get}
     var currentCiImage: CIImage? {get}
-    var settingsPublisher: Published<TnCameraSettings>.Publisher {get}
-    var statusPublisher: Published<CameraStatus>.Publisher {get}
     
+    var settingsPublisher: Published<TnCameraSettings>.Publisher {get}
+    var settings: TnCameraSettings {get}
+
+    var statusPublisher: Published<CameraStatus>.Publisher {get}
+    var status: CameraStatus {get}
+
     func toggleCapturing(completion: (() -> Void)?)
+    func startCapturing(completion: (() -> Void)?)
+    func stopCapturing(completion: (() -> Void)?)
     func switchCamera(completion: (() -> Void)?)
 
     func captureImage(completion: @escaping (UIImage) -> Void)
