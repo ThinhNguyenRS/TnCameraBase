@@ -18,7 +18,7 @@ public class TnCameraProxyClient: NSObject, ObservableObject, TnLoggable {
 
     @Published public private(set) var currentCiImage: CIImage?
     @Published public private(set) var settings: TnCameraSettings = .init()
-    @Published public private(set) var status: CameraStatus = .none
+    @Published public private(set) var status: TnCameraStatus = .none
     
     private let ble: TnBluetoothClient
     private var network: TnNetworkConnection?
@@ -53,7 +53,7 @@ extension TnCameraProxyClient: TnCameraProxyProtocol {
         $settings
     }
     
-    public var statusPublisher: Published<CameraStatus>.Publisher {
+    public var statusPublisher: Published<TnCameraStatus>.Publisher {
         $status
     }
     

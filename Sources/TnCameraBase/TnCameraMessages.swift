@@ -76,12 +76,12 @@ public struct TnCameraMessageSettingsResponse: TnCameraMessageProtocol {
     public var messageType: TnCameraMessageType {.getSettingsResponse}
 
     public let settings: TnCameraSettings
-    public let status: CameraStatus
+    public let status: TnCameraStatus
 
     public let ipHost: String?
     public let ipPort: UInt16?
 
-    public init(settings: TnCameraSettings, status: CameraStatus, network: TnNetwork? = nil) {
+    public init(settings: TnCameraSettings, status: TnCameraStatus, network: TnNetwork? = nil) {
         self.settings = settings
         self.status = status
         self.ipHost = network?.host

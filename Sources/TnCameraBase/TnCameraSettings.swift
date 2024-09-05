@@ -10,14 +10,15 @@ import AVFoundation
 import UIKit
 import TnIosPackage
 
-// MARK: CameraStatus
-public enum CameraStatus: Int, Comparable, Codable {
+// MARK: TnCameraStatus
+public enum TnCameraStatus: Int, Comparable, Codable {
     case none
     case failed
     case inited
     case started
 }
 
+// MARK: TnCameraSettings
 public struct TnCameraSettings: Codable {
     public init() {
     }

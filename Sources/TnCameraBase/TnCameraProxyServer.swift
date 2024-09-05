@@ -157,11 +157,11 @@ extension TnCameraProxyServer: TnCameraProxyProtocol {
         cameraManager.settings
     }
     
-    public var statusPublisher: Published<CameraStatus>.Publisher {
+    public var statusPublisher: Published<TnCameraStatus>.Publisher {
         cameraManager.statusPublisher
     }
     
-    public var status: CameraStatus {
+    public var status: TnCameraStatus {
         cameraManager.status
     }
     public func startCapturing(completion: (() -> Void)?) {

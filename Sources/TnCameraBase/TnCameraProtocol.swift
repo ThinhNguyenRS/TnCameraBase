@@ -20,8 +20,8 @@ public protocol TnCameraProtocol {
     var settingsPublisher: Published<TnCameraSettings>.Publisher {get}
     var settings: TnCameraSettings {get}
 
-    var statusPublisher: Published<CameraStatus>.Publisher {get}
-    var status: CameraStatus {get}
+    var statusPublisher: Published<TnCameraStatus>.Publisher {get}
+    var status: TnCameraStatus {get}
 
     func toggleCapturing(completion: (() -> Void)?)
     func startCapturing(completion: (() -> Void)?)
