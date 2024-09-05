@@ -11,7 +11,6 @@ import CoreImage
 import Combine
 import AVFoundation
 import TnIosPackage
-import TnCameraBase
 
 // MARK: TnCameraProtocol
 public protocol TnCameraProtocol {
