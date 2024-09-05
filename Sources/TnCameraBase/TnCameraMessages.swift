@@ -75,13 +75,13 @@ public struct TnCameraMessageValue<T: Codable>: TnCameraMessageProtocol {
 public struct TnCameraMessageSettingsResponse: TnCameraMessageProtocol {
     public var messageType: TnCameraMessageType {.getSettingsResponse}
 
-    let settings: TnCameraSettings
-    let status: CameraStatus
+    public let settings: TnCameraSettings
+    public let status: CameraStatus
 
-    let ipHost: String?
-    let ipPort: UInt16?
+    public let ipHost: String?
+    public let ipPort: UInt16?
 
-    init(settings: TnCameraSettings, status: CameraStatus, network: TnNetwork? = nil) {
+    public init(settings: TnCameraSettings, status: CameraStatus, network: TnNetwork? = nil) {
         self.settings = settings
         self.status = status
         self.ipHost = network?.host
@@ -91,25 +91,25 @@ public struct TnCameraMessageSettingsResponse: TnCameraMessageProtocol {
 
 public struct TnCameraMessageImageResponse: TnCameraMessageProtocol {
     public var messageType: TnCameraMessageType {.getImageResponse}
-    let jpegData: Data?
+    public let jpegData: Data?
     
-    init(jpegData: Data) {
+    public init(jpegData: Data) {
         self.jpegData = jpegData
     }
     
-    init(uiImage: UIImage?, scale: CGFloat, compressionQuality: CGFloat) {
+    public init(uiImage: UIImage?, scale: CGFloat, compressionQuality: CGFloat) {
         jpegData = uiImage?.jpegData(scale: scale, compressionQuality: compressionQuality)
     }
     
-    init(ciImage: CIImage?, scale: CGFloat, compressionQuality: CGFloat) {
+    public init(ciImage: CIImage?, scale: CGFloat, compressionQuality: CGFloat) {
         jpegData = ciImage?.jpegData(scale: scale, compressionQuality: compressionQuality)
     }
 }
 
 public struct TnCameraMessageSetZoomFactorRequest: TnCameraMessageProtocol {
     public var messageType: TnCameraMessageType {.setZoomFactor}
-    let value: CGFloat
-    let adjust: Bool
-    let withRate: Float
+    public let value: CGFloat
+    public let adjust: Bool
+    public let withRate: Float
 }
 
