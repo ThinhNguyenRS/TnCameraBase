@@ -16,8 +16,6 @@ public struct TnCameraToolbarMiscView<TCameraManager: TnCameraProtocol>: View, T
     public var body: some View {
         Group {
             switch cameraModel.toolbarType {
-            case .main:
-                TnCameraSettingsToolbarMainView(cameraManager: cameraManager)
             case .zoom:
                 zoomView                
             case .misc:
@@ -26,7 +24,9 @@ public struct TnCameraToolbarMiscView<TCameraManager: TnCameraProtocol>: View, T
                 EmptyView()
             }
         }
-        .cornerRadius(24)
+        .padding(.all, 12)
+        .background(Color.appleAsparagus.opacity(0.75))
+        .cornerRadius(8)
     }
 }
 
@@ -62,7 +62,8 @@ extension TnCameraToolbarMiscView {
                         cameraManager.setZoomFactor(cameraModel.settings.zoomFactor + step, withRate: 1, completion: nil)
                     }
                 }
-            }
+            },
+            closeable: false
         )
     }
             

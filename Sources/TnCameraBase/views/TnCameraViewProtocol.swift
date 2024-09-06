@@ -70,7 +70,11 @@ extension TnCameraViewProtocol {
     public func getSettingsButton(type: TnCameraToolbarViewType, text: String) -> some View {
         circleButtonRotation(text: text) {
             withAnimation {
-                cameraModel.toolbarType = type
+                if cameraModel.toolbarType != type {
+                    cameraModel.toolbarType = type
+                } else {
+                    cameraModel.toolbarType = .none
+                }
             }
         }
     }
@@ -78,7 +82,11 @@ extension TnCameraViewProtocol {
     public func getSettingsButton(type: TnCameraToolbarViewType, imageName: String) -> some View {
         circleButtonRotation(imageName: imageName) {
             withAnimation {
-                cameraModel.toolbarType = type
+                if cameraModel.toolbarType != type {
+                    cameraModel.toolbarType = type
+                } else {
+                    cameraModel.toolbarType = .none
+                }
             }
         }
     }

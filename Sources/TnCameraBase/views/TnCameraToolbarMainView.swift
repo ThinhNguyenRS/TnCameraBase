@@ -19,13 +19,13 @@ public struct TnCameraToolbarMainView<TBottom: View, TCameraManager: TnCameraPro
 
     public var body: some View {
         HStack {
-            if let capturedImage = self.capturedImage {
-                Image(uiImage: capturedImage)
-                    .tnMakeScalable()
-                    .frame(width: 80, height: 80)
-            }
-            
             if cameraModel.status == .started {
+                if let capturedImage = self.capturedImage {
+                    Image(uiImage: capturedImage)
+                        .tnMakeScalable()
+                        .frame(width: 80, height: 80)
+                }
+
                 Spacer()
                 circleButtonRotation(imageName: cameraModel.settings.cameraPosition.imageName) {
                     cameraManager.switchCamera()
@@ -51,9 +51,10 @@ public struct TnCameraToolbarMainView<TBottom: View, TCameraManager: TnCameraPro
 
                 // settings
                 Spacer()
-                circleButtonRotation(imageName: "gear", radius: 50) {
-                    cameraModel.toolbarType = cameraModel.toolbarType == .misc ? .none : .misc
-                }
+                getSettingsButton(type: .misc, imageName: "ellipsis")
+//                circleButtonRotation(imageName: "gear", radius: 50) {
+//                    cameraModel.toolbarType = cameraModel.toolbarType == .misc ? .none : .misc
+//                }
 
                 Spacer()
             }
