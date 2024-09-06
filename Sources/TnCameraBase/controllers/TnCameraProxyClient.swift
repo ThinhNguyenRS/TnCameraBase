@@ -14,7 +14,7 @@ import CoreImage
 import TnIosBase
 
 public class TnCameraProxyClient: NSObject, ObservableObject, TnLoggable {
-    public let LOG_NAME = "CameraBluetoothClient"
+    public let LOG_NAME = "TnCameraProxyClient"
 
     @Published public private(set) var currentCiImage: CIImage?
     @Published public private(set) var settings: TnCameraSettings = .init()
@@ -164,7 +164,7 @@ extension TnCameraProxyClient {
     func solveData(data: Data) {
         let receivedMsg = TnMessage(data: data)
         let messageType: TnCameraMessageType = .init(rawValue: receivedMsg.typeCode)!
-        TnLogger.debug(LOG_NAME, "receive", messageType)
+        logDebug("receive", messageType)
         
         switch messageType {
         case .getSettingsResponse:
@@ -182,7 +182,7 @@ extension TnCameraProxyClient {
         case .getImageResponse:
             solveMsg(receivedMsg) { (msg: TnCameraMessageImageResponse) in
                 let uiImage: UIImage = .init(data: msg.jpegData!)!
-                TnLogger.debug(LOG_NAME, "image", uiImage.size.width, uiImage.size.height)
+                logDebug("image", uiImage.size.width, uiImage.size.height)
 
                 let ciImage = CIImage(image: uiImage)!
                 self.currentCiImage = ciImage

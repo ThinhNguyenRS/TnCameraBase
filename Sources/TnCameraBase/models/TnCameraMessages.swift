@@ -43,6 +43,7 @@ public enum TnCameraMessageType: UInt8, Codable {
     case captureImage
 }
 
+// MARK: TnCameraMessageProtocol
 public protocol TnCameraMessageProtocol: TnMessageProtocol {
     var messageType: TnCameraMessageType { get }
 }
@@ -53,6 +54,7 @@ extension TnCameraMessageProtocol {
     }
 }
 
+// MARK: TnCameraMessage
 public struct TnCameraMessage: TnCameraMessageProtocol {
     public let messageType: TnCameraMessageType
     

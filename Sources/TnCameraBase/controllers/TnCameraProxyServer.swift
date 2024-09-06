@@ -13,7 +13,7 @@ import CoreImage
 import TnIosBase
 
 public class TnCameraProxyServer: TnLoggable {
-    public let LOG_NAME = "CameraBluetoothServer"
+    public let LOG_NAME = "TnCameraProxyServer"
 
     private let cameraManager: TnCameraProtocol
     private var network: TnNetworkServer?
@@ -76,23 +76,23 @@ extension TnCameraProxyServer {
     func solveData(data: Data) {
         let receivedMsg = data.toMessage()
         let messageType: TnCameraMessageType = .init(rawValue: receivedMsg.typeCode)!
-        TnLogger.debug(LOG_NAME, "receive", messageType)
+        logDebug("receive", messageType)
 
         switch messageType {
         case .toggleCapturing:
             cameraManager.toggleCapturing { [self] in
-                send(TnCameraMessageSettingsResponse(settings: cameraManager.settings, status: cameraManager.status))
+//                send(TnCameraMessageSettingsResponse(settings: cameraManager.settings, status: cameraManager.status))
             }
 
         case .switchCamera:
             cameraManager.switchCamera { [self] in
-                send(TnCameraMessageSettingsResponse(settings: cameraManager.settings, status: cameraManager.status))
+//                send(TnCameraMessageSettingsResponse(settings: cameraManager.settings, status: cameraManager.status))
             }
             
         case .captureImage:
             cameraManager.captureImage(completion: { [self] uiImage in
-                TnLogger.debug(LOG_NAME, "captured image", uiImage.size.width, uiImage.size.height)
-                send(TnCameraMessageImageResponse(uiImage: uiImage, scale: 0.9, compressionQuality: 0.9))
+                logDebug("captured image", uiImage.size.width, uiImage.size.height)
+//                send(TnCameraMessageImageResponse(uiImage: uiImage, scale: 0.9, compressionQuality: 0.9))
             })
 
         case .getSettings:
@@ -105,7 +105,7 @@ extension TnCameraProxyServer {
         case .setZoomFactor:
             let msg: TnCameraMessageSetZoomFactorRequest = receivedMsg.toObject()!
             cameraManager.setZoomFactor(msg.value, adjust: msg.adjust, withRate: msg.withRate) { [self] in
-                send(TnCameraMessageSettingsResponse(settings: cameraManager.settings, status: cameraManager.status))
+//                send(TnCameraMessageSettingsResponse(settings: cameraManager.settings, status: cameraManager.status))
             }
             
         case .setLivephoto:
