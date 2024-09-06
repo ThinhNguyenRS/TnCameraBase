@@ -7,7 +7,7 @@
 
 import Foundation
 import AVFoundation
-import TnIosPackage
+import TnIosBase
 
 extension AVCaptureConnection {
 //    func setRotationAngle(_ v: CGFloat) {

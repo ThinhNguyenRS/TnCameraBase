@@ -1,5 +1,5 @@
 {
-  "originHash" : "b34f0b0e884cb20e56b4c44d26a41dce9cb55a6f7c5684d834590cc7b1efe860",
+  "originHash" : "ec61695d7cc413cb7d2523f7ab5041c3b0980d84e1096352900b69c17ea45815",
   "pins" : [
     {
       "identity" : "tniosbase",
@@ -7,7 +7,7 @@
       "location" : "https://github.com/ThinhNguyenRS/TnIosBase",
       "state" : {
         "branch" : "main",
-        "revision" : "298af63ff86b537e6c99653ff800f5f70366bbe0"
+        "revision" : "38f3bd11140c33e088ca34294ad635a862bc7ccf"
       }
     }
   ],

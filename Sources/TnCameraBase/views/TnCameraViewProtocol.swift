@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import TnIosPackage
+import TnIosBase
 
 // MARK: camera views based
 public protocol TnCameraViewProtocol {

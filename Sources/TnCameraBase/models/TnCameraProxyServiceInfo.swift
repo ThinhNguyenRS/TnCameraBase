@@ -7,7 +7,7 @@
 
 import Foundation
 import CoreBluetooth
-import TnIosPackage
+import TnIosBase
 
 public struct TnCameraProxyServiceInfo {
     private init() {}

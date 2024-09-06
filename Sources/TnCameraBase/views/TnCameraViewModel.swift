@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import Combine
 import AVFAudio
-import TnIosPackage
+import TnIosBase
 
 public protocol TnCameraViewModelDelegate {
     func onChanged(settings: TnCameraSettings, status: TnCameraStatus)

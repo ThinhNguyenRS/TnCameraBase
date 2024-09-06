@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import AVFoundation
 import Photos
-import TnIosPackage
+import TnIosBase
 
 public class TnCameraCaptureDelegate: NSObject, AVCapturePhotoCaptureDelegate, TnLoggable {
     public let LOG_NAME = "CameraCaptureDelegate"

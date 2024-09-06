@@ -10,7 +10,7 @@ import AVFoundation
 import CoreImage
 import Combine
 import UIKit
-import TnIosPackage
+import TnIosBase
 
 public class TnCameraLocal: NSObject, ObservableObject, TnLoggable {
     public static let shared = TnCameraLocal()

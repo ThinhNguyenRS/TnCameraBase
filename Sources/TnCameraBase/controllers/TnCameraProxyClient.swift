@@ -11,7 +11,7 @@ import Combine
 import CoreBluetooth
 import AVFoundation
 import CoreImage
-import TnIosPackage
+import TnIosBase
 
 public class TnCameraProxyClient: NSObject, ObservableObject, TnLoggable {
     public let LOG_NAME = "CameraBluetoothClient"

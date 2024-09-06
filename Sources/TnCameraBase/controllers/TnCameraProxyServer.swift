@@ -10,7 +10,7 @@ import SwiftUI
 import Combine
 import AVFoundation
 import CoreImage
-import TnIosPackage
+import TnIosBase
 
 public class TnCameraProxyServer: TnLoggable {
     public let LOG_NAME = "CameraBluetoothServer"

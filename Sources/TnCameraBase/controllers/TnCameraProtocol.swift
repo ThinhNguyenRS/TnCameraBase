@@ -10,7 +10,7 @@ import SwiftUI
 import CoreImage
 import Combine
 import AVFoundation
-import TnIosPackage
+import TnIosBase
 
 // MARK: TnCameraProtocol
 public protocol TnCameraProtocol {

@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import TnIosPackage
+import TnIosBase
 
 public struct TnCameraSettingsViewEnum<TValue: TnEnum, TStyle: PickerStyle, TTopView: View, TBottomView: View>: View, TnCameraViewProtocol {
     @EnvironmentObject public var cameraModel: TnCameraViewModel

@@ -7,7 +7,7 @@
 
 import Foundation
 import SwiftUI
-import TnIosPackage
+import TnIosBase
 
 public struct TnCameraToolbarMiscView<TCameraManager: TnCameraProtocol>: View, TnCameraViewProtocol {
     @EnvironmentObject public var cameraModel: TnCameraViewModel

@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import TnIosPackage
+import TnIosBase
 
 public struct TnCameraSettingsViewSlider<TValue, TTopView: View, TBottomView: View>: View, TnCameraViewProtocol where TValue : BinaryFloatingPoint & CVarArg, TValue.Stride: BinaryFloatingPoint {
     @EnvironmentObject public var cameraModel: TnCameraViewModel

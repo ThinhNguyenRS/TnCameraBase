@@ -9,7 +9,7 @@ import Foundation
 import MetalKit
 import SwiftUI
 import Combine
-import TnIosPackage
+import TnIosBase
 
 public struct TnCameraPreviewViewMetal: UIViewRepresentable {
     public class InternalView: MTKView {

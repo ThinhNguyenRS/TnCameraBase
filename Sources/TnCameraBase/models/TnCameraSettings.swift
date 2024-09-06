@@ -8,7 +8,7 @@
 import Foundation
 import AVFoundation
 import UIKit
-import TnIosPackage
+import TnIosBase
 
 // MARK: TnCameraStatus
 public enum TnCameraStatus: Int, Comparable, Codable {

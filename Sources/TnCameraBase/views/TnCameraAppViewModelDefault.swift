@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import TnIosPackage
+import TnIosBase
 
 open class TnCameraAppViewModelDefault<TCameraManager: TnCameraProxyProtocol>: NSObject, ObservableObject, TnCameraAppViewModelProtocol, TnLoggable {
     public let LOG_NAME = "AppViewModelDefault"

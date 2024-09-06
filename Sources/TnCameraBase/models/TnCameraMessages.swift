@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import CoreImage
 import AVFoundation
-import TnIosPackage
+import TnIosBase
 
 public enum TnCameraMessageType: UInt8, Codable {
     case getSettings
