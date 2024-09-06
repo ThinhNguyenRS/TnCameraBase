@@ -32,7 +32,7 @@ public struct TnCameraSettingsViewEnum<TValue: TnEnum, TStyle: PickerStyle, TTop
                     if closeable {
                         circleButton(imageName: "xmark", radius: 40) {
                             withAnimation {
-                                cameraModel.settingsType = .main
+                                cameraModel.toolbarType = .main
                             }
                         }
                     }
@@ -54,7 +54,7 @@ public struct TnCameraSettingsViewEnum<TValue: TnEnum, TStyle: PickerStyle, TTop
 
         }
         .onAppear {
-            TnLogger.debug("CameraSettingsEnumView", "init", cameraModel.settingsType, value.description)
+            TnLogger.debug("CameraSettingsEnumView", "init", cameraModel.toolbarType, value.description)
         }
         .onChange(of: value, perform: { v in
             self.onChanged?(value)

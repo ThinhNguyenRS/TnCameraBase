@@ -9,13 +9,13 @@ import Foundation
 import SwiftUI
 import TnIosPackage
 
-public struct TnCameraSettingsToolbarVariantView<TCameraManager: TnCameraProtocol>: View, TnCameraViewProtocol {
+public struct TnCameraToolbarMiscView<TCameraManager: TnCameraProtocol>: View, TnCameraViewProtocol {
     @EnvironmentObject public var cameraModel: TnCameraViewModel
     let cameraManager: TCameraManager
 
     public var body: some View {
         Group {
-            switch cameraModel.settingsType {
+            switch cameraModel.toolbarType {
             case .main:
                 TnCameraSettingsToolbarMainView(cameraManager: cameraManager)
             case .zoom:
@@ -30,7 +30,7 @@ public struct TnCameraSettingsToolbarVariantView<TCameraManager: TnCameraProtoco
     }
 }
 
-extension TnCameraSettingsToolbarVariantView {
+extension TnCameraToolbarMiscView {
     var zoomView: some View {
         let step = 0.1/2
         return getSliderView(

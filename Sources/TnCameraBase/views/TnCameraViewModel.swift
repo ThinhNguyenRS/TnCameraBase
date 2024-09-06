@@ -20,14 +20,18 @@ public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {
     public let LOG_NAME = "CameraViewModel"
     @Published public var status: TnCameraStatus = .none
     @Published public var settings: TnCameraSettings = .init()
-    @Published public var settingsType: TnCameraSettingsViewType = .none
+    @Published public var toolbarType: TnCameraToolbarViewType = .none
 
     @Published public var orientation: UIDeviceOrientation = .unknown
     @Published public var orientationAngle: Angle = .zero
     
     private var cancelables: Set<AnyCancellable> = []
-    
     public var delegate: TnCameraViewModelDelegate? = nil
+    
+    public override init() {
+        super.init()
+        logDebug("inited")
+    }
     
     public func listen(manager: TnCameraProtocol, withOrientation: Bool = true) {
         let motionOrientation: DeviceMotionOrientationListener = .shared

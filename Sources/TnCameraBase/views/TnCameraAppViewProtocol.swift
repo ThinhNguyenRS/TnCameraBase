@@ -48,7 +48,11 @@ extension TnCameraAppViewProtocol {
                 // bottom toolbar
                 if showToolbar.wrappedValue {
                     VStack(alignment: .leading) {
-                        TnCameraToolbarView(cameraManager: cameraManager, bottom: bottom)
+                        Spacer()
+                        if cameraModel.status == .started {
+                            TnCameraToolbarMiscView(cameraManager: cameraManager)
+                        }
+                        TnCameraToolbarMainView(cameraManager: cameraManager, bottom: bottom)
                     }
                 }
             }

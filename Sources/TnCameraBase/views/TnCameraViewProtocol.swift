@@ -14,15 +14,6 @@ public protocol TnCameraViewProtocol {
 }
 
 extension TnCameraViewProtocol {
-//    var cameraManager: CameraManagerProtocol {
-//        CameraManagerServer.shared
-//    }
-//    var motionOrientation: DeviceMotionOrientationListener {
-//        DeviceMotionOrientationListener.shared
-//    }
-}
-
-extension TnCameraViewProtocol {
     var orientation: UIDeviceOrientation {
         cameraModel.orientation
     }
@@ -76,18 +67,18 @@ extension TnCameraViewProtocol {
         }
     }
     
-    public func getSettingsButton(type: TnCameraSettingsViewType, text: String) -> some View {
+    public func getSettingsButton(type: TnCameraToolbarViewType, text: String) -> some View {
         circleButtonRotation(text: text) {
             withAnimation {
-                cameraModel.settingsType = type
+                cameraModel.toolbarType = type
             }
         }
     }
     
-    public func getSettingsButton(type: TnCameraSettingsViewType, imageName: String) -> some View {
+    public func getSettingsButton(type: TnCameraToolbarViewType, imageName: String) -> some View {
         circleButtonRotation(imageName: imageName) {
             withAnimation {
-                cameraModel.settingsType = type
+                cameraModel.toolbarType = type
             }
         }
     }

@@ -52,14 +52,11 @@ public struct TnCameraToolbarMainView<TBottom: View, TCameraManager: TnCameraPro
                 // settings
                 Spacer()
                 circleButtonRotation(imageName: "gear", radius: 50) {
-                    cameraModel.settingsType = cameraModel.settingsType == .misc ? .none : .misc
+                    cameraModel.toolbarType = cameraModel.toolbarType == .misc ? .none : .misc
                 }
 
                 Spacer()
             }
-        }
-        .onAppear {
-//            cameraManager.toggleCapturing()
         }
     }
 }

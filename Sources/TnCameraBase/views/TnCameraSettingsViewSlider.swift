@@ -36,7 +36,7 @@ public struct TnCameraSettingsViewSlider<TValue, TTopView: View, TBottomView: Vi
                     if closeable {
                         circleButton(imageName: "xmark", radius: 40) {
                             withAnimation {
-                                cameraModel.settingsType = .main
+                                cameraModel.toolbarType = .main
                             }
                         }
                     }
