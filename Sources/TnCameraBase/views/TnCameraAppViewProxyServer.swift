@@ -7,7 +7,6 @@
 
 import Foundation
 import SwiftUI
-import TnCameraBase
 
 public struct TnCameraAppViewProxyServer: TnCameraAppViewProtocol {
     public typealias TAppViewModel = TnCameraAppViewProxyServerModel
@@ -17,4 +16,10 @@ public struct TnCameraAppViewProxyServer: TnCameraAppViewProtocol {
         nil as EmptyView?
     }
     public var showToolbar: State<Bool> = .init(initialValue: true)
+}
+
+extension TnCameraAppViewProxyServer {
+    public static func getView(cameraManager: TnCameraProxyServer, cameraModel: TnCameraViewModel) -> Self {
+        Self.init(appModel: TnCameraAppViewProxyServerModel(cameraManager: cameraManager, cameraModel: cameraModel))
+    }
 }
