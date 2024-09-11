@@ -22,7 +22,7 @@ public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {
     @Published public var status: TnCameraStatus = .none
     @Published public var settings: TnCameraSettings = .init()
     @Published public var toolbarType: TnCameraToolbarViewType = .none
-    @Published var capturedImage: UIImage? = nil
+    @Published public var capturedImage: UIImage? = nil
 
     @Published public var orientation: UIDeviceOrientation = .unknown
     @Published public var orientationAngle: Angle = .zero
