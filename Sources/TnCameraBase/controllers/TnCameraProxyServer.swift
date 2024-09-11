@@ -185,8 +185,8 @@ extension TnCameraProxyServer: TnCameraProxyProtocol {
         cameraManager.switchCamera(completion: completion)
     }
     
-    public func captureImage(completion: ((UIImage) -> Void)?) {
-        cameraManager.captureImage(completion: completion)
+    public func captureImage() {
+        cameraManager.captureImage()
     }
     
     public func setLivephoto(_ v: Bool) {

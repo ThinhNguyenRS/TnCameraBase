@@ -12,7 +12,7 @@ public class TnCameraAppViewProxyClientModel: TnCameraAppViewModelDefault<TnCame
     }
     
     public func onVolumeButton() {
-        cameraManager.captureImage(completion: { uiImage in })
+        cameraManager.captureImage()
     }
     
     public override func setup() {

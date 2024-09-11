@@ -10,7 +10,7 @@ import SwiftUI
 
 public class TnCameraAppViewProxyServerModel: TnCameraAppViewModelDefault<TnCameraProxyServer>, TnCameraViewModelDelegate {
     public func onVolumeButton() {
-        cameraManager.captureImage(completion: { uiImage in })
+        cameraManager.captureImage()
     }
     
     public func onChanged(settings: TnCameraSettings, status: TnCameraStatus) {

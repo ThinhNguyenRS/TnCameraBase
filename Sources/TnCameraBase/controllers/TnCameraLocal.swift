@@ -572,11 +572,7 @@ extension TnCameraLocal {
 
 // MARK: captureImage
 extension TnCameraLocal {
-    public func captureImage(completion: ((UIImage) -> Void)?) {
-        if completion != nil {
-            self.captureImageCompletion = completion
-        }
-        
+    public func captureImage() {
         sessionAsync { me in
             me.getDevice { device in
                 var p: AVCapturePhotoSettings!
