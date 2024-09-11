@@ -79,5 +79,8 @@ public struct TnCameraSettings: Codable {
     public var focusModes: [AVCaptureDevice.FocusMode] = []
     
     public var wideColor = true
+    
+    public var imageScale = 0.75
+    public var imageCompressQuality = 0.75
 }
 

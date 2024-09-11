@@ -73,10 +73,7 @@ public struct TnCameraMessageValue<T: Codable>: TnCameraMessageProtocol {
     }
 }
 
-
-public struct TnCameraMessageSettingsResponse: TnCameraMessageProtocol {
-    public var messageType: TnCameraMessageType {.getSettingsResponse}
-
+public struct TnCameraGetSettingsValue: Codable {
     public let settings: TnCameraSettings
     public let status: TnCameraStatus
 
@@ -91,25 +88,7 @@ public struct TnCameraMessageSettingsResponse: TnCameraMessageProtocol {
     }
 }
 
-public struct TnCameraMessageImageResponse: TnCameraMessageProtocol {
-    public var messageType: TnCameraMessageType {.getImageResponse}
-    public let jpegData: Data?
-    
-    public init(jpegData: Data) {
-        self.jpegData = jpegData
-    }
-    
-    public init(uiImage: UIImage?, scale: CGFloat, compressionQuality: CGFloat) {
-        jpegData = uiImage?.jpegData(scale: scale, compressionQuality: compressionQuality)
-    }
-    
-    public init(ciImage: CIImage?, scale: CGFloat, compressionQuality: CGFloat) {
-        jpegData = ciImage?.jpegData(scale: scale, compressionQuality: compressionQuality)
-    }
-}
-
-public struct TnCameraMessageSetZoomFactorRequest: TnCameraMessageProtocol {
-    public var messageType: TnCameraMessageType {.setZoomFactor}
+public struct TnCameraSetZoomFactorValue: Codable {
     public let value: CGFloat
     public let adjust: Bool
     public let withRate: Float
@@ -120,4 +99,3 @@ public struct TnCameraMessageSetZoomFactorRequest: TnCameraMessageProtocol {
         self.withRate = withRate
     }
 }
-

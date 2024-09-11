@@ -79,8 +79,9 @@ extension TnCameraProxyServer {
     }
     
     public func sendImage() {
-//        send(MsgGetImageResponse(ciImage: cameraManager.currentCiImage, scale: 0.25, compressionQuality: 0.5))
-        send(TnCameraMessageImageResponse(ciImage: cameraManager.currentCiImage, scale: 1, compressionQuality: 0.75))
+        if let currentCiImage = cameraManager.currentCiImage {
+            send(.getImageResponse, currentCiImage.jpegData(scale: settings.imageScale, compressionQuality: settings.imageCompressQuality))
+        }
     }
     
     func solveData(data: Data) {
@@ -98,21 +99,18 @@ extension TnCameraProxyServer {
             }
             
         case .captureImage:
-            captureImage(completion: { _ in
-                
-            })
+            captureImage()
 
         case .getSettings:
             // response settings
-            send(TnCameraMessageSettingsResponse(settings: cameraManager.settings, status: cameraManager.status, network: network), useBle: true)
+            send(.getSettingsResponse, TnCameraGetSettingsValue(settings: cameraManager.settings, status: cameraManager.status, network: network), useBle: true)
 
         case .getImage:
             sendImage()
             
         case .setZoomFactor:
-            let msg: TnCameraMessageSetZoomFactorRequest = receivedMsg.toObject()!
-            setZoomFactor(msg.value, adjust: msg.adjust, withRate: msg.withRate) {
-//                send(TnCameraMessageSettingsResponse(settings: cameraManager.settings, status: cameraManager.status))
+            let zoomValue: TnCameraSetZoomFactorValue = getMessageValue(receivedMsg)
+            setZoomFactor(zoomValue.value, adjust: zoomValue.adjust, withRate: zoomValue.withRate) {
             }
             
         case .setLivephoto:

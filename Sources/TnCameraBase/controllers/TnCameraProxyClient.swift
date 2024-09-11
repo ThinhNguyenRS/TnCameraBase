@@ -103,7 +103,7 @@ extension TnCameraProxyClient: TnCameraProxyProtocol {
     }
     
     public func setZoomFactor(_ newValue: CGFloat, adjust: Bool = false, withRate: Float = 2, completion: (() -> Void)? = nil) {
-        send(TnCameraMessageSetZoomFactorRequest(value: newValue, adjust: adjust, withRate: withRate))
+        send(.setZoomFactor, TnCameraSetZoomFactorValue(value: newValue, adjust: adjust, withRate: withRate))
     }
     
     public func setDepth(_ v: Bool) {
@@ -155,12 +155,6 @@ extension TnCameraProxyClient {
         }
     }
     
-    private func solveMsg<TMessage: Codable>(_ receivedMsg: TnMessage, handler: (TMessage) -> Void) {
-        if let msg: TMessage = receivedMsg.toObject() {
-            handler(msg)
-        }
-    }
-    
     func solveData(data: Data) {
         let receivedMsg = TnMessage(data: data)
         let messageType: TnCameraMessageType = .init(rawValue: receivedMsg.typeCode)!
@@ -168,25 +162,23 @@ extension TnCameraProxyClient {
         
         switch messageType {
         case .getSettingsResponse:
-            solveMsg(receivedMsg) { (msg: TnCameraMessageSettingsResponse) in
-                self.status = msg.status
-                self.settings = msg.settings
-                // connect to TCP
-                if network == nil {
-                    if let ipHost = msg.ipHost, let ipPort = msg.ipPort {
-                        network = .init(host: ipHost, port: ipPort, queue: nil, delegate: self, eom: bluetooth.EOM)
-                        network?.start()
-                    }
+            let settingsValue: TnCameraGetSettingsValue = getMessageValue(receivedMsg)
+            self.status = settingsValue.status
+            self.settings = settingsValue.settings
+            // connect to TCP
+            if network == nil {
+                if let ipHost = settingsValue.ipHost, let ipPort = settingsValue.ipPort {
+                    network = .init(host: ipHost, port: ipPort, queue: nil, delegate: self, eom: bluetooth.EOM)
+                    network?.start()
                 }
             }
         case .getImageResponse:
-            solveMsg(receivedMsg) { (msg: TnCameraMessageImageResponse) in
-                let uiImage: UIImage = .init(data: msg.jpegData!)!
-                logDebug("image", uiImage.size.width, uiImage.size.height)
+            let imageValue: TnCameraMessageValue<Data> = getMessageValue(receivedMsg)
+            let uiImage: UIImage = .init(data: imageValue.value)!
+            logDebug("image", uiImage.size.width, uiImage.size.height)
 
-                let ciImage = CIImage(image: uiImage)!
-                self.currentCiImage = ciImage
-            }
+            let ciImage = CIImage(image: uiImage)!
+            self.currentCiImage = ciImage
         default:
             return
         }
