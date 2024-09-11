@@ -11,8 +11,6 @@ import TnIosBase
 
 public struct TnCameraAppViewProxyClient: TnCameraAppViewProtocol {
     public typealias TAppViewModel = TnCameraAppViewProxyClientModel
-    @StateObject public var appModel: TAppViewModel
-    
     public var bottom: Optional<some View> {
         HStack {
             tnCircleButton(imageName: "photo.artframe", radius: 50) {
@@ -21,14 +19,14 @@ public struct TnCameraAppViewProxyClient: TnCameraAppViewProtocol {
         }
     }
     public var showToolbar: State<Bool> = .init(initialValue: true)
-}
-
-extension TnCameraAppViewProxyClient {
-    public static func getInstance(cameraManager: TnCameraProxyClient, cameraModel: TnCameraViewModel) -> Self {
-        Self.init(appModel: TnCameraAppViewProxyClientModel(cameraManager: cameraManager, cameraModel: cameraModel))
+    
+    public var appModelState: StateObject<TAppViewModel>
+    public var appModel: TAppViewModel {
+        appModelState.wrappedValue
     }
     
-    public static func getInstance(appModel: TnCameraAppViewProxyClientModel) -> Self {
-        Self.init(appModel: appModel)
+    public init(appModel: TAppViewModel) {
+        self.appModelState = .init(wrappedValue: appModel)
     }
 }
+
