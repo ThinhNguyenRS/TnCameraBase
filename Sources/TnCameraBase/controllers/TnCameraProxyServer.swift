@@ -109,30 +109,30 @@ extension TnCameraProxyServer {
             sendImage()
             
         case .setZoomFactor:
-            let zoomValue: TnCameraSetZoomFactorValue = getMessageValue(receivedMsg)
+            let zoomValue: TnCameraSetZoomFactorValue = getMessageValue(receivedMsg)!
             setZoomFactor(zoomValue.value, adjust: zoomValue.adjust, withRate: zoomValue.withRate) {
             }
-            
+
         case .setLivephoto:
-            setLivephoto(getMessageValue(receivedMsg))
+            setLivephoto(getMessageValue(receivedMsg)!)
             
         case .setFlash:
-            setFlash(getMessageValue(receivedMsg))
+            setFlash(getMessageValue(receivedMsg)!)
 
         case .setHDR:
-            setHDR(getMessageValue(receivedMsg))
+            setHDR(getMessageValue(receivedMsg)!)
 
         case .setPreset:
-            setPreset(getMessageValue(receivedMsg))
+            setPreset(getMessageValue(receivedMsg)!)
             
         case .setCameraType:
-            setCameraType(getMessageValue(receivedMsg))
+            setCameraType(getMessageValue(receivedMsg)!)
             
         case .setQuality:
-            setQuality(getMessageValue(receivedMsg))
+            setQuality(getMessageValue(receivedMsg)!)
             
         case .setFocusMode:
-            setFocusMode(getMessageValue(receivedMsg))
+            setFocusMode(getMessageValue(receivedMsg)!)
 
         default:
             return

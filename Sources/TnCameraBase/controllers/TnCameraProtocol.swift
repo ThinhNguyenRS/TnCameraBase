@@ -86,9 +86,9 @@ extension TnCameraProxyProtocol {
         self.send(TnCameraMessageValue(messageType, value), useBle: useBle)
     }
     
-    public func getMessageValue<T: Codable>(_ receivedMsg: TnMessage) -> T {
-        let msg: TnCameraMessageValue<T> = receivedMsg.toObject()!
-        return msg.value
+    public func getMessageValue<TValue: Codable>(_ receivedMsg: TnMessage) -> TValue? {
+        let msg: TnCameraMessageValue<TValue>? = receivedMsg.toObject()
+        return msg?.value
     }
 
     public func solveMsg<TMessage: Codable>(_ receivedMsg: TnMessage, handler: (TMessage) -> Void) {

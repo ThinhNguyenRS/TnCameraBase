@@ -162,7 +162,7 @@ extension TnCameraProxyClient {
         
         switch messageType {
         case .getSettingsResponse:
-            let settingsValue: TnCameraGetSettingsValue = getMessageValue(receivedMsg)
+            let settingsValue: TnCameraGetSettingsValue = getMessageValue(receivedMsg)!
             self.status = settingsValue.status
             self.settings = settingsValue.settings
             // connect to TCP
@@ -173,7 +173,7 @@ extension TnCameraProxyClient {
                 }
             }
         case .getImageResponse:
-            let imageValue: TnCameraMessageValue<Data> = getMessageValue(receivedMsg)
+            let imageValue: TnCameraMessageValue<Data> = getMessageValue(receivedMsg)!
             let uiImage: UIImage = .init(data: imageValue.value)!
             logDebug("image", uiImage.size.width, uiImage.size.height)
 
