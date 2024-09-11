@@ -22,11 +22,11 @@ public class TnCameraProxyClient: NSObject, ObservableObject, TnLoggable {
     
     private let ble: TnBluetoothClient
     private var network: TnNetworkConnection?
-    private let bluetooth: TnBluetoothServiceInfo
+    private let networkInfo: TnNetworkServiceInfo
     
-    public init(bluetooth: TnBluetoothServiceInfo) {
-        self.bluetooth = bluetooth
-        self.ble = .init(info: bluetooth)
+    public init(networkInfo: TnNetworkServiceInfo) {
+        self.networkInfo = networkInfo
+        self.ble = .init(info: networkInfo)
     }
     
     public var bleDelegate: TnBluetoothClientDelegate? {
@@ -168,7 +168,7 @@ extension TnCameraProxyClient {
             // connect to TCP
             if network == nil {
                 if let ipHost = settingsValue.ipHost, let ipPort = settingsValue.ipPort {
-                    network = .init(host: ipHost, port: ipPort, queue: nil, delegate: self, eom: bluetooth.EOM)
+                    network = .init(host: ipHost, port: ipPort, queue: nil, delegate: self, EOM: networkInfo.EOM, MTU: networkInfo.MTU)
                     network?.start()
                 }
             }

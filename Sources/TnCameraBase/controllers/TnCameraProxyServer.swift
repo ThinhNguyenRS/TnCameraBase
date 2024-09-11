@@ -19,11 +19,11 @@ public class TnCameraProxyServer: TnLoggable {
     private var network: TnNetworkServer?
     private let ble: TnBluetoothServer
 
-    public init(_ cameraManager: TnCameraLocal, bluetooth: TnBluetoothServiceInfo) {
+    public init(_ cameraManager: TnCameraLocal, networkInfo: TnNetworkServiceInfo) {
         self.cameraManager = cameraManager
-        ble = .init(info: bluetooth)
+        ble = .init(info: networkInfo)
         if let address = TnNetworkHelper.getAddressList(for: [.wifi, .cellularBridge, .cellular]).first {
-            network = .init(host: address.address, port: 1234, queue: .main, delegate: self, eom: bluetooth.EOM)
+            network = .init(host: address.address, port: 1234, queue: .main, delegate: self, EOM: networkInfo.EOM, MTU: networkInfo.MTU)
             network?.start()
         }
     }
