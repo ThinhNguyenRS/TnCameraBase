@@ -22,3 +22,9 @@ public struct TnCameraAppViewProxyClient: TnCameraAppViewProtocol {
     }
     public var showToolbar: State<Bool> = .init(initialValue: true)
 }
+
+extension TnCameraAppViewProxyClient {
+    public static func getInstance(cameraManager: TnCameraProxyClient, cameraModel: TnCameraViewModel) -> Self {
+        Self.init(appModel: TnCameraAppViewProxyClientModel(cameraManager: cameraManager, cameraModel: cameraModel))
+    }
+}
