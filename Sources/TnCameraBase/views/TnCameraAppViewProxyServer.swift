@@ -19,7 +19,7 @@ public struct TnCameraAppViewProxyServer: TnCameraAppViewProtocol {
 }
 
 extension TnCameraAppViewProxyServer {
-    public static func getView(cameraManager: TnCameraProxyServer, cameraModel: TnCameraViewModel) -> Self {
+    public static func getInstance(cameraManager: TnCameraProxyServer, cameraModel: TnCameraViewModel) -> Self {
         Self.init(appModel: TnCameraAppViewProxyServerModel(cameraManager: cameraManager, cameraModel: cameraModel))
     }
 }
