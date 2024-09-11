@@ -40,11 +40,7 @@ public struct TnCameraToolbarMainView<TBottom: View, TCameraManager: TnCameraPro
                 // capture
                 Spacer()
                 circleButtonRotation(imageName: "camera", radius: 90, backColor: .white, imageColor: .black) {
-                    cameraManager.captureImage { capturedImage in
-                        withAnimation {
-                            cameraModel.capturedImage = capturedImage
-                        }
-                    }
+                    cameraManager.captureImage()
                 }
 
                 // settings
