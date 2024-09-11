@@ -22,8 +22,8 @@ public struct TnCameraAppViewProxyServer: TnCameraAppViewProtocol {
         appModelState.wrappedValue
     }
     
-    public init(appModel: StateObject<TAppViewModel>) {
-        self.appModelState = appModel
+    public init(appModel: TAppViewModel) {
+        self.appModelState = .init(wrappedValue: appModel)
     }
 }
 
