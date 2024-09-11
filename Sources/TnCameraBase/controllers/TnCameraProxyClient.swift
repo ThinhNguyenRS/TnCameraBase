@@ -71,7 +71,7 @@ extension TnCameraProxyClient: TnCameraProxyProtocol {
         send(.switchCamera)
     }
     
-    public func captureImage(completion: @escaping (UIImage) -> Void) {
+    public func captureImage(completion: ((UIImage) -> Void)?) {
         send(.captureImage)
     }
     

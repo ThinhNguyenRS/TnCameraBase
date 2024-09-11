@@ -36,6 +36,16 @@ public class TnCameraProxyServer: TnLoggable {
             ble.delegate = newValue
         }
     }
+    
+    public var captureCompletion: ((UIImage) -> Void)? {
+        get {
+            cameraManager.captureImageCompletion
+        }
+        set {
+            cameraManager.captureImageCompletion = newValue
+        }
+    }
+
 }
 
 // MARK: TnBluetoothServerDelegate
@@ -177,7 +187,7 @@ extension TnCameraProxyServer: TnCameraProxyProtocol {
         cameraManager.switchCamera(completion: completion)
     }
     
-    public func captureImage(completion: @escaping (UIImage) -> Void) {
+    public func captureImage(completion: ((UIImage) -> Void)?) {
         cameraManager.captureImage(completion: completion)
     }
     

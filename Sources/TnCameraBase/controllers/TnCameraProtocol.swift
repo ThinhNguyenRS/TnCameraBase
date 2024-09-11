@@ -28,8 +28,7 @@ public protocol TnCameraProtocol {
     func stopCapturing(completion: (() -> Void)?)
     func switchCamera(completion: (() -> Void)?)
 
-    func captureImage(completion: @escaping (UIImage) -> Void)
-//    var captureImageCompletion: ((UIImage) -> Void)? { get set }
+    func captureImage(completion: ((UIImage) -> Void)?)
 
     func setLivephoto(_ v: Bool)
     func setFlash(_ v: AVCaptureDevice.FlashMode)
@@ -47,6 +46,10 @@ public protocol TnCameraProtocol {
 }
 
 extension TnCameraProtocol {
+    public func captureImage() {
+        self.captureImage(completion: nil)
+    }
+    
     public func toggleCapturing() {
         self.toggleCapturing(completion: nil)
     }
