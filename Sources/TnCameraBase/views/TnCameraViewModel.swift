@@ -18,9 +18,11 @@ public protocol TnCameraViewModelDelegate {
 
 public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {
     public let LOG_NAME = "CameraViewModel"
+    
     @Published public var status: TnCameraStatus = .none
     @Published public var settings: TnCameraSettings = .init()
     @Published public var toolbarType: TnCameraToolbarViewType = .none
+    @Published var capturedImage: UIImage? = nil
 
     @Published public var orientation: UIDeviceOrientation = .unknown
     @Published public var orientationAngle: Angle = .zero

@@ -22,13 +22,14 @@ public protocol TnCameraProtocol {
 
     var statusPublisher: Published<TnCameraStatus>.Publisher {get}
     var status: TnCameraStatus {get}
-
+    
     func toggleCapturing(completion: (() -> Void)?)
     func startCapturing(completion: (() -> Void)?)
     func stopCapturing(completion: (() -> Void)?)
     func switchCamera(completion: (() -> Void)?)
 
     func captureImage(completion: @escaping (UIImage) -> Void)
+//    var captureImageCompletion: ((UIImage) -> Void)? { get set }
 
     func setLivephoto(_ v: Bool)
     func setFlash(_ v: AVCaptureDevice.FlashMode)

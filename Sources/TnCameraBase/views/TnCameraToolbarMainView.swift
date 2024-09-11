@@ -13,14 +13,12 @@ public struct TnCameraToolbarMainView<TBottom: View, TCameraManager: TnCameraPro
     @EnvironmentObject public var cameraModel: TnCameraViewModel
     let cameraManager: TCameraManager
 
-    @State var capturedImage: UIImage?
-
     let bottom: TBottom?
 
     public var body: some View {
         HStack {
             if cameraModel.status == .started {
-                if let capturedImage = self.capturedImage {
+                if let capturedImage = cameraModel.capturedImage {
                     Image(uiImage: capturedImage)
                         .tnMakeScalable()
                         .frame(width: 80, height: 80)
@@ -44,7 +42,7 @@ public struct TnCameraToolbarMainView<TBottom: View, TCameraManager: TnCameraPro
                 circleButtonRotation(imageName: "camera", radius: 90, backColor: .white, imageColor: .black) {
                     cameraManager.captureImage { capturedImage in
                         withAnimation {
-                            self.capturedImage = capturedImage
+                            cameraModel.capturedImage = capturedImage
                         }
                     }
                 }

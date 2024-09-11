@@ -15,11 +15,11 @@ import TnIosBase
 public class TnCameraProxyServer: TnLoggable {
     public let LOG_NAME = "TnCameraProxyServer"
 
-    private let cameraManager: TnCameraProtocol
+    private let cameraManager: TnCameraLocal
     private var network: TnNetworkServer?
     private let ble: TnBluetoothServer
 
-    public init(_ cameraManager: TnCameraProtocol, bluetooth: TnBluetoothServiceInfo) {
+    public init(_ cameraManager: TnCameraLocal, bluetooth: TnBluetoothServiceInfo) {
         self.cameraManager = cameraManager
         ble = .init(info: bluetooth)
         if let address = TnNetworkHelper.getAddressList(for: [.wifi, .cellularBridge, .cellular]).first {
@@ -80,19 +80,16 @@ extension TnCameraProxyServer {
 
         switch messageType {
         case .toggleCapturing:
-            cameraManager.toggleCapturing { [self] in
-//                send(TnCameraMessageSettingsResponse(settings: cameraManager.settings, status: cameraManager.status))
+            toggleCapturing {
             }
 
         case .switchCamera:
-            cameraManager.switchCamera { [self] in
-//                send(TnCameraMessageSettingsResponse(settings: cameraManager.settings, status: cameraManager.status))
+            switchCamera {
             }
             
         case .captureImage:
-            cameraManager.captureImage(completion: { [self] uiImage in
-                logDebug("captured image", uiImage.size.width, uiImage.size.height)
-//                send(TnCameraMessageImageResponse(uiImage: uiImage, scale: 0.9, compressionQuality: 0.9))
+            captureImage(completion: { _ in
+                
             })
 
         case .getSettings:
@@ -104,30 +101,30 @@ extension TnCameraProxyServer {
             
         case .setZoomFactor:
             let msg: TnCameraMessageSetZoomFactorRequest = receivedMsg.toObject()!
-            cameraManager.setZoomFactor(msg.value, adjust: msg.adjust, withRate: msg.withRate) { [self] in
+            setZoomFactor(msg.value, adjust: msg.adjust, withRate: msg.withRate) {
 //                send(TnCameraMessageSettingsResponse(settings: cameraManager.settings, status: cameraManager.status))
             }
             
         case .setLivephoto:
-            cameraManager.setLivephoto(getMessageValue(receivedMsg))
+            setLivephoto(getMessageValue(receivedMsg))
             
         case .setFlash:
-            cameraManager.setFlash(getMessageValue(receivedMsg))
+            setFlash(getMessageValue(receivedMsg))
 
         case .setHDR:
-            cameraManager.setHDR(getMessageValue(receivedMsg))
+            setHDR(getMessageValue(receivedMsg))
 
         case .setPreset:
-            cameraManager.setPreset(getMessageValue(receivedMsg))
+            setPreset(getMessageValue(receivedMsg))
             
         case .setCameraType:
-            cameraManager.setCameraType(getMessageValue(receivedMsg))
+            setCameraType(getMessageValue(receivedMsg))
             
         case .setQuality:
-            cameraManager.setQuality(getMessageValue(receivedMsg))
+            setQuality(getMessageValue(receivedMsg))
             
         case .setFocusMode:
-            cameraManager.setFocusMode(getMessageValue(receivedMsg))
+            setFocusMode(getMessageValue(receivedMsg))
 
         default:
             return
