@@ -26,6 +26,8 @@ public class TnCameraProxyServer: TnLoggable {
             network = .init(host: address.address, port: 1234, queue: .main, delegate: self, EOM: networkInfo.EOM, MTU: networkInfo.MTU)
             network?.start()
         }
+        
+        logDebug("inited")
     }
     
     public var bleDelegate: TnBluetoothServerDelegate? {

@@ -9,7 +9,9 @@ import Foundation
 import SwiftUI
 import TnIosBase
 
-public struct TnCameraAppViewProxyClient: TnCameraAppViewProtocol {
+public struct TnCameraAppViewProxyClient: TnCameraAppViewProtocol, TnLoggable {
+    public let LOG_NAME = "TnCameraAppViewProxyClient"
+    
     public typealias TAppViewModel = TnCameraAppViewProxyClientModel
     public var bottom: Optional<some View> {
         HStack {
@@ -27,6 +29,7 @@ public struct TnCameraAppViewProxyClient: TnCameraAppViewProtocol {
     
     public init(appModel: TAppViewModel) {
         self.appModelState = .init(wrappedValue: appModel)
+        logDebug("inited")
     }
 }
 

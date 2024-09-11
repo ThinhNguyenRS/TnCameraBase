@@ -7,8 +7,11 @@
 
 import Foundation
 import SwiftUI
+import TnIosBase
 
-public struct TnCameraAppViewProxyServer: TnCameraAppViewProtocol {
+public struct TnCameraAppViewProxyServer: TnCameraAppViewProtocol, TnLoggable {
+    public let LOG_NAME = "TnCameraAppViewProxyServer"
+    
     public typealias TAppViewModel = TnCameraAppViewProxyServerModel
     public var bottom: Optional<some View> {
         nil as EmptyView?
@@ -22,5 +25,6 @@ public struct TnCameraAppViewProxyServer: TnCameraAppViewProtocol {
     
     public init(appModel: TAppViewModel) {
         self.appModelState = .init(wrappedValue: appModel)
+        logDebug("inited")
     }
 }

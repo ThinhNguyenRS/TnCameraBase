@@ -8,6 +8,12 @@
 import Foundation
 
 public class TnCameraAppViewProxyClientModel: TnCameraAppViewModelDefault<TnCameraProxyClient>, TnCameraViewModelDelegate {
+    public override init(cameraManager: TnCameraProxyClient, cameraModel: TnCameraViewModel) {
+        super.init(cameraManager: cameraManager, cameraModel: cameraModel)
+        LOG_NAME = "TnCameraAppViewProxyClientModel"
+        logDebug("inited")
+    }
+
     public func onChanged(settings: TnCameraSettings, status: TnCameraStatus) {
     }
     

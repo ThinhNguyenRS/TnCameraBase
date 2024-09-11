@@ -7,8 +7,15 @@
 
 import Foundation
 import SwiftUI
+import TnIosBase
 
 public class TnCameraAppViewProxyServerModel: TnCameraAppViewModelDefault<TnCameraProxyServer>, TnCameraViewModelDelegate {
+    public override init(cameraManager: TnCameraProxyServer, cameraModel: TnCameraViewModel) {
+        super.init(cameraManager: cameraManager, cameraModel: cameraModel)
+        LOG_NAME = "TnCameraAppViewProxyServerModel"
+        logDebug("inited")
+    }
+    
     public func onVolumeButton() {
         cameraManager.captureImage()
     }
@@ -35,5 +42,6 @@ public class TnCameraAppViewProxyServerModel: TnCameraAppViewModelDefault<TnCame
             }
         }
         super.setup(withOrientation: true)
+        
     }
 }

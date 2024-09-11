@@ -27,6 +27,9 @@ public class TnCameraProxyClient: NSObject, ObservableObject, TnLoggable {
     public init(networkInfo: TnNetworkServiceInfo) {
         self.networkInfo = networkInfo
         self.ble = .init(info: networkInfo)
+        super.init()
+        
+        logDebug("inited")
     }
     
     public var bleDelegate: TnBluetoothClientDelegate? {

@@ -9,7 +9,7 @@ import Foundation
 import TnIosBase
 
 open class TnCameraAppViewModelDefault<TCameraManager: TnCameraProxyProtocol>: NSObject, ObservableObject, TnCameraAppViewModelProtocol, TnLoggable {
-    public let LOG_NAME = "AppViewModelDefault"
+    public var LOG_NAME = "AppViewModelDefault"
     
     public var cameraManager: TCameraManager
     public var cameraModel: TnCameraViewModel
@@ -19,7 +19,7 @@ open class TnCameraAppViewModelDefault<TCameraManager: TnCameraProxyProtocol>: N
         self.cameraModel = cameraModel
         super.init()
         
-        logDebug("init", TCameraManager.self)
+        logDebug("inited")
     }
     
     open func setup() {
