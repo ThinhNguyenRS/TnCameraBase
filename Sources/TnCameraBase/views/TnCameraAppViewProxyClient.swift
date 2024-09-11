@@ -27,4 +27,8 @@ extension TnCameraAppViewProxyClient {
     public static func getInstance(cameraManager: TnCameraProxyClient, cameraModel: TnCameraViewModel) -> Self {
         Self.init(appModel: TnCameraAppViewProxyClientModel(cameraManager: cameraManager, cameraModel: cameraModel))
     }
+    
+    public static func getInstance(appModel: TnCameraAppViewProxyClientModel) -> Self {
+        Self.init(appModel: appModel)
+    }
 }
