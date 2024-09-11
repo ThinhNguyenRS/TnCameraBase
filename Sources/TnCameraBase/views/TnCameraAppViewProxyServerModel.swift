@@ -27,10 +27,12 @@ public class TnCameraAppViewProxyServerModel: TnCameraAppViewModelDefault<TnCame
         cameraModel.delegate = self
         cameraManager.bleDelegate = cameraManager
         cameraManager.captureCompletion = { [self] capturedImage in
-            withAnimation {
-                cameraModel.capturedImage = capturedImage
+            DispatchQueue.main.async { [self] in
+                withAnimation {
+                    cameraModel.capturedImage = capturedImage
+                }
+                cameraManager.sendImage()
             }
-            cameraManager.sendImage()
         }
         super.setup(withOrientation: true)
     }
