@@ -67,10 +67,13 @@ public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {
         }
         
         do {
-            try AVAudioSession.sharedInstance().setActive(true)
-            AVAudioSession.sharedInstance().publisher(for: \.outputVolume)
+            let audio = AVAudioSession.sharedInstance()
+            try audio.setActive(true)
+            audio.publisher(for: \.outputVolume)
                 .sink(receiveValue: { [self] v in
-                    delegate?.onVolumeButton()
+                    if audio.outputVolume != v {
+                        delegate?.onVolumeButton()
+                    }
                 })
                 .store(in: &cancelables)
         } catch {

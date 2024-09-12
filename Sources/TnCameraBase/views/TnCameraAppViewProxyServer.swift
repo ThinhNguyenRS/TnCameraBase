@@ -24,46 +24,4 @@ public struct TnCameraAppViewProxyServer: TnCameraAppViewProtocol, TnLoggable {
         self.appModelState = appModel
         logDebug("inited")
     }
-        
-//    public var body: some View {
-//        ZStack {
-//            // preview
-//            TnCameraPreviewViewMetal(imagePublisher: appModel.wrappedValue.cameraManager.currentCiImagePublisher)
-//                .onTapGesture {
-//                    withAnimation {
-//                        showToolbar.wrappedValue.toggle()
-//                    }
-//                }
-//            
-//            // bottom toolbar
-//            if showToolbar.wrappedValue {
-//                VStack(alignment: .leading) {
-//                    Spacer()
-//                    TnCameraToolbarMiscView(cameraManager: appModel.wrappedValue.cameraManager)
-//                    TnCameraToolbarMainView(cameraManager: appModel.wrappedValue.cameraManager, bottom: bottom)
-//                }
-//            }
-////            if appModel.cameraManager.status == .started {
-////                // preview
-////                TnCameraPreviewViewMetal(imagePublisher: appModel.cameraManager.currentCiImagePublisher)
-////                    .onTapGesture {
-////                        withAnimation {
-////                            showToolbar.toggle()
-////                        }
-////                    }
-////                
-////                // bottom toolbar
-////                if showToolbar {
-////                    VStack(alignment: .leading) {
-////                        Spacer()
-////                        TnCameraToolbarMiscView(cameraManager: appModel.cameraManager)
-////                        TnCameraToolbarMainView(cameraManager: appModel.cameraManager, bottom: bottom)
-////                    }
-////                }
-////            }
-//        }
-//        .onAppear {
-//            appModel.wrappedValue.setup()
-//        }
-//    }
 }
