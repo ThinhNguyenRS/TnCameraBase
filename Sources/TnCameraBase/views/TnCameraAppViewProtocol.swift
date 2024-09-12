@@ -12,7 +12,7 @@ public protocol TnCameraAppViewProtocol: View {
     associatedtype TAppViewModel: TnCameraAppViewModelProtocol
     associatedtype TBottom: View
     
-    var appModel: TAppViewModel { get }
+    var appModel: StateObject<TAppViewModel> { get }
     @ViewBuilder var bottom: TBottom? { get }
     
     var showToolbar: State<Bool> { get }
@@ -20,10 +20,10 @@ public protocol TnCameraAppViewProtocol: View {
 
 extension TnCameraAppViewProtocol {
     public var cameraModel: TnCameraViewModel {
-        appModel.cameraModel
+        appModel.wrappedValue.cameraModel
     }
     public var cameraManager: TAppViewModel.TCameraManager {
-        appModel.cameraManager
+        appModel.wrappedValue.cameraManager
     }
 }
 
@@ -50,7 +50,7 @@ extension TnCameraAppViewProtocol {
             }
         }
         .onAppear {
-            appModel.setup()
+            appModel.wrappedValue.setup()
         }
     }
 }

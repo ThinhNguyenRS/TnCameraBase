@@ -21,14 +21,10 @@ public struct TnCameraAppViewProxyClient: TnCameraAppViewProtocol, TnLoggable {
         }
     }
     public var showToolbar: State<Bool> = .init(initialValue: true)
-    
-    public var appModelState: StateObject<TAppViewModel>
-    public var appModel: TAppViewModel {
-        appModelState.wrappedValue
-    }
-    
-    public init(appModel: TAppViewModel) {
-        self.appModelState = .init(wrappedValue: appModel)
+    public var appModel: StateObject<TAppViewModel>
+
+    public init(appModel: StateObject<TAppViewModel>) {
+        self.appModel = appModel
         logDebug("inited")
     }
 }

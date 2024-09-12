@@ -28,9 +28,9 @@ public struct TnCameraAppViewProxyServer: TnCameraAppViewProtocol, TnLoggable {
     //        logDebug("inited")
     //    }
 
-    @StateObject public var appModel: TAppViewModel
+    public var appModel: StateObject<TAppViewModel>
     public init(appModel: StateObject<TAppViewModel>) {
-        self._appModel = appModel
+        self.appModel = appModel
         logDebug("inited")
     }
 }
