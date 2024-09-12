@@ -17,30 +17,30 @@ public struct TnCameraAppViewProxyServer: View, TnLoggable {
         nil as EmptyView?
     }
     
-    @State var showToolbar = true
+    var showToolbar: State<Bool> = .init(initialValue: true)
     
-    @StateObject public var appModel: TAppViewModel
+    public var appModel: StateObject<TAppViewModel>
     public init(appModel: StateObject<TAppViewModel>) {
-        self._appModel = appModel
+        self.appModel = appModel
         logDebug("inited")
     }
         
     public var body: some View {
         ZStack {
             // preview
-            TnCameraPreviewViewMetal(imagePublisher: appModel.cameraManager.currentCiImagePublisher)
+            TnCameraPreviewViewMetal(imagePublisher: appModel.wrappedValue.cameraManager.currentCiImagePublisher)
                 .onTapGesture {
                     withAnimation {
-                        showToolbar.toggle()
+                        showToolbar.wrappedValue.toggle()
                     }
                 }
             
             // bottom toolbar
-            if showToolbar {
+            if showToolbar.wrappedValue {
                 VStack(alignment: .leading) {
                     Spacer()
-                    TnCameraToolbarMiscView(cameraManager: appModel.cameraManager)
-                    TnCameraToolbarMainView(cameraManager: appModel.cameraManager, bottom: bottom)
+                    TnCameraToolbarMiscView(cameraManager: appModel.wrappedValue.cameraManager)
+                    TnCameraToolbarMainView(cameraManager: appModel.wrappedValue.cameraManager, bottom: bottom)
                 }
             }
 //            if appModel.cameraManager.status == .started {
@@ -63,7 +63,7 @@ public struct TnCameraAppViewProxyServer: View, TnLoggable {
 //            }
         }
         .onAppear {
-            appModel.setup()
+            appModel.wrappedValue.setup()
         }
     }
 }
