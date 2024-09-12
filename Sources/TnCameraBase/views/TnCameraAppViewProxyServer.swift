@@ -27,24 +27,40 @@ public struct TnCameraAppViewProxyServer: View, TnLoggable {
         
     public var body: some View {
         ZStack {
-            if appModel.cameraManager.status == .started {
-                // preview
-                TnCameraPreviewViewMetal(imagePublisher: appModel.cameraManager.currentCiImagePublisher)
-                    .onTapGesture {
-                        withAnimation {
-                            showToolbar.toggle()
-                        }
-                    }
-                
-                // bottom toolbar
-                if showToolbar {
-                    VStack(alignment: .leading) {
-                        Spacer()
-                        TnCameraToolbarMiscView(cameraManager: appModel.cameraManager)
-                        TnCameraToolbarMainView(cameraManager: appModel.cameraManager, bottom: bottom)
+            // preview
+            TnCameraPreviewViewMetal(imagePublisher: appModel.cameraManager.currentCiImagePublisher)
+                .onTapGesture {
+                    withAnimation {
+                        showToolbar.toggle()
                     }
                 }
+            
+            // bottom toolbar
+            if showToolbar {
+                VStack(alignment: .leading) {
+                    Spacer()
+                    TnCameraToolbarMiscView(cameraManager: appModel.cameraManager)
+                    TnCameraToolbarMainView(cameraManager: appModel.cameraManager, bottom: bottom)
+                }
             }
+//            if appModel.cameraManager.status == .started {
+//                // preview
+//                TnCameraPreviewViewMetal(imagePublisher: appModel.cameraManager.currentCiImagePublisher)
+//                    .onTapGesture {
+//                        withAnimation {
+//                            showToolbar.toggle()
+//                        }
+//                    }
+//                
+//                // bottom toolbar
+//                if showToolbar {
+//                    VStack(alignment: .leading) {
+//                        Spacer()
+//                        TnCameraToolbarMiscView(cameraManager: appModel.cameraManager)
+//                        TnCameraToolbarMainView(cameraManager: appModel.cameraManager, bottom: bottom)
+//                    }
+//                }
+//            }
         }
         .onAppear {
             appModel.setup()
