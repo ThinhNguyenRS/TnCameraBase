@@ -15,7 +15,6 @@ public protocol TnCameraAppViewProtocol: View {
     @ViewBuilder var bottom: TBottom? { get }
 
     var appModelState: StateObject<TAppViewModel> { get }
-    var showToolbarState: State<Bool> { get }
 }
 
 extension TnCameraAppViewProtocol {
@@ -39,12 +38,12 @@ extension TnCameraAppViewProtocol {
             TnCameraPreviewViewMetal(imagePublisher: cameraManager.currentCiImagePublisher)
                 .onTapGesture {
                     withAnimation {
-                        showToolbarState.wrappedValue.toggle()
+                        appModel.showToolbar.toggle()
                     }
                 }
 
             // bottom toolbar
-            if showToolbarState.wrappedValue {
+            if appModel.showToolbar {
                 VStack(alignment: .leading) {
                     Spacer()
                     TnCameraToolbarMiscView(cameraManager: cameraManager)

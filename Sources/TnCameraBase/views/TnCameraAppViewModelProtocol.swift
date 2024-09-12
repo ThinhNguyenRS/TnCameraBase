@@ -11,6 +11,7 @@ public protocol TnCameraAppViewModelProtocol: ObservableObject {
     associatedtype TCameraManager: TnCameraProxyProtocol
     var cameraManager: TCameraManager { get }
     var cameraModel: TnCameraViewModel { get }
+    var showToolbar: Bool { get set }
     
     func setup()
 }

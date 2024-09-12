@@ -36,7 +36,6 @@ public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {
     }
     
     public func listen(manager: TnCameraProtocol, withOrientation: Bool = true) {
-        let motionOrientation: DeviceMotionOrientationListener = .shared
         manager.statusPublisher
             .onReceive(debounceMs: 10, cancelables: &cancelables) { [self] v in
                 withAnimation {
@@ -56,6 +55,7 @@ public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {
             }
 
         if withOrientation {
+            let motionOrientation: DeviceMotionOrientationListener = .shared
             motionOrientation.$orientation
                 .onReceive(debounceMs: 10, cancelables: &cancelables) { [self] _ in
                     withAnimation {
