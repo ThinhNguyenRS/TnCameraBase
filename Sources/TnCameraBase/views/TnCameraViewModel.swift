@@ -66,18 +66,18 @@ public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {
                 }
         }
         
-        do {
-            let audio = AVAudioSession.sharedInstance()
-            try audio.setActive(true)
-            audio.publisher(for: \.outputVolume)
-                .sink(receiveValue: { [self] v in
-                    if audio.outputVolume != v {
-                        delegate?.onVolumeButton()
-                    }
-                })
-                .store(in: &cancelables)
-        } catch {
-            logError("Cannot listen volume button", error.localizedDescription)
-        }
+//        do {
+//            let audio = AVAudioSession.sharedInstance()
+//            try audio.setActive(true)
+//            audio.publisher(for: \.outputVolume)
+//                .sink(receiveValue: { [self] v in
+//                    if audio.outputVolume != v {
+//                        delegate?.onVolumeButton()
+//                    }
+//                })
+//                .store(in: &cancelables)
+//        } catch {
+//            logError("Cannot listen volume button", error.localizedDescription)
+//        }
     }
 }
