@@ -12,18 +12,18 @@ public protocol TnCameraAppViewProtocol: View {
     associatedtype TAppViewModel: TnCameraAppViewModelProtocol
     associatedtype TBottom: View
     
-    var appModel: StateObject<TAppViewModel> { get }
     @ViewBuilder var bottom: TBottom? { get }
-    
-    var showToolbar: State<Bool> { get }
+
+    var appModelState: StateObject<TAppViewModel> { get }
+    var showToolbarState: State<Bool> { get }
 }
 
 extension TnCameraAppViewProtocol {
     public var cameraModel: TnCameraViewModel {
-        appModel.wrappedValue.cameraModel
+        appModelState.wrappedValue.cameraModel
     }
     public var cameraManager: TAppViewModel.TCameraManager {
-        appModel.wrappedValue.cameraManager
+        appModelState.wrappedValue.cameraManager
     }
 }
 
@@ -34,39 +34,21 @@ extension TnCameraAppViewProtocol {
             TnCameraPreviewViewMetal(imagePublisher: cameraManager.currentCiImagePublisher)
                 .onTapGesture {
                     withAnimation {
-                        showToolbar.wrappedValue.toggle()
+                        showToolbarState.wrappedValue.toggle()
                     }
                 }
 
             // bottom toolbar
-            if showToolbar.wrappedValue {
+            if showToolbarState.wrappedValue {
                 VStack(alignment: .leading) {
                     Spacer()
                     TnCameraToolbarMiscView(cameraManager: cameraManager)
                     TnCameraToolbarMainView(cameraManager: cameraManager, bottom: bottom)
                 }
             }
-//            if cameraModel.status == .started {
-//                // preview
-//                TnCameraPreviewViewMetal(imagePublisher: cameraManager.currentCiImagePublisher)
-//                    .onTapGesture {
-//                        withAnimation {
-//                            showToolbar.wrappedValue.toggle()
-//                        }
-//                    }
-//
-//                // bottom toolbar
-//                if showToolbar.wrappedValue {
-//                    VStack(alignment: .leading) {
-//                        Spacer()
-//                        TnCameraToolbarMiscView(cameraManager: cameraManager)
-//                        TnCameraToolbarMainView(cameraManager: cameraManager, bottom: bottom)
-//                    }
-//                }
-//            }
         }
         .onAppear {
-            appModel.wrappedValue.setup()
+            appModelState.wrappedValue.setup()
         }
     }
 }
