@@ -19,9 +19,14 @@ public protocol TnCameraAppViewProtocol: View {
 }
 
 extension TnCameraAppViewProtocol {
+    public var appModel: TAppViewModel {
+        appModelState.wrappedValue
+    }
+    
     public var cameraModel: TnCameraViewModel {
         appModelState.wrappedValue.cameraModel
     }
+    
     public var cameraManager: TAppViewModel.TCameraManager {
         appModelState.wrappedValue.cameraManager
     }
@@ -48,7 +53,7 @@ extension TnCameraAppViewProtocol {
             }
         }
         .onAppear {
-            appModelState.wrappedValue.setup()
+            appModel.setup()
         }
     }
 }
