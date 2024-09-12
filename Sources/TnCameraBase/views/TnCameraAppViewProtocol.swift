@@ -30,24 +30,40 @@ extension TnCameraAppViewProtocol {
 extension TnCameraAppViewProtocol {
     public var body: some View {
         ZStack {
-            if cameraModel.status == .started {
-                // preview
-                TnCameraPreviewViewMetal(imagePublisher: cameraManager.currentCiImagePublisher)
-                    .onTapGesture {
-                        withAnimation {
-                            showToolbar.wrappedValue.toggle()
-                        }
-                    }
-
-                // bottom toolbar
-                if showToolbar.wrappedValue {
-                    VStack(alignment: .leading) {
-                        Spacer()
-                        TnCameraToolbarMiscView(cameraManager: cameraManager)
-                        TnCameraToolbarMainView(cameraManager: cameraManager, bottom: bottom)
+            // preview
+            TnCameraPreviewViewMetal(imagePublisher: cameraManager.currentCiImagePublisher)
+                .onTapGesture {
+                    withAnimation {
+                        showToolbar.wrappedValue.toggle()
                     }
                 }
+
+            // bottom toolbar
+            if showToolbar.wrappedValue {
+                VStack(alignment: .leading) {
+                    Spacer()
+                    TnCameraToolbarMiscView(cameraManager: cameraManager)
+                    TnCameraToolbarMainView(cameraManager: cameraManager, bottom: bottom)
+                }
             }
+//            if cameraModel.status == .started {
+//                // preview
+//                TnCameraPreviewViewMetal(imagePublisher: cameraManager.currentCiImagePublisher)
+//                    .onTapGesture {
+//                        withAnimation {
+//                            showToolbar.wrappedValue.toggle()
+//                        }
+//                    }
+//
+//                // bottom toolbar
+//                if showToolbar.wrappedValue {
+//                    VStack(alignment: .leading) {
+//                        Spacer()
+//                        TnCameraToolbarMiscView(cameraManager: cameraManager)
+//                        TnCameraToolbarMainView(cameraManager: cameraManager, bottom: bottom)
+//                    }
+//                }
+//            }
         }
         .onAppear {
             appModel.wrappedValue.setup()
