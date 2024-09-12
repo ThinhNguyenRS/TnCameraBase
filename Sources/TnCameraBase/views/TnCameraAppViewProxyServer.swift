@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import TnIosBase
 
-public struct TnCameraAppViewProxyServer: TnLoggable {
+public struct TnCameraAppViewProxyServer: View, TnLoggable {
     public typealias TAppViewModel = TnCameraAppViewProxyServerModel
     public let LOG_NAME = "TnCameraAppViewProxyServer"
     
