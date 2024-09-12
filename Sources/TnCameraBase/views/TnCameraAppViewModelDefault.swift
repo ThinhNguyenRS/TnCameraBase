@@ -11,8 +11,8 @@ import TnIosBase
 open class TnCameraAppViewModelDefault<TCameraManager: TnCameraProxyProtocol>: NSObject, ObservableObject, TnCameraAppViewModelProtocol, TnLoggable {
     public var LOG_NAME = "AppViewModelDefault"
     
-    public var cameraManager: TCameraManager
-    public var cameraModel: TnCameraViewModel
+    @Published public var cameraManager: TCameraManager
+    @Published public var cameraModel: TnCameraViewModel
     
     public init(cameraManager: TCameraManager, cameraModel: TnCameraViewModel) {
         self.cameraManager = cameraManager
