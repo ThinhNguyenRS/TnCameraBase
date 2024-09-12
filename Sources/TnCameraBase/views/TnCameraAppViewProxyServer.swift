@@ -27,7 +27,7 @@ public struct TnCameraAppViewProxyServer: View, TnLoggable {
         
     public var body: some View {
         ZStack {
-            if appModel.cameraModel.status == .started {
+            if appModel.cameraManager.status == .started {
                 // preview
                 TnCameraPreviewViewMetal(imagePublisher: appModel.cameraManager.currentCiImagePublisher)
                     .onTapGesture {
