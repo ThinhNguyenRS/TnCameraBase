@@ -25,18 +25,12 @@ extension TnCameraAppViewProtocol {
     public var cameraManager: TAppViewModel.TCameraManager {
         appModel.cameraManager
     }
-    public var cameraStatus: TnCameraStatus {
-        cameraModel.status
-    }
-    public var cameraSettings: TnCameraSettings {
-        cameraModel.settings
-    }
 }
 
 extension TnCameraAppViewProtocol {
     public var body: some View {
         ZStack {
-            if cameraStatus == .started {
+            if cameraModel.status == .started {
                 // preview
                 TnCameraPreviewViewMetal(imagePublisher: cameraManager.currentCiImagePublisher)
                     .onTapGesture {
@@ -49,9 +43,7 @@ extension TnCameraAppViewProtocol {
                 if showToolbar.wrappedValue {
                     VStack(alignment: .leading) {
                         Spacer()
-                        if cameraModel.status == .started {
-                            TnCameraToolbarMiscView(cameraManager: cameraManager)
-                        }
+                        TnCameraToolbarMiscView(cameraManager: cameraManager)
                         TnCameraToolbarMainView(cameraManager: cameraManager, bottom: bottom)
                     }
                 }
