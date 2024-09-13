@@ -195,7 +195,7 @@ extension TnCameraToolbarMiscView {
                 getSliderView(
                     value: $cameraModel.settings.transportMaxWidth,
                     label: "Image max width",
-                    bounds: 720.0...1920.0,
+                    bounds: 240...1080,
                     step: 120,
                     onChanged: { _ in},
                     onChanging: { [self] v in
