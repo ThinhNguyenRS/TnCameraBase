@@ -40,9 +40,9 @@ public struct TnCameraAppView<TCameraManager: TnCameraProxyProtocol, TBottom: Vi
     public let LOG_NAME = "TnCameraAppView.\(TCameraManager.Type.self)"
     var appModelState: StateObject<TnCameraAppViewModel<TCameraManager>>
     
-    @ViewBuilder var bottom: (TnCameraAppViewModel<TCameraManager>) -> TBottom?
+    @ViewBuilder var bottom: () -> TBottom?
     
-    public init(appModel: StateObject<TnCameraAppViewModel<TCameraManager>>, @ViewBuilder bottom: @escaping (TnCameraAppViewModel<TCameraManager>) -> TBottom?) {
+    public init(appModel: StateObject<TnCameraAppViewModel<TCameraManager>>, @ViewBuilder bottom: @escaping () -> TBottom?) {
         self.appModelState = appModel
         self.bottom = bottom
         logDebug("inited")
@@ -79,7 +79,7 @@ extension TnCameraAppView: View {
                 VStack(alignment: .leading) {
                     Spacer()
                     TnCameraToolbarMiscView(cameraManager: cameraManager)
-                    TnCameraToolbarMainView(cameraManager: cameraManager, bottom: bottom(appModel))
+                    TnCameraToolbarMainView(cameraManager: cameraManager, bottom: bottom())
                 }
             }
         }
