@@ -15,7 +15,7 @@ public struct TnCameraAppViewModelFactory {
         let cameraManager: TnCameraProxyServer
         
         func onChanged(settings: TnCameraBase.TnCameraSettings, status: TnCameraBase.TnCameraStatus) {
-            try? cameraManager.send(
+            cameraManager.send(
                 .getSettingsResponse,
                 TnCameraGetSettingsValue(settings: cameraManager.settings, status: status)
             )
@@ -35,9 +35,9 @@ public struct TnCameraAppViewModelFactory {
         }
     }
     
-    public static func createServerModel(delegate: TnCameraViewModelDelegate? = nil) -> TnCameraAppViewModel<TnCameraProxyServer> {
+    public static func createServerModel(delegate: TnCameraViewModelDelegate? = nil, EOM: String? = nil, MTU: Int? = nil) -> TnCameraAppViewModel<TnCameraProxyServer> {
         let appModel: TnCameraAppViewModel = .init(
-            cameraManager: TnCameraProxyServer(TnCameraLocal.shared, networkInfo: TnCameraProxyServiceInfo.shared),
+            cameraManager: TnCameraProxyServer(TnCameraLocal.shared, networkInfo: TnCameraProxyServiceInfo.getInstance(EOM: EOM, MTU: MTU)),
             cameraModel: TnCameraViewModel()
         )
         appModel.cameraModel.delegate = delegate ?? ServerDelegate(cameraManager: appModel.cameraManager)
@@ -53,9 +53,9 @@ public struct TnCameraAppViewModelFactory {
         return appModel
     }
     
-    public static func createClientModel(delegate: TnCameraViewModelDelegate? = nil) -> TnCameraAppViewModel<TnCameraProxyClient> {
+    public static func createClientModel(delegate: TnCameraViewModelDelegate? = nil, EOM: String? = nil, MTU: Int? = nil) -> TnCameraAppViewModel<TnCameraProxyClient> {
         let appModel: TnCameraAppViewModel = .init(
-            cameraManager: TnCameraProxyClient(networkInfo: TnCameraProxyServiceInfo.shared),
+            cameraManager: TnCameraProxyClient(networkInfo: TnCameraProxyServiceInfo.getInstance(EOM: EOM, MTU: MTU)),
             cameraModel: TnCameraViewModel()
         )
         appModel.cameraModel.delegate = delegate ?? ClientDelegate(cameraManager: appModel.cameraManager)
