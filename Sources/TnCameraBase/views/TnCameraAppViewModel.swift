@@ -38,28 +38,39 @@ public class TnCameraAppViewModel<TCameraManager: TnCameraProxyProtocol>: NSObje
 
 public struct TnCameraAppView<TCameraManager: TnCameraProxyProtocol, TBottom: View>: TnLoggable {
     public let LOG_NAME = "TnCameraAppView.\(TCameraManager.Type.self)"
-    var appModelState: StateObject<TnCameraAppViewModel<TCameraManager>>
-    
     @ViewBuilder var bottom: () -> TBottom?
     
-    public init(appModel: StateObject<TnCameraAppViewModel<TCameraManager>>, @ViewBuilder bottom: @escaping () -> TBottom?) {
-        self.appModelState = appModel
+    //    var appModelState: StateObject<TnCameraAppViewModel<TCameraManager>>
+    //    public init(appModel: StateObject<TnCameraAppViewModel<TCameraManager>>, @ViewBuilder bottom: @escaping () -> TBottom?) {
+    //        self.appModelState = appModel
+    //        self.bottom = bottom
+    //        logDebug("inited")
+    //    }
+    //    public var appModel: TnCameraAppViewModel<TCameraManager> {
+    //        appModelState.wrappedValue
+    //    }
+    //
+    //    public var cameraModel: TnCameraViewModel {
+    //        appModelState.wrappedValue.cameraModel
+    //    }
+    //
+    //    public var cameraManager: TCameraManager {
+    //        appModelState.wrappedValue.cameraManager
+    //    }
+    
+    var appModel: TnCameraAppViewModel<TCameraManager>
+    public init(appModel: TnCameraAppViewModel<TCameraManager>, @ViewBuilder bottom: @escaping () -> TBottom?) {
+        self.appModel = appModel
         self.bottom = bottom
         logDebug("inited")
     }
-}
-
-extension TnCameraAppView {
-    public var appModel: TnCameraAppViewModel<TCameraManager> {
-        appModelState.wrappedValue
-    }
     
     public var cameraModel: TnCameraViewModel {
-        appModelState.wrappedValue.cameraModel
+        appModel.cameraModel
     }
     
     public var cameraManager: TCameraManager {
-        appModelState.wrappedValue.cameraManager
+        appModel.cameraManager
     }
 }
 
