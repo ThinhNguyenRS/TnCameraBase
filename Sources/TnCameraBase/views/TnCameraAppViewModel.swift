@@ -65,8 +65,8 @@ public struct TnCameraAppView<TCameraManager: TnCameraProxyProtocol, TBottom: Vi
 //        logDebug("inited")
 //    }
     
-    @StateObject var appModel: TnCameraAppViewModel<TCameraManager>
-    public init(appModel: StateObject<TnCameraAppViewModel<TCameraManager>>, @ViewBuilder bottom: @escaping () -> TBottom?) {
+    @Binding var appModel: TnCameraAppViewModel<TCameraManager>
+    public init(appModel: Binding<TnCameraAppViewModel<TCameraManager>>, @ViewBuilder bottom: @escaping () -> TBottom?) {
         self._appModel = appModel
         self.bottom = bottom
         logDebug("inited")
