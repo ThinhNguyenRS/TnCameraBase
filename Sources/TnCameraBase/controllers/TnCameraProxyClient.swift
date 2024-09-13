@@ -186,8 +186,12 @@ extension TnCameraProxyClient {
 
                 let ciImage = CIImage(image: uiImage)!
                 self.currentCiImage = ciImage
+                
+                if settings.transportContinuous {
+                    send(.getImage)
+                }
             } else {
-                print("error")
+                print("receive image error")
             }
         default:
             return

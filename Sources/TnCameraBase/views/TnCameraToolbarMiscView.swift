@@ -193,30 +193,35 @@ extension TnCameraToolbarMiscView {
 
             Section("System") {
                 getSliderView(
-                    value: $cameraModel.settings.imageMaxWidth,
+                    value: $cameraModel.settings.transportMaxWidth,
                     label: "Image max width",
                     bounds: 720.0...1920.0,
                     step: 120,
                     onChanged: { _ in},
                     onChanging: { [self] v in
-                        cameraManager.setTransport(.init(imageMaxWidth: v))
+                        cameraManager.setTransport(.init(maxWidth: v))
                     },
                     specifier: "%.0f",
                     closeable: false
                 )
 
                 getSliderView(
-                    value: $cameraModel.settings.imageCompressQuality,
+                    value: $cameraModel.settings.transportCompressQuality,
                     label: "Image compress quality",
                     bounds: 0.25...1,
                     step: 0.25,
                     onChanged: { _ in},
                     onChanging: { [self] v in
-                        cameraManager.setTransport(.init(imageCompressQuality: v))
+                        cameraManager.setTransport(.init(compressQuality: v))
                     },
                     specifier: "%.2f",
                     closeable: false
                 )
+
+                TnToggleField(label: "Image continuous", value: $cameraModel.settings.transportContinuous) { v in
+                    cameraManager.setTransport(.init(continuous: v))
+                }
+                .toggleStyle(.switch)
             }
         }
     }

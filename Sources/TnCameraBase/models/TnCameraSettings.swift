@@ -80,7 +80,8 @@ public struct TnCameraSettings: Codable {
     
     public var wideColor = true
     
-    public var imageMaxWidth: CGFloat = 1080
-    public var imageCompressQuality: CGFloat = 0.75
+    public var transportMaxWidth: CGFloat = 1080
+    public var transportCompressQuality: CGFloat = 0.75
+    public var transportContinuous = false
 }
 
