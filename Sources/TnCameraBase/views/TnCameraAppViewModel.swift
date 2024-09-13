@@ -100,5 +100,8 @@ extension TnCameraAppView: View {
         .onAppear {
             appModel.setup()
         }
+        .onReceive(cameraModel.$status, perform: { v in
+            logDebug("cameraModel status changed", v)
+        })
     }
 }
