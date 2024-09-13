@@ -58,20 +58,13 @@ public struct TnCameraAppView<TCameraManager: TnCameraProxyProtocol, TBottom: Vi
     //        appModelState.wrappedValue.cameraManager
     //    }
     
-//    var appModel: TnCameraAppViewModel<TCameraManager>
-//    public init(appModel: TnCameraAppViewModel<TCameraManager>, @ViewBuilder bottom: @escaping () -> TBottom?) {
-//        self.appModel = appModel
-//        self.bottom = bottom
-//        logDebug("inited")
-//    }
-    
-    @Binding var appModel: TnCameraAppViewModel<TCameraManager>
-    public init(appModel: Binding<TnCameraAppViewModel<TCameraManager>>, @ViewBuilder bottom: @escaping () -> TBottom?) {
-        self._appModel = appModel
+    let appModel: TnCameraAppViewModel<TCameraManager>
+    public init(appModel: TnCameraAppViewModel<TCameraManager>, @ViewBuilder bottom: @escaping () -> TBottom?) {
+        self.appModel = appModel
         self.bottom = bottom
         logDebug("inited")
     }
-
+    
     public var cameraModel: TnCameraViewModel {
         appModel.cameraModel
     }
