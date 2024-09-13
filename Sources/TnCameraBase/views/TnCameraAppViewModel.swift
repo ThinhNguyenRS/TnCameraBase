@@ -77,20 +77,22 @@ public struct TnCameraAppView<TCameraManager: TnCameraProxyProtocol, TBottom: Vi
 extension TnCameraAppView: View {
     public var body: some View {
         ZStack {
-            // preview
-            TnCameraPreviewViewMetal(imagePublisher: cameraManager.currentCiImagePublisher)
-                .onTapGesture {
-                    withAnimation {
-                        appModel.showToolbar.toggle()
+            if cameraModel.status == .started {
+                // preview
+                TnCameraPreviewViewMetal(imagePublisher: cameraManager.currentCiImagePublisher)
+                    .onTapGesture {
+                        withAnimation {
+                            appModel.showToolbar.toggle()
+                        }
                     }
-                }
 
-            // bottom toolbar
-            if appModel.showToolbar {
-                VStack(alignment: .leading) {
-                    Spacer()
-                    TnCameraToolbarMiscView(cameraManager: cameraManager)
-                    TnCameraToolbarMainView(cameraManager: cameraManager, bottom: bottom())
+                // bottom toolbar
+                if appModel.showToolbar {
+                    VStack(alignment: .leading) {
+                        Spacer()
+                        TnCameraToolbarMiscView(cameraManager: cameraManager)
+                        TnCameraToolbarMainView(cameraManager: cameraManager, bottom: bottom())
+                    }
                 }
             }
         }
