@@ -72,21 +72,21 @@ public struct TnCameraAppView<TCameraManager: TnCameraProxyProtocol, TBottom: Vi
         logDebug("inited")
     }
 
-    public var cameraModel: TnCameraViewModel {
-        appModel.cameraModel
-    }
-    
-    public var cameraManager: TCameraManager {
-        appModel.cameraManager
-    }
+//    public var cameraModel: TnCameraViewModel {
+//        appModel.cameraModel
+//    }
+//    
+//    public var cameraManager: TCameraManager {
+//        appModel.cameraManager
+//    }
 }
 
 extension TnCameraAppView: View {
     public var body: some View {
         ZStack {
-            if cameraModel.status == .started {
+            if appModel.cameraModel.status == .started {
                 // preview
-                TnCameraPreviewViewMetal(imagePublisher: cameraManager.currentCiImagePublisher)
+                TnCameraPreviewViewMetal(imagePublisher: appModel.cameraManager.currentCiImagePublisher)
                     .onTapGesture {
                         withAnimation {
                             appModel.showToolbar.toggle()
@@ -97,17 +97,17 @@ extension TnCameraAppView: View {
                 if appModel.showToolbar {
                     VStack(alignment: .leading) {
                         Spacer()
-                        TnCameraToolbarMiscView(cameraManager: cameraManager)
-                        TnCameraToolbarMainView(cameraManager: cameraManager, bottom: bottom?())
+                        TnCameraToolbarMiscView(cameraManager: appModel.cameraManager)
+                        TnCameraToolbarMainView(cameraManager: appModel.cameraManager, bottom: bottom?())
                     }
                 }
             }
         }
-        .environmentObject(cameraModel)
+//        .environmentObject(cameraModel)
         .onAppear {
             appModel.setup()
         }
-        .onReceive(cameraModel.$status, perform: { v in
+        .onReceive(appModel.cameraModel.$status, perform: { v in
             logDebug("cameraModel status changed", v)
         })
     }
