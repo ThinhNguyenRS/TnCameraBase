@@ -39,52 +39,21 @@ public class TnCameraAppViewModel<TCameraManager: TnCameraProxyProtocol>: NSObje
 public struct TnCameraAppView<TCameraManager: TnCameraProxyProtocol, TBottom: View>: TnLoggable {
     public let LOG_NAME = "TnCameraAppView.\(TCameraManager.Type.self)"
     var bottom: (() -> TBottom)?
-    
-    //    var appModelState: StateObject<TnCameraAppViewModel<TCameraManager>>
-    //    public init(appModel: StateObject<TnCameraAppViewModel<TCameraManager>>, @ViewBuilder bottom: @escaping () -> TBottom?) {
-    //        self.appModelState = appModel
-    //        self.bottom = bottom
-    //        logDebug("inited")
-    //    }
-    //    public var appModel: TnCameraAppViewModel<TCameraManager> {
-    //        appModelState.wrappedValue
-    //    }
-    //
-    //    public var cameraModel: TnCameraViewModel {
-    //        appModelState.wrappedValue.cameraModel
-    //    }
-    //
-    //    public var cameraManager: TCameraManager {
-    //        appModelState.wrappedValue.cameraManager
-    //    }
-    
-//    let appModel: TnCameraAppViewModel<TCameraManager>
-//    public init(appModel: TnCameraAppViewModel<TCameraManager>, @ViewBuilder bottom: @escaping () -> TBottom?) {
-//        self.appModel = appModel
-//        self.bottom = bottom
-//        logDebug("inited")
-//    }
-
     @EnvironmentObject var appModel: TnCameraAppViewModel<TCameraManager>
+    @EnvironmentObject var cameraModel: TnCameraViewModel
+
+//    @State var
 
     public init(bottom: (() -> TBottom)? = nil) {
         self.bottom = bottom
         logDebug("inited")
     }
-
-//    public var cameraModel: TnCameraViewModel {
-//        appModel.cameraModel
-//    }
-//    
-//    public var cameraManager: TCameraManager {
-//        appModel.cameraManager
-//    }
 }
 
 extension TnCameraAppView: View {
     public var body: some View {
         ZStack {
-//            if appModel.cameraModel.status == .started {
+            if cameraModel.status == .started {
                 // preview
                 TnCameraPreviewViewMetal(imagePublisher: appModel.cameraManager.currentCiImagePublisher)
                     .onTapGesture {
@@ -101,9 +70,8 @@ extension TnCameraAppView: View {
                         TnCameraToolbarMainView(cameraManager: appModel.cameraManager, bottom: bottom?())
                     }
                 }
-//            }
+            }
         }
-//        .environmentObject(cameraModel)
         .onAppear {
             appModel.setup()
         }
