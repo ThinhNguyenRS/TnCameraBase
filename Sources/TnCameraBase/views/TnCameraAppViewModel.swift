@@ -84,7 +84,7 @@ public struct TnCameraAppView<TCameraManager: TnCameraProxyProtocol, TBottom: Vi
 extension TnCameraAppView: View {
     public var body: some View {
         ZStack {
-            if appModel.cameraModel.status == .started {
+//            if appModel.cameraModel.status == .started {
                 // preview
                 TnCameraPreviewViewMetal(imagePublisher: appModel.cameraManager.currentCiImagePublisher)
                     .onTapGesture {
@@ -101,7 +101,7 @@ extension TnCameraAppView: View {
                         TnCameraToolbarMainView(cameraManager: appModel.cameraManager, bottom: bottom?())
                     }
                 }
-            }
+//            }
         }
 //        .environmentObject(cameraModel)
         .onAppear {
