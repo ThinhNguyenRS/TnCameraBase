@@ -258,49 +258,45 @@ extension TnCameraLocal: TnCameraProtocol {
         $status
     }
     
-    public func startCapturing(completion: (() -> Void)?) {
+    public func startCapturing() {
         sessionAsync { me in
             if me.status < .inited {
-                me.startSession(completion: completion)
+                me.startSession()
             } else {
                 if !me.session.isRunning {
                     me.session.startRunning()
                     me.status = .started
-                    completion?()
                 }
             }
         }
     }
     
-    public func stopCapturing(completion: (() -> Void)?) {
+    public func stopCapturing() {
         sessionAsync { me in
             if me.session.isRunning {
                 me.session.startRunning()
                 me.status = .started
-                completion?()
             }
         }
     }
     
-    public func toggleCapturing(completion: (() -> Void)?) {
+    public func toggleCapturing() {
         sessionAsync { me in
             if me.status < .inited {
-                me.startSession(completion: completion)
+                me.startSession()
             } else {
                 if me.session.isRunning {
                     me.session.stopRunning()
                     me.status = .inited
-                    completion?()
                 } else {
                     me.session.startRunning()
                     me.status = .started
-                    completion?()
                 }
             }
         }
     }
     
-    public func switchCamera(completion: (() -> Void)? = nil) {
+    public func switchCamera() {
         settings.cameraPosition = settings.cameraPosition.toggle()
         // change cameratype if necessary
         forceValueInRange(&settings.cameraType, TnCameraDiscover.getAvailableDeviceTpes(for: settings.cameraPosition))
@@ -310,7 +306,6 @@ extension TnCameraLocal: TnCameraProtocol {
             handler: {_,_ in },
             postHandler: { [self] deviceInput, device in
                 videoDataOutput.orientation = .portrait
-                completion?()
             }
         )
     }
@@ -321,7 +316,7 @@ extension TnCameraLocal: TnCameraProtocol {
                 if session.isRunning {
                     session.stopRunning()
                 }
-//                session.removeOutput(photoOutput)
+                //                session.removeOutput(photoOutput)
                 
                 session.beginConfiguration()
                 photoOutput.isLivePhotoCaptureEnabled = v
@@ -404,14 +399,14 @@ extension TnCameraLocal: TnCameraProtocol {
         }
     }
     
-    public func setExposure(iso: Float? = nil, duration: Double? = nil) {
+    public func setExposure(_ v: TnCameraExposureValue) {
         if settings.exposureMode == .custom {
             applyDevice(
                 name: "setExposure",
                 handler: { _, device in
                     device.setExposureModeCustom(
-                        duration: duration == nil ? AVCaptureDevice.currentExposureDuration : CMTime(seconds: duration!, preferredTimescale: device.exposureDuration.timescale),
-                        iso: iso ?? AVCaptureDevice.currentISO
+                        duration: v.duration == nil ? AVCaptureDevice.currentExposureDuration : CMTime(seconds: v.duration!, preferredTimescale: device.exposureDuration.timescale),
+                        iso: v.iso ?? AVCaptureDevice.currentISO
                     )
                 },
                 postHandler: {_,_ in
@@ -421,21 +416,20 @@ extension TnCameraLocal: TnCameraProtocol {
         }
     }
     
-    public func setZoomFactor(_ newValue: CGFloat, adjust: Bool = false, withRate: Float = 2, completion: (() -> Void)? = nil) {
-        if !settings.zoomRange.contains(newValue) {
+    public func setZoomFactor(_ v: TnCameraZoomFactorValue) {
+        if !settings.zoomRange.contains(v.value) {
             return
         }
-        var v = newValue * settings.zoomMainFactor
+        var newV = v.value * settings.zoomMainFactor
         self.applyDevice(
             name: "setZoomFactor",
             handler: { [self] _, device in
-                if adjust {
-                    v = getValueInRange(device.videoZoomFactor + newValue - 1, device.minAvailableVideoZoomFactor, device.maxAvailableVideoZoomFactor)
+                if v.adjust {
+                    newV = getValueInRange(device.videoZoomFactor + v.value - 1, device.minAvailableVideoZoomFactor, device.maxAvailableVideoZoomFactor)
                 }
-                if v != device.videoZoomFactor {
-                    device.ramp(toVideoZoomFactor: v, withRate: withRate * Float(settings.zoomMainFactor))
-                    settings.zoomFactor = newValue
-                    completion?()
+                if newV != device.videoZoomFactor {
+                    device.ramp(toVideoZoomFactor: newV, withRate: v.withRate * Float(settings.zoomMainFactor))
+                    settings.zoomFactor = v.value
                 }
             }
         )
@@ -497,6 +491,15 @@ extension TnCameraLocal: TnCameraProtocol {
         applyDevice(name: "setFocusMode", handler: { _, device in
             device.focusMode = v
         })
+    }
+    
+    public func setTransport(_ v: TnCameraTransportValue) {
+        if let imageMaxWidth = v.imageMaxWidth {
+            settings.imageMaxWidth = imageMaxWidth
+        }
+        if let imageCompressQuality = v.imageCompressQuality {
+            settings.imageMaxWidth = imageCompressQuality
+        }
     }
 }
 

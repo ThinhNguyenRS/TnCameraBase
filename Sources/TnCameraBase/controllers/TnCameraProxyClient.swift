@@ -60,17 +60,17 @@ extension TnCameraProxyClient: TnCameraProxyProtocol {
         $status
     }
     
-    public func startCapturing(completion: (() -> Void)?) {
+    public func startCapturing() {
     }
     
-    public func stopCapturing(completion: (() -> Void)?) {
+    public func stopCapturing() {
     }
     
-    public func toggleCapturing(completion: (() -> Void)?) {
+    public func toggleCapturing() {
         send(.toggleCapturing)
     }
     
-    public func switchCamera(completion: (() -> Void)?) {
+    public func switchCamera() {
         send(.switchCamera)
     }
     
@@ -102,11 +102,11 @@ extension TnCameraProxyClient: TnCameraProxyProtocol {
         send(.setExposureMode, v)
     }
     
-    public func setExposure(iso: Float? = nil, duration: Double? = nil) {
+    public func setExposure(_ v: TnCameraExposureValue) {
     }
     
-    public func setZoomFactor(_ newValue: CGFloat, adjust: Bool = false, withRate: Float = 2, completion: (() -> Void)? = nil) {
-        send(.setZoomFactor, TnCameraSetZoomFactorValue(value: newValue, adjust: adjust, withRate: withRate))
+    public func setZoomFactor(_ v: TnCameraZoomFactorValue) {
+        send(.setZoomFactor, v)
     }
     
     public func setDepth(_ v: Bool) {
@@ -123,6 +123,10 @@ extension TnCameraProxyClient: TnCameraProxyProtocol {
     
     public func setFocusMode(_ v: AVCaptureDevice.FocusMode) {
         send(.setFocusMode, v)
+    }
+    
+    public func setTransport(_ v: TnCameraTransportValue) {
+        send(.setTransport, v)
     }
 }
 
@@ -165,7 +169,7 @@ extension TnCameraProxyClient {
 
         switch messageType {
         case .getSettingsResponse:
-            let settingsValue: TnCameraGetSettingsValue = getMessageValue(receivedMsg)!
+            let settingsValue: TnCameraSettingsValue = getMessageValue(receivedMsg)!
             self.status = settingsValue.status
             self.settings = settingsValue.settings
             // connect to TCP
@@ -178,7 +182,7 @@ extension TnCameraProxyClient {
         case .getImageResponse:
             if let imageData: Data = getMessageValue(receivedMsg) {
                 let uiImage: UIImage = .init(data: imageData)!
-                logDebug("image", uiImage.size.width, uiImage.size.height)
+                logDebug("image", uiImage.size.width, uiImage.size.height, uiImage.scale)
 
                 let ciImage = CIImage(image: uiImage)!
                 self.currentCiImage = ciImage

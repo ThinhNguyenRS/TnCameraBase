@@ -15,12 +15,12 @@ import TnIosBase
 public class TnCameraProxyServer: TnLoggable {
     public let LOG_NAME = "TnCameraProxyServer"
 
-    private let cameraManager: TnCameraLocal
+    private let cameraLocal: TnCameraLocal
     private var network: TnNetworkServer?
     private let ble: TnBluetoothServer
 
     public init(_ cameraManager: TnCameraLocal, networkInfo: TnNetworkServiceInfo) {
-        self.cameraManager = cameraManager
+        self.cameraLocal = cameraManager
         ble = .init(info: networkInfo)
         if let address = TnNetworkHelper.getAddressList(for: [.wifi, .cellularBridge, .cellular]).first {
             network = .init(host: address.address, port: 1234, queue: .main, delegate: self, EOM: networkInfo.EOM, MTU: networkInfo.MTU)
@@ -41,10 +41,10 @@ public class TnCameraProxyServer: TnLoggable {
     
     public var captureCompletion: ((UIImage) -> Void)? {
         get {
-            cameraManager.captureImageCompletion
+            cameraLocal.captureImageCompletion
         }
         set {
-            cameraManager.captureImageCompletion = newValue
+            cameraLocal.captureImageCompletion = newValue
         }
     }
 
@@ -57,7 +57,7 @@ extension TnCameraProxyServer: TnBluetoothServerDelegate {
         case .inited:
             ble.start()
         case .started:
-            cameraManager.startCapturing(completion: nil)
+            cameraLocal.startCapturing()
         default:
             return
         }
@@ -81,7 +81,7 @@ extension TnCameraProxyServer {
     }
     
     public func sendImage() {
-        if let currentCiImage = cameraManager.currentCiImage {
+        if let currentCiImage = cameraLocal.currentCiImage {
             send(.getImageResponse, currentCiImage.jpegData(maxWidth: settings.imageMaxWidth, compressionQuality: settings.imageCompressQuality))
         }
     }
@@ -93,27 +93,24 @@ extension TnCameraProxyServer {
 
         switch messageType {
         case .toggleCapturing:
-            toggleCapturing {
-            }
+            toggleCapturing()
 
         case .switchCamera:
-            switchCamera {
-            }
+            switchCamera()
             
         case .captureImage:
             captureImage()
 
         case .getSettings:
             // response settings
-            send(.getSettingsResponse, TnCameraGetSettingsValue(settings: cameraManager.settings, status: cameraManager.status, network: network), useBle: true)
+            send(.getSettingsResponse, TnCameraSettingsValue(settings: cameraLocal.settings, status: cameraLocal.status, network: network), useBle: true)
 
         case .getImage:
             sendImage()
             
         case .setZoomFactor:
-            let zoomValue: TnCameraSetZoomFactorValue = getMessageValue(receivedMsg)!
-            setZoomFactor(zoomValue.value, adjust: zoomValue.adjust, withRate: zoomValue.withRate) {
-            }
+            let zoomValue: TnCameraZoomFactorValue = getMessageValue(receivedMsg)!
+            setZoomFactor(zoomValue)
 
         case .setLivephoto:
             setLivephoto(getMessageValue(receivedMsg)!)
@@ -136,6 +133,9 @@ extension TnCameraProxyServer {
         case .setFocusMode:
             setFocusMode(getMessageValue(receivedMsg)!)
 
+        case .setTransport:
+            let value: TnCameraTransportValue = getMessageValue(receivedMsg)!
+            setTransport(value)
         default:
             return
         }
@@ -149,93 +149,97 @@ extension TnCameraProxyServer: TnCameraProxyProtocol {
     }
     
     public var currentCiImagePublisher: Published<CIImage?>.Publisher {
-        cameraManager.currentCiImagePublisher
+        cameraLocal.currentCiImagePublisher
     }
     
     public var currentCiImage: CIImage? {
-        cameraManager.currentCiImage
+        cameraLocal.currentCiImage
     }
     
     public var settingsPublisher: Published<TnCameraSettings>.Publisher {
-        cameraManager.settingsPublisher
+        cameraLocal.settingsPublisher
     }
     
     public var settings: TnCameraSettings {
-        cameraManager.settings
+        cameraLocal.settings
     }
     
     public var statusPublisher: Published<TnCameraStatus>.Publisher {
-        cameraManager.statusPublisher
+        cameraLocal.statusPublisher
     }
     
     public var status: TnCameraStatus {
-        cameraManager.status
+        cameraLocal.status
     }
-    public func startCapturing(completion: (() -> Void)?) {
-        cameraManager.startCapturing(completion: completion)
+    public func startCapturing() {
+        cameraLocal.startCapturing()
     }
     
-    public func stopCapturing(completion: (() -> Void)?) {
-        cameraManager.stopCapturing(completion: completion)
+    public func stopCapturing() {
+        cameraLocal.stopCapturing()
     }
 
-    public func toggleCapturing(completion: (() -> Void)?) {
-        cameraManager.toggleCapturing(completion: completion)
+    public func toggleCapturing() {
+        cameraLocal.toggleCapturing()
     }
     
-    public func switchCamera(completion: (() -> Void)?) {
-        cameraManager.switchCamera(completion: completion)
+    public func switchCamera() {
+        cameraLocal.switchCamera()
     }
     
     public func captureImage() {
-        cameraManager.captureImage()
+        cameraLocal.captureImage()
     }
     
     public func setLivephoto(_ v: Bool) {
-        cameraManager.setLivephoto(v)
+        cameraLocal.setLivephoto(v)
     }
     
     public func setFlash(_ v: AVCaptureDevice.FlashMode) {
-        cameraManager.setFlash(v)
+        cameraLocal.setFlash(v)
     }
     
     public func setHDR(_ v: TnTripleState) {
-        cameraManager.setHDR(v)
+        cameraLocal.setHDR(v)
     }
     
     public func setPreset(_ v: AVCaptureSession.Preset) {
-        cameraManager.setPreset(v)
+        cameraLocal.setPreset(v)
     }
     
     public func setCameraType(_ v: AVCaptureDevice.DeviceType) {
-        cameraManager.setCameraType(v)
+        cameraLocal.setCameraType(v)
     }
     
     public func setExposureMode(_ v: AVCaptureDevice.ExposureMode) {
-        cameraManager.setExposureMode(v)
+        cameraLocal.setExposureMode(v)
     }
     
-    public func setExposure(iso: Float?, duration: Double?) {
-        cameraManager.setExposure(iso: iso, duration: duration)
+    public func setExposure(_ v: TnCameraExposureValue) {
+        cameraLocal.setExposure(v)
     }
     
-    public func setZoomFactor(_ newValue: CGFloat, adjust: Bool, withRate: Float, completion: (() -> Void)?) {
-        cameraManager.setZoomFactor(newValue, adjust: adjust, withRate: withRate, completion: completion)
+    public func setZoomFactor(_ v: TnCameraZoomFactorValue) {
+        cameraLocal.setZoomFactor(v)
     }
     
     public func setDepth(_ v: Bool) {
-        cameraManager.setDepth(v)
+        cameraLocal.setDepth(v)
     }
     
     public func setPortrait(_ v: Bool) {
-        cameraManager.setPortrait(v)
+        cameraLocal.setPortrait(v)
     }
     
     public func setQuality(_ v: AVCapturePhotoOutput.QualityPrioritization) {
-        cameraManager.setQuality(v)
+        cameraLocal.setQuality(v)
     }
     
     public func setFocusMode(_ v: AVCaptureDevice.FocusMode) {
+    }
+    
+    public func setTransport(_ v: TnCameraTransportValue) {
+        cameraLocal.setTransport(v)
     }
 }
 

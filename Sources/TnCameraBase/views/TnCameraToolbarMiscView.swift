@@ -40,26 +40,27 @@ extension TnCameraToolbarMiscView {
             step: step,
             onChanged: { _ in},
             onChanging: { [self] v in
-                cameraManager.setZoomFactor(v, withRate: 1, completion: nil)
+                cameraManager.setZoomFactor(.init(value: v))
             },
             specifier: "%0.2f",
             bottomView: {
                 HStack {
                     tnCircleButton(imageName: "chevron.backward", radius: 40) {
-                        cameraManager.setZoomFactor(cameraModel.settings.zoomFactor - step, withRate: 1, completion: nil)
+                        cameraManager.setZoomFactor(.init(value: cameraModel.settings.zoomFactor - step))
                     }
+                    
                     Spacer()
                     tnForEach(cameraModel.settings.zoomRelativeFactors) { idx, v in
                         Group {
                             tnCircleButton(text: v.toString("%0.1f"), radius: 36, backColor: cameraModel.settings.zoomFactor == v ? .orange : .gray) {
-                                cameraManager.setZoomFactor(v, withRate: 1, completion: nil)
+                                cameraManager.setZoomFactor(.init(value: v))
                             }
                             Spacer()
                         }
                     }
 
                     tnCircleButton(imageName: "chevron.forward", radius: 40) {
-                        cameraManager.setZoomFactor(cameraModel.settings.zoomFactor + step, withRate: 1, completion: nil)
+                        cameraManager.setZoomFactor(.init(value: cameraModel.settings.zoomFactor + step))
                     }
                 }
             },
@@ -152,7 +153,7 @@ extension TnCameraToolbarMiscView {
                         step: 50,
                         onChanged: { _ in},
                         onChanging: { [self] v in
-                            cameraManager.setExposure(iso: v)
+                            cameraManager.setExposure(.init(iso: v))
                         },
                         specifier: "%.0f",
                         closeable: false
@@ -165,7 +166,7 @@ extension TnCameraToolbarMiscView {
                         step: 0.001,
                         onChanged: { _ in},
                         onChanging: { [self] v in
-                            cameraManager.setExposure(duration: v)
+                            cameraManager.setExposure(.init(duration: v))
                         },
                         specifier: "%.3f",
                         closeable: false
@@ -194,10 +195,11 @@ extension TnCameraToolbarMiscView {
                 getSliderView(
                     value: $cameraModel.settings.imageMaxWidth,
                     label: "Image max width",
-                    bounds: 720...1920,
+                    bounds: 720.0...1920.0,
                     step: 120,
                     onChanged: { _ in},
                     onChanging: { [self] v in
+                        cameraManager.setTransport(.init(imageMaxWidth: v))
                     },
                     specifier: "%.0f",
                     closeable: false
@@ -210,22 +212,12 @@ extension TnCameraToolbarMiscView {
                     step: 0.25,
                     onChanged: { _ in},
                     onChanging: { [self] v in
+                        cameraManager.setTransport(.init(imageCompressQuality: v))
                     },
                     specifier: "%.2f",
                     closeable: false
                 )
             }
         }
-//        .hideBackground()
     }
 }
-
-//extension View {
-//    func hideBackground() -> AnyView {
-//        var view: AnyView = .init(self)
-//        if #available(iOS 16.0, *) {
-//            view = .init(self.scrollContentBackground(.hidden))
-//        }
-//        return view
-//    }
-//}

@@ -41,6 +41,8 @@ public enum TnCameraMessageType: UInt8, Codable {
     case setFocusMode
 
     case captureImage
+    
+    case setTransport
 }
 
 // MARK: TnCameraMessageProtocol
@@ -63,6 +65,7 @@ public struct TnCameraMessage: TnCameraMessageProtocol {
     }
 }
 
+// MARK: TnCameraMessageValue
 public struct TnCameraMessageValue<T: Codable>: TnCameraMessageProtocol {
     public let messageType: TnCameraMessageType
     public let value: T
@@ -73,7 +76,8 @@ public struct TnCameraMessageValue<T: Codable>: TnCameraMessageProtocol {
     }
 }
 
-public struct TnCameraGetSettingsValue: Codable {
+// MARK: TnCameraSettingsValue
+public struct TnCameraSettingsValue: Codable {
     public let settings: TnCameraSettings
     public let status: TnCameraStatus
 
@@ -88,14 +92,35 @@ public struct TnCameraGetSettingsValue: Codable {
     }
 }
 
-public struct TnCameraSetZoomFactorValue: Codable {
+// MARK: TnCameraZoomFactorValue
+public struct TnCameraZoomFactorValue: Codable {
     public let value: CGFloat
     public let adjust: Bool
     public let withRate: Float
     
-    public init(value: CGFloat, adjust: Bool, withRate: Float) {
+    public init(value: CGFloat, adjust: Bool = false, withRate: Float = 1) {
         self.value = value
         self.adjust = adjust
         self.withRate = withRate
+    }
+}
+
+public struct TnCameraTransportValue: Codable {
+    public let imageMaxWidth: CGFloat?
+    public let imageCompressQuality: CGFloat?
+    
+    public init(imageMaxWidth: CGFloat? = nil, imageCompressQuality: CGFloat? = nil) {
+        self.imageMaxWidth = imageMaxWidth
+        self.imageCompressQuality = imageCompressQuality
+    }
+}
+
+public struct TnCameraExposureValue: Codable {
+    public let iso: Float?
+    public let duration: Double?
+    
+    public init(iso: Float? = nil, duration: Double? = nil) {
+        self.iso = iso
+        self.duration = duration
     }
 }

@@ -17,7 +17,7 @@ public struct TnCameraAppViewModelFactory {
         func onChanged(settings: TnCameraBase.TnCameraSettings, status: TnCameraBase.TnCameraStatus) {
             cameraManager.send(
                 .getSettingsResponse,
-                TnCameraGetSettingsValue(settings: cameraManager.settings, status: status)
+                TnCameraSettingsValue(settings: cameraManager.settings, status: status)
             )
         }
         
