@@ -30,7 +30,7 @@ public struct TnCameraToolbarMainView<TBottom: View, TCameraManager: TnCameraPro
                 }
 
                 Spacer()
-                getSettingsButton(type: .zoom, text: cameraModel.settings.zoomFactor.toString("%0.1fx"))
+                getSettingsButton(type: .zoom, text: cameraModel.settings.zoomFactor.toString("%0.2f"))
 
                 if let bottom {
                     Spacer()
