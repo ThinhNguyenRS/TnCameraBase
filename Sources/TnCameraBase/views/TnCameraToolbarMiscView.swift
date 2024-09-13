@@ -193,13 +193,13 @@ extension TnCameraToolbarMiscView {
             Section("System") {
                 getSliderView(
                     value: $cameraModel.settings.imageMaxWidth,
-                    label: "Image width",
+                    label: "Image max width",
                     bounds: 720...1920,
                     step: 120,
                     onChanged: { _ in},
                     onChanging: { [self] v in
                     },
-                    specifier: "%.3f",
+                    specifier: "%.0f",
                     closeable: false
                 )
 
@@ -211,7 +211,7 @@ extension TnCameraToolbarMiscView {
                     onChanged: { _ in},
                     onChanging: { [self] v in
                     },
-                    specifier: "%.3f",
+                    specifier: "%.2f",
                     closeable: false
                 )
             }
