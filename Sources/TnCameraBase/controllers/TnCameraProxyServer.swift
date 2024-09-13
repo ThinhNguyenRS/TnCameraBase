@@ -109,33 +109,49 @@ extension TnCameraProxyServer {
             sendImage()
             
         case .setZoomFactor:
-            let zoomValue: TnCameraZoomFactorValue = getMessageValue(receivedMsg)!
-            setZoomFactor(zoomValue)
+            solveMsgValue(receivedMsg) { (v: TnCameraZoomFactorValue) in
+                setZoomFactor(v)
+            }
 
         case .setLivephoto:
-            setLivephoto(getMessageValue(receivedMsg)!)
+            solveMsgValue(receivedMsg) { (v: Bool) in
+                setLivephoto(v)
+            }
             
         case .setFlash:
-            setFlash(getMessageValue(receivedMsg)!)
+            solveMsgValue(receivedMsg) { (v: AVCaptureDevice.FlashMode) in
+                setFlash(v)
+            }
 
         case .setHDR:
-            setHDR(getMessageValue(receivedMsg)!)
+            solveMsgValue(receivedMsg) { (v: TnTripleState) in
+                setHDR(v)
+            }
 
         case .setPreset:
-            setPreset(getMessageValue(receivedMsg)!)
+            solveMsgValue(receivedMsg) { (v: AVCaptureSession.Preset) in
+                setPreset(v)
+            }
             
         case .setCameraType:
-            setCameraType(getMessageValue(receivedMsg)!)
+            solveMsgValue(receivedMsg) { (v: AVCaptureDevice.DeviceType) in
+                setCameraType(v)
+            }
             
         case .setQuality:
-            setQuality(getMessageValue(receivedMsg)!)
+            solveMsgValue(receivedMsg) { (v: AVCapturePhotoOutput.QualityPrioritization) in
+                setQuality(v)
+            }
             
         case .setFocusMode:
-            setFocusMode(getMessageValue(receivedMsg)!)
+            solveMsgValue(receivedMsg) { (v: AVCaptureDevice.FocusMode) in
+                setFocusMode(v)
+            }
 
         case .setTransport:
-            let value: TnCameraTransportValue = getMessageValue(receivedMsg)!
-            setTransport(value)
+            solveMsgValue(receivedMsg) { (v: TnCameraTransportValue) in
+                setTransport(v)
+            }
         default:
             return
         }
