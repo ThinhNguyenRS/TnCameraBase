@@ -21,7 +21,7 @@ public class TnCameraAppViewProxyServerModel: TnCameraAppViewModelDefault<TnCame
     }
     
     public func onChanged(settings: TnCameraSettings, status: TnCameraStatus) {
-        cameraManager.send(
+        try? cameraManager.send(
             .getSettingsResponse,
             TnCameraGetSettingsValue(settings: cameraManager.settings, status: status)
         )

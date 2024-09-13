@@ -152,9 +152,9 @@ extension TnCameraProxyClient: TnBluetoothClientDelegate {
 extension TnCameraProxyClient {
     public func send(_ object: TnCameraMessageProtocol, useBle: Bool = false) {
         if useBle {
-            ble.send(object: object)
+            try? ble.send(object: object)
         } else {
-            network?.send(object: object)
+            try? network?.send(object: object)
         }
     }
     

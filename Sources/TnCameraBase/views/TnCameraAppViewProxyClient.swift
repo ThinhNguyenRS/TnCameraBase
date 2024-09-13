@@ -16,7 +16,7 @@ public struct TnCameraAppViewProxyClient: TnCameraAppViewProtocol, TnLoggable {
     public var bottom: Optional<some View> {
         HStack {
             tnCircleButton(imageName: "photo.artframe", radius: 50) {
-                cameraManager.send(.getImage)
+                try? cameraManager.send(.getImage)
             }
         }
     }

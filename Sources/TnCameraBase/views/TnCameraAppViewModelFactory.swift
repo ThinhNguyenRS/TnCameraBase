@@ -15,7 +15,7 @@ public struct TnCameraAppViewModelFactory {
         let cameraManager: TnCameraProxyServer
         
         func onChanged(settings: TnCameraBase.TnCameraSettings, status: TnCameraBase.TnCameraStatus) {
-            cameraManager.send(
+            try? cameraManager.send(
                 .getSettingsResponse,
                 TnCameraGetSettingsValue(settings: cameraManager.settings, status: status)
             )

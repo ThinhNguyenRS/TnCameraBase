@@ -74,9 +74,9 @@ extension TnCameraProxyServer: TnBluetoothServerDelegate {
 extension TnCameraProxyServer {
     public func send(_ object: TnCameraMessageProtocol, useBle: Bool = false) {
         if useBle {
-            ble.send(object: object)
+            try? ble.send(object: object)
         } else {
-            network?.send(object: object)
+            try? network?.send(object: object)
         }
     }
     
@@ -87,7 +87,7 @@ extension TnCameraProxyServer {
     }
     
     func solveData(data: Data) {
-        let receivedMsg = data.toMessage()
+        let receivedMsg = TnMessage(data: data)
         let messageType: TnCameraMessageType = .init(rawValue: receivedMsg.typeCode)!
         logDebug("receive", messageType)
 
