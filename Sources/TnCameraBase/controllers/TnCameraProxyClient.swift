@@ -162,7 +162,9 @@ extension TnCameraProxyClient {
         let receivedMsg = TnMessage(data: data)
         let messageType: TnCameraMessageType = .init(rawValue: receivedMsg.typeCode)!
         logDebug("receive", messageType)
-        
+
+        let msgStr = String(data: data, encoding: .utf8)!
+
         switch messageType {
         case .getSettingsResponse:
             let settingsValue: TnCameraGetSettingsValue = getMessageValue(receivedMsg)!
@@ -176,15 +178,14 @@ extension TnCameraProxyClient {
                 }
             }
         case .getImageResponse:
-            if let imageValue: TnCameraMessageValue<Data?> = getMessageValue(receivedMsg), let imageData = imageValue.value {
-                let uiImage: UIImage = .init(data: imageData)!
+            if let imageValue: TnCameraMessageValue<Data> = getMessageValue(receivedMsg) {
+                let uiImage: UIImage = .init(data: imageValue.value)!
                 logDebug("image", uiImage.size.width, uiImage.size.height)
 
                 let ciImage = CIImage(image: uiImage)!
                 self.currentCiImage = ciImage
             } else {
-                let msgStr = String(data: data, encoding: .utf8)!
-                print(msgStr)
+                print("error")
             }
         default:
             return
