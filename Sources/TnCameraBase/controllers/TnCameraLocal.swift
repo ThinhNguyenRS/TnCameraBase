@@ -498,7 +498,7 @@ extension TnCameraLocal: TnCameraProtocol {
             settings.imageMaxWidth = imageMaxWidth
         }
         if let imageCompressQuality = v.imageCompressQuality {
-            settings.imageMaxWidth = imageCompressQuality
+            settings.imageCompressQuality = imageCompressQuality
         }
     }
 }
