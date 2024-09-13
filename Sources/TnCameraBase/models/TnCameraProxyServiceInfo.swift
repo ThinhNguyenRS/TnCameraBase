@@ -17,6 +17,6 @@ public struct TnCameraProxyServiceInfo {
         bleCharacteristicUUID: CBUUID(string: "B20A40F8-6232-457C-8C8E-2A36F0C92945"),
         bleRssiMin: -100,
         EOM: "$$$EOM$$$".data(using: .utf8)!,
-        MTU: 4*1024*1024
+        MTU: 64*1024
     )
 }
