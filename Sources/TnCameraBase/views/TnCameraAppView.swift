@@ -11,11 +11,11 @@ import TnIosBase
 
 public struct TnCameraAppView<TCameraManager: TnCameraProxyProtocol, TBottom: View>: TnLoggable {
     public let LOG_NAME = "TnCameraAppView.\(TCameraManager.Type.self)"
-    var bottom: (() -> TBottom)?
+    @ViewBuilder var bottom: () -> TBottom
     @EnvironmentObject var appModel: TnCameraAppViewModel<TCameraManager>
     @EnvironmentObject var cameraModel: TnCameraViewModel
 
-    public init(bottom: (() -> TBottom)? = nil) {
+    public init(_ type: TCameraManager.Type, @ViewBuilder bottom: @escaping () -> TBottom) {
         self.bottom = bottom
         logDebug("inited")
     }
@@ -38,7 +38,7 @@ extension TnCameraAppView: View {
                     VStack(alignment: .leading) {
                         Spacer()
                         TnCameraToolbarMiscView(cameraManager: appModel.cameraManager)
-                        TnCameraToolbarMainView(cameraManager: appModel.cameraManager, bottom: bottom?())
+                        TnCameraToolbarMainView(cameraManager: appModel.cameraManager, bottom: bottom())
                     }
                 }
             }
