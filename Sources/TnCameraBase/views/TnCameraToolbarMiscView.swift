@@ -97,6 +97,10 @@ extension TnCameraToolbarMiscView {
                 }
                 .toggleStyle(.switch)
                 .disabled(!cameraModel.settings.livephotoSupported)
+
+                TnToggleField(label: "Wide color", value: $cameraModel.settings.wideColor) { v in
+                }
+                .toggleStyle(.switch)
             }
 
             Section("Light") {
@@ -185,6 +189,32 @@ extension TnCameraToolbarMiscView {
                 .disabled(!(cameraModel.settings.depth && cameraModel.settings.portraitSupported))
             }
             .disabled(!cameraModel.settings.depthSupported)
+
+            Section("System") {
+                getSliderView(
+                    value: $cameraModel.settings.imageMaxWidth,
+                    label: "Image width",
+                    bounds: 720...1920,
+                    step: 120,
+                    onChanged: { _ in},
+                    onChanging: { [self] v in
+                    },
+                    specifier: "%.3f",
+                    closeable: false
+                )
+
+                getSliderView(
+                    value: $cameraModel.settings.imageCompressQuality,
+                    label: "Image compress quality",
+                    bounds: 0.25...1,
+                    step: 0.25,
+                    onChanged: { _ in},
+                    onChanging: { [self] v in
+                    },
+                    specifier: "%.3f",
+                    closeable: false
+                )
+            }
         }
 //        .hideBackground()
     }
