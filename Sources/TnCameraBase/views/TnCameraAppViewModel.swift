@@ -12,8 +12,8 @@ import TnIosBase
 public class TnCameraAppViewModel<TCameraManager: TnCameraProxyProtocol>: NSObject, ObservableObject, TnLoggable {
     public let LOG_NAME = "TnCameraAppViewModel.\(TCameraManager.Type.self)"
     
-    @Published public var cameraManager: TCameraManager
-    @Published public var cameraModel: TnCameraViewModel
+    /*@Published*/ public var cameraManager: TCameraManager
+    /*@Published*/ public var cameraModel: TnCameraViewModel
     @Published public var showToolbar: Bool = true
     let listenOrientation: Bool
     
@@ -41,8 +41,6 @@ public struct TnCameraAppView<TCameraManager: TnCameraProxyProtocol, TBottom: Vi
     var bottom: (() -> TBottom)?
     @EnvironmentObject var appModel: TnCameraAppViewModel<TCameraManager>
     @EnvironmentObject var cameraModel: TnCameraViewModel
-
-//    @State var
 
     public init(bottom: (() -> TBottom)? = nil) {
         self.bottom = bottom
