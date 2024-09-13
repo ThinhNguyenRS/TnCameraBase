@@ -163,7 +163,7 @@ extension TnCameraProxyClient {
         let messageType: TnCameraMessageType = .init(rawValue: receivedMsg.typeCode)!
         logDebug("receive", messageType)
 
-        let msgStr = String(data: data, encoding: .utf8)!
+        let msgStr = receivedMsg.jsonString()
 
         switch messageType {
         case .getSettingsResponse:
