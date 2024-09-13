@@ -14,6 +14,7 @@ open class TnCameraAppViewModelDefault<TCameraManager: TnCameraProxyProtocol>: N
     @Published public var cameraManager: TCameraManager
     @Published public var cameraModel: TnCameraViewModel
     @Published public var showToolbar: Bool = true
+    
 
     public init(cameraManager: TCameraManager, cameraModel: TnCameraViewModel) {
         self.cameraManager = cameraManager
@@ -32,3 +33,4 @@ open class TnCameraAppViewModelDefault<TCameraManager: TnCameraProxyProtocol>: N
         cameraManager.setup()
     }
 }
+
