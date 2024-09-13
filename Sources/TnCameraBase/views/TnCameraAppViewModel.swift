@@ -83,6 +83,7 @@ extension TnCameraAppView: View {
                 }
             }
         }
+        .environmentObject(cameraModel)
         .onAppear {
             appModel.setup()
         }
