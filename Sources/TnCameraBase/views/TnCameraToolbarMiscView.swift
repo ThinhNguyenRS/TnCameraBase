@@ -206,7 +206,7 @@ extension TnCameraToolbarMiscView {
                         (v*100).toString("%.0f%%")
                     },
                     closeable: false,
-                    adjustBounds: true
+                    adjustBounds: false
                 )
 
                 getSliderView(
@@ -223,7 +223,7 @@ extension TnCameraToolbarMiscView {
                         (v*100).toString("%.0f%%")
                     },
                     closeable: false,
-                    adjustBounds: true
+                    adjustBounds: false
                 )
 
                 TnToggleField(label: "Image continuous", value: $cameraModel.settings.transportContinuous) { v in
