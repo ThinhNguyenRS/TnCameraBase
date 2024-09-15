@@ -106,12 +106,12 @@ public struct TnCameraZoomFactorValue: Codable {
 }
 
 public struct TnCameraTransportValue: Codable {
-    public let maxWidth: CGFloat?
+    public let scale: CGFloat?
     public let compressQuality: CGFloat?
     public let continuous: Bool?
     
-    public init(maxWidth: CGFloat? = nil, compressQuality: CGFloat? = nil, continuous: Bool? = nil) {
-        self.maxWidth = maxWidth
+    public init(scale: CGFloat? = nil, compressQuality: CGFloat? = nil, continuous: Bool? = nil) {
+        self.scale = scale
         self.compressQuality = compressQuality
         self.continuous = continuous
     }

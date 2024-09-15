@@ -82,7 +82,7 @@ extension TnCameraProxyServer {
     
     public func sendImage() {
         if let currentCiImage = cameraLocal.currentCiImage {
-            send(.getImageResponse, currentCiImage.jpegData(maxWidth: settings.transportMaxWidth, compressionQuality: settings.transportCompressQuality))
+            send(.getImageResponse, currentCiImage.jpegData(scale: settings.transportScale, compressionQuality: settings.transportCompressQuality))
         }
     }
     

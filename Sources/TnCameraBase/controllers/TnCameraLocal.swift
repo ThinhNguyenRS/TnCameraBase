@@ -494,8 +494,8 @@ extension TnCameraLocal: TnCameraProtocol {
     }
     
     public func setTransport(_ v: TnCameraTransportValue) {
-        if let imageMaxWidth = v.maxWidth {
-            settings.transportMaxWidth = imageMaxWidth
+        if let scale = v.scale {
+            settings.transportScale = scale
         }
         if let imageCompressQuality = v.compressQuality {
             settings.transportCompressQuality = imageCompressQuality

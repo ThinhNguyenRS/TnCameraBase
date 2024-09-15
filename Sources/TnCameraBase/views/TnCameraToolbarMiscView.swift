@@ -193,15 +193,15 @@ extension TnCameraToolbarMiscView {
 
             Section("System") {
                 getSliderView(
-                    value: $cameraModel.settings.transportMaxWidth,
-                    label: "Image max width",
-                    bounds: 240...1920,
-                    step: 120,
+                    value: $cameraModel.settings.transportScale,
+                    label: "Image scale",
+                    bounds: 0.15...1.00,
+                    step: 0.5,
                     onChanged: { _ in},
                     onChanging: { [self] v in
-                        cameraManager.setTransport(.init(maxWidth: v/3))
+                        cameraManager.setTransport(.init(scale: v))
                     },
-                    specifier: "%.0f",
+                    specifier: "%.02f",
                     closeable: false
                 )
 
