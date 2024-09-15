@@ -195,8 +195,8 @@ extension TnCameraToolbarMiscView {
                 getSliderView(
                     value: $cameraModel.settings.transportScale,
                     label: "Image scale",
-                    bounds: 0.15...1.00,
-                    step: 0.05,
+                    bounds: 0.02...0.40,
+                    step: 0.01,
                     onChanged: { _ in},
                     onChanging: { [self] v in
                         cameraManager.setTransport(.init(scale: v))
