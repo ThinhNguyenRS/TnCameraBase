@@ -42,7 +42,7 @@ extension TnCameraToolbarMiscView {
             onChanging: { [self] v in
                 cameraManager.setZoomFactor(.init(value: v))
             },
-            specifier: "%0.2f",
+            formatter: getNumberFormatter("%.2f"),
             bottomView: {
                 HStack {
                     tnCircleButton(imageName: "chevron.backward", radius: 40) {
@@ -155,7 +155,7 @@ extension TnCameraToolbarMiscView {
                         onChanging: { [self] v in
                             cameraManager.setExposure(.init(iso: v))
                         },
-                        specifier: "%.0f",
+                        formatter: getNumberFormatter("%.0f"),
                         closeable: false
                     )
                     
@@ -168,7 +168,7 @@ extension TnCameraToolbarMiscView {
                         onChanging: { [self] v in
                             cameraManager.setExposure(.init(duration: v))
                         },
-                        specifier: "%.3f",
+                        formatter: getNumberFormatter("%.3f"),
                         closeable: false
                     )
                 }
@@ -201,7 +201,6 @@ extension TnCameraToolbarMiscView {
                     onChanging: { [self] v in
                         cameraManager.setTransport(.init(scale: v))
                     },
-                    specifier: "%.02f",
                     formatter: { v in
                         (v*100).toString("%.0f%%")
                     },
@@ -218,7 +217,6 @@ extension TnCameraToolbarMiscView {
                     onChanging: { [self] v in
                         cameraManager.setTransport(.init(compressQuality: v))
                     },
-                    specifier: "%.2f",
                     formatter: { v in
                         (v*100).toString("%.0f%%")
                     },

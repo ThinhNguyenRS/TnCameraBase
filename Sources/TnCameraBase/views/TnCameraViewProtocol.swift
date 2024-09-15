@@ -141,6 +141,7 @@ extension TnCameraViewProtocol {
     }
 }
 
+
 extension TnCameraViewProtocol {
     public func getSliderView<TValue, TTopView: View, TBottomView: View>(
         value: Binding<TValue>,
@@ -149,8 +150,7 @@ extension TnCameraViewProtocol {
         step: TValue.Stride,
         onChanged: @escaping (TValue) -> Void,
         onChanging: @escaping (TValue) -> Void,
-        specifier: String = "%.0f",
-        formatter: ((TValue) -> String)? = nil,
+        formatter: @escaping (TValue) -> String = defaultNumberFormatter,
         @ViewBuilder topView: @escaping () -> TTopView,
         @ViewBuilder bottomView: @escaping () -> TBottomView,
         closeable: Bool = true,
@@ -161,7 +161,6 @@ extension TnCameraViewProtocol {
             label: label,
             bounds: bounds,
             step: step,
-            specifier: specifier,
             formatter: formatter,
             onChanged: onChanged,
             onChanging: onChanging,
@@ -179,8 +178,7 @@ extension TnCameraViewProtocol {
         step: TValue.Stride,
         onChanged: @escaping (TValue) -> Void,
         onChanging: @escaping (TValue) -> Void,
-        specifier: String = "%.0f",
-        formatter: ((TValue) -> String)? = nil,
+        formatter: @escaping (TValue) -> String = defaultNumberFormatter,
         @ViewBuilder topView: @escaping () -> TTopView,
         closeable: Bool = true,
         adjustBounds: Bool = false
@@ -192,7 +190,6 @@ extension TnCameraViewProtocol {
             step: step,
             onChanged: onChanged,
             onChanging: onChanging,
-            specifier: specifier,
             formatter: formatter,
             topView: topView,
             bottomView: { },
@@ -207,8 +204,7 @@ extension TnCameraViewProtocol {
         step: TValue.Stride,
         onChanged: @escaping (TValue) -> Void,
         onChanging: @escaping (TValue) -> Void,
-        specifier: String = "%.0f",
-        formatter: ((TValue) -> String)? = nil,
+        formatter: @escaping (TValue) -> String = defaultNumberFormatter,
         @ViewBuilder bottomView: @escaping () -> TBottomView,
         closeable: Bool = true,
         adjustBounds: Bool = false
@@ -220,7 +216,6 @@ extension TnCameraViewProtocol {
             step: step,
             onChanged: onChanged,
             onChanging: onChanging,
-            specifier: specifier,
             formatter: formatter,
             topView: { },
             bottomView: bottomView,
@@ -235,8 +230,7 @@ extension TnCameraViewProtocol {
         step: TValue.Stride,
         onChanged: @escaping (TValue) -> Void,
         onChanging: @escaping (TValue) -> Void,
-        specifier: String = "%.0f",
-        formatter: ((TValue) -> String)? = nil,
+        formatter: @escaping (TValue) -> String = defaultNumberFormatter,
         closeable: Bool = true,
         adjustBounds: Bool = false
     ) -> some View where TValue : BinaryFloatingPoint & CVarArg, TValue.Stride : BinaryFloatingPoint {
@@ -247,7 +241,6 @@ extension TnCameraViewProtocol {
             step: step,
             onChanged: onChanged,
             onChanging: onChanging,
-            specifier: specifier,
             formatter: formatter,
             topView: { },
             bottomView: { },
