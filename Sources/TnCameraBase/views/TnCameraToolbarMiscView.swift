@@ -202,6 +202,9 @@ extension TnCameraToolbarMiscView {
                         cameraManager.setTransport(.init(scale: v))
                     },
                     specifier: "%.02f",
+                    formatter: { v in
+                        (v*100).toString("%.0f%%")
+                    },
                     closeable: false,
                     adjustBounds: true
                 )
@@ -216,6 +219,9 @@ extension TnCameraToolbarMiscView {
                         cameraManager.setTransport(.init(compressQuality: v))
                     },
                     specifier: "%.2f",
+                    formatter: { v in
+                        (v*100).toString("%.0f%%")
+                    },
                     closeable: false,
                     adjustBounds: true
                 )

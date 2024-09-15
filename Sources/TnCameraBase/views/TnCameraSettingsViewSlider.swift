@@ -18,6 +18,7 @@ public struct TnCameraSettingsViewSlider<TValue, TTopView: View, TBottomView: Vi
     let step: TValue.Stride
 
     let specifier: String
+    var formatter: ((TValue) -> String)? = nil
 
     let onChanged: ((TValue) -> Void)?
     let onChanging: ((TValue) -> Void)?
@@ -46,7 +47,7 @@ public struct TnCameraSettingsViewSlider<TValue, TTopView: View, TBottomView: Vi
 
                 topView()
 
-                TnSliderField(value: $value, bounds: bounds, step: step, specifier: specifier, onEdited:  { v in
+                TnSliderField(value: $value, bounds: bounds, step: step, specifier: specifier, formatter: formatter, onEdited:  { v in
                     onChanging?(v)
                 }, adjustBounds: adjustBounds)
 
