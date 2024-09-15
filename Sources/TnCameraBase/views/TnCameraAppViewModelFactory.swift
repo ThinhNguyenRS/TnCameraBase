@@ -19,6 +19,7 @@ public struct TnCameraAppViewModelFactory {
                 .getSettingsResponse,
                 TnCameraSettingsValue(settings: cameraManager.settings, status: status)
             )
+            cameraManager.sendImage()
         }
         
         func onVolumeButton() {
