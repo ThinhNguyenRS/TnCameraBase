@@ -152,7 +152,8 @@ extension TnCameraViewProtocol {
         specifier: String = "%.0f",
         @ViewBuilder topView: @escaping () -> TTopView,
         @ViewBuilder bottomView: @escaping () -> TBottomView,
-        closeable: Bool = true
+        closeable: Bool = true,
+        adjustBounds: Bool = false
     ) -> some View where TValue : BinaryFloatingPoint & CVarArg, TValue.Stride : BinaryFloatingPoint {
         TnCameraSettingsViewSlider(
             value: value,
@@ -164,7 +165,8 @@ extension TnCameraViewProtocol {
             onChanging: onChanging,
             topView: topView,
             bottomView: bottomView,
-            closeable: closeable
+            closeable: closeable,
+            adjustBounds: adjustBounds
         )
     }
 
@@ -177,7 +179,8 @@ extension TnCameraViewProtocol {
         onChanging: @escaping (TValue) -> Void,
         specifier: String = "%.0f",
         @ViewBuilder topView: @escaping () -> TTopView,
-        closeable: Bool = true
+        closeable: Bool = true,
+        adjustBounds: Bool = false
     ) -> some View where TValue : BinaryFloatingPoint & CVarArg, TValue.Stride : BinaryFloatingPoint {
         getSliderView(
             value: value,
@@ -189,7 +192,8 @@ extension TnCameraViewProtocol {
             specifier: specifier,
             topView: topView,
             bottomView: { },
-            closeable: closeable
+            closeable: closeable,
+            adjustBounds: adjustBounds
         )
     }
 
@@ -201,7 +205,8 @@ extension TnCameraViewProtocol {
         onChanging: @escaping (TValue) -> Void,
         specifier: String = "%.0f",
         @ViewBuilder bottomView: @escaping () -> TBottomView,
-        closeable: Bool = true
+        closeable: Bool = true,
+        adjustBounds: Bool = false
     ) -> some View where TValue : BinaryFloatingPoint & CVarArg, TValue.Stride : BinaryFloatingPoint {
         getSliderView(
             value: value,
@@ -213,7 +218,8 @@ extension TnCameraViewProtocol {
             specifier: specifier,
             topView: { },
             bottomView: bottomView,
-            closeable: closeable
+            closeable: closeable,
+            adjustBounds: adjustBounds
         )
     }
 
@@ -224,7 +230,8 @@ extension TnCameraViewProtocol {
         onChanged: @escaping (TValue) -> Void,
         onChanging: @escaping (TValue) -> Void,
         specifier: String = "%.0f",
-        closeable: Bool = true
+        closeable: Bool = true,
+        adjustBounds: Bool = false
     ) -> some View where TValue : BinaryFloatingPoint & CVarArg, TValue.Stride : BinaryFloatingPoint {
         getSliderView(
             value: value,
@@ -236,7 +243,8 @@ extension TnCameraViewProtocol {
             specifier: specifier,
             topView: { },
             bottomView: { },
-            closeable: closeable
+            closeable: closeable,
+            adjustBounds: adjustBounds
         )
     }
 }

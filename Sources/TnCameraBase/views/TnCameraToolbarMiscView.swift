@@ -202,20 +202,22 @@ extension TnCameraToolbarMiscView {
                         cameraManager.setTransport(.init(scale: v))
                     },
                     specifier: "%.02f",
-                    closeable: false
+                    closeable: false,
+                    adjustBounds: true
                 )
 
                 getSliderView(
                     value: $cameraModel.settings.transportCompressQuality,
                     label: "Image compress quality",
                     bounds: 0.25...1,
-                    step: 0.25,
+                    step: 0.05,
                     onChanged: { _ in},
                     onChanging: { [self] v in
                         cameraManager.setTransport(.init(compressQuality: v))
                     },
                     specifier: "%.2f",
-                    closeable: false
+                    closeable: false,
+                    adjustBounds: true
                 )
 
                 TnToggleField(label: "Image continuous", value: $cameraModel.settings.transportContinuous) { v in

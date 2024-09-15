@@ -26,6 +26,8 @@ public struct TnCameraSettingsViewSlider<TValue, TTopView: View, TBottomView: Vi
     @ViewBuilder let bottomView: () -> TBottomView
 
     var closeable = true
+    
+    var adjustBounds: Bool = false
 
     public var body: some View {
         HStack {
@@ -46,7 +48,7 @@ public struct TnCameraSettingsViewSlider<TValue, TTopView: View, TBottomView: Vi
 
                 TnSliderField(value: $value, bounds: bounds, step: step, specifier: specifier, onEdited:  { v in
                     onChanging?(v)
-                })
+                }, adjustBounds: adjustBounds)
 
                 bottomView()
             }
