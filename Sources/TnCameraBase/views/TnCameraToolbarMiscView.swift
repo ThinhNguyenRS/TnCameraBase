@@ -199,7 +199,7 @@ extension TnCameraToolbarMiscView {
                     step: 120,
                     onChanged: { _ in},
                     onChanging: { [self] v in
-                        cameraManager.setTransport(.init(maxWidth: v))
+                        cameraManager.setTransport(.init(maxWidth: v/3))
                     },
                     specifier: "%.0f",
                     closeable: false
