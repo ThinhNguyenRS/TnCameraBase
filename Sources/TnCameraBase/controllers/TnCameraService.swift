@@ -257,14 +257,14 @@ extension TnCameraService {
         logDebug("reset session", name, "!")
     }
 
-    private func configSession(name: String, sessionLock: Bool = false, sessionStop: Bool = false, deviceLock: Bool = false, deviceHandler: DoDeviceHandler? = nil) throws {
+    private func configSession(name: String, sessionLock: Bool = false, deviceLock: Bool = false, deviceHandler: DoDeviceHandler? = nil) throws {
         logDebug("config session", name, "...")
         
         defer {
             if sessionLock {
                 session.commitConfiguration()
             }
-            if sessionStop && !session.isRunning {
+            if !session.isRunning {
                 session.startRunning()
             }
             fetchSettings()
@@ -273,10 +273,10 @@ extension TnCameraService {
         // lock session
         if sessionLock {
             session.beginConfiguration()
-        }
-        // stop session
-        if sessionStop && session.isRunning {
-            session.stopRunning()
+            // stop session
+            if session.isRunning {
+                session.stopRunning()
+            }
         }
         // setup device
         try setupDevice(deviceLock: deviceLock, deviceHandler: deviceHandler)
@@ -352,7 +352,7 @@ extension TnCameraService {
     public func setDepth(_ v: Bool) throws {
         guard settings.depthSupported && settings.depth != v else { return }
         
-        try configSession(name: "setDepth", sessionLock: true, sessionStop: true, deviceLock: true) { [self] _, device in
+        try configSession(name: "setDepth", sessionLock: true, deviceLock: true) { [self] _, device in
             photoOutput.isDepthDataDeliveryEnabled = v
             if v, let depthFormat = device.getDepthFormat(mediaSubTypes: [kCVPixelFormatType_DepthFloat32]) {
                 device.activeDepthDataFormat = depthFormat
@@ -363,7 +363,7 @@ extension TnCameraService {
     public func setPortrait(_ v: Bool) throws {
         guard settings.portraitSupported && settings.portrait != v else { return }
         
-        try configSession(name: "setPortrait", sessionLock: true, sessionStop: true, deviceLock: true) { [self] _, device in
+        try configSession(name: "setPortrait", sessionLock: true, deviceLock: true) { [self] _, device in
             photoOutput.isPortraitEffectsMatteDeliveryEnabled = v
         }
     }
@@ -371,7 +371,7 @@ extension TnCameraService {
     public func setHDR(_ v: TnTripleState) throws {
         guard settings.hdr != v else { return }
 
-        try configSession(name: "setHDR", sessionLock: true, sessionStop: true, deviceLock: true) { _, device in
+        try configSession(name: "setHDR", sessionLock: true, deviceLock: true) { _, device in
             switch v {
             case .auto:
                 device.automaticallyAdjustsVideoHDREnabled = true
@@ -393,7 +393,7 @@ extension TnCameraService {
     public func setExposureMode(_ v: AVCaptureDevice.ExposureMode) throws {
         guard settings.exposureMode != v else { return }
 
-        try configSession(name: "setExposureMode", sessionLock: false, sessionStop: false, deviceLock: false) { _, device in
+        try configSession(name: "setExposureMode", sessionLock: false, deviceLock: false) { _, device in
             device.exposureMode = v
         }
     }
@@ -401,7 +401,7 @@ extension TnCameraService {
     public func setExposure(_ v: TnCameraExposureValue) throws {
         guard settings.exposureMode == .custom else { return }
 
-        try configSession(name: "setExposure", sessionLock: false, sessionStop: false, deviceLock: false) { _, device in
+        try configSession(name: "setExposure", sessionLock: false, deviceLock: false) { _, device in
             let defaultISO = device.iso /*AVCaptureDevice.currentISO*/
             let defaultDuration = device.exposureDuration /*AVCaptureDevice.currentExposureDuration*/
             
@@ -415,7 +415,7 @@ extension TnCameraService {
     public func setFocusMode(_ v: AVCaptureDevice.FocusMode) throws {
         guard settings.focusMode != v else { return }
 
-        try configSession(name: "setFocusMode", sessionLock: false, sessionStop: false, deviceLock: false) { _, device in
+        try configSession(name: "setFocusMode", sessionLock: false, deviceLock: false) { _, device in
             device.focusMode = v
         }
     }
