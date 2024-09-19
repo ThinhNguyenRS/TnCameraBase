@@ -34,7 +34,7 @@ extension TnCameraAppView: View {
 //                            appModel.showToolbar.toggle()
 //                        }
 //                    }
-                TnCameraPreviewViewMetal(imagePublisher: appModel.cameraManager.currentCiImagePublisher)
+                TnCameraPreviewViewMetal().setImagePublisher(imagePublisher: { await appModel.cameraManager.currentCiImagePublisher })
                     .onTapGesture {
                         withAnimation {
                             appModel.showToolbar.toggle()

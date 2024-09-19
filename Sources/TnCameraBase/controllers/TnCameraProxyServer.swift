@@ -165,15 +165,11 @@ extension TnCameraProxyServer: TnCameraProxyProtocol {
     }
     
     public var currentCiImagePublisher: Published<CIImage?>.Publisher {
-        cameraLocal.currentCiImagePublisher
-    }
-    
-    public var currentCiImage: CIImage? {
-        cameraLocal.currentCiImage
+        cameraLocal.$currentCiImage
     }
     
     public var settingsPublisher: Published<TnCameraSettings>.Publisher {
-        cameraLocal.settingsPublisher
+        cameraLocal.$settings
     }
     
     public var settings: TnCameraSettings {
@@ -181,7 +177,7 @@ extension TnCameraProxyServer: TnCameraProxyProtocol {
     }
     
     public var statusPublisher: Published<TnCameraStatus>.Publisher {
-        cameraLocal.statusPublisher
+        cameraLocal.$status
     }
     
     public var status: TnCameraStatus {

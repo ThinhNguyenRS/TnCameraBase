@@ -14,14 +14,9 @@ import TnIosBase
 
 // MARK: TnCameraProtocol
 public protocol TnCameraProtocol {
-    var currentCiImagePublisher: Published<CIImage?>.Publisher {get}
-    var currentCiImage: CIImage? {get}
-    
-    var settingsPublisher: Published<TnCameraSettings>.Publisher {get}
-    var settings: TnCameraSettings {get}
-    
-    var statusPublisher: Published<TnCameraStatus>.Publisher {get}
-    var status: TnCameraStatus {get}
+    var currentCiImagePublisher: Published<CIImage?>.Publisher { get async }
+    var settingsPublisher: Published<TnCameraSettings>.Publisher { get async }
+    var statusPublisher: Published<TnCameraStatus>.Publisher { get async }
     
     func toggleCapturing()
     func startCapturing()

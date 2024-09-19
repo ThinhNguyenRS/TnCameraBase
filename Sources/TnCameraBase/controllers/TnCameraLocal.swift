@@ -205,20 +205,8 @@ extension TnCameraLocal: AVCaptureVideoDataOutputSampleBufferDelegate {
     }
 }
 
-// MARK: CameraManagerProtocol
-extension TnCameraLocal: TnCameraProtocol {
-    public var currentCiImagePublisher: Published<CIImage?>.Publisher {
-        $currentCiImage
-    }
-    
-    public var settingsPublisher: Published<TnCameraSettings>.Publisher {
-        $settings
-    }
-    
-    public var statusPublisher: Published<TnCameraStatus>.Publisher {
-        $status
-    }
-    
+// MARK: public functions
+extension TnCameraLocal {
     public func startCapturing() {
         doSessionQueue { me in
             if me.status < .inited {

@@ -106,6 +106,10 @@ public struct TnCameraPreviewViewMetal: TnLoggable {
     }
     
     let internalView: InternalView = InternalView(device: MTLCreateSystemDefaultDevice()!)
+    
+    public init() {
+    }
+    
     public init(imagePublisher: Published<CIImage?>.Publisher) {
         internalView.setImagePublisher(imagePublisher: imagePublisher.eraseToAnyPublisher())
         logDebug("inited")

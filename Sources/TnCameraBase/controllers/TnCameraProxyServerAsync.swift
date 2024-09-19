@@ -12,7 +12,7 @@ import AVFoundation
 import CoreImage
 import TnIosBase
 
-public class TnCameraProxyServerNew: TnLoggable {
+public class TnCameraProxyServerAsync: TnLoggable {
     public let LOG_NAME = "TnCameraProxyServerNew"
 
     private let cameraService: TnCameraService
@@ -50,7 +50,7 @@ public class TnCameraProxyServerNew: TnLoggable {
 }
 
 // MARK: TnBluetoothServerDelegate
-extension TnCameraProxyServerNew: TnBluetoothServerDelegate {
+extension TnCameraProxyServerAsync: TnBluetoothServerDelegate {
     public func tnBluetoothServer(ble: TnBluetoothServer, statusChanged: TnBluetoothServer.Status) {
         switch statusChanged {
         case .inited:
@@ -73,7 +73,7 @@ extension TnCameraProxyServerNew: TnBluetoothServerDelegate {
 }
 
 // MARK: TnCameraSendMessageProtocol
-extension TnCameraProxyServerNew: TnCameraSendMessageProtocol {
+extension TnCameraProxyServerAsync: TnCameraSendMessageProtocol {
     public func send(_ object: TnCameraMessageProtocol, useBle: Bool = false) {
         if useBle {
             try? ble.send(object: object)
@@ -83,7 +83,7 @@ extension TnCameraProxyServerNew: TnCameraSendMessageProtocol {
     }
 }
 
-extension TnCameraProxyServerNew {
+extension TnCameraProxyServerAsync {
     public func sendImage() {
         Task {
             if let currentCiImage = await cameraService.currentCiImage {
@@ -96,7 +96,7 @@ extension TnCameraProxyServerNew {
 }
 
 // MARK: solve messages
-extension TnCameraProxyServerNew {
+extension TnCameraProxyServerAsync {
     func solveData(data: Data) {
         let receivedMsg = TnMessage(data: data)
         let messageType: TnCameraMessageType = .init(rawValue: receivedMsg.typeCode)!
@@ -173,7 +173,7 @@ extension TnCameraProxyServerNew {
 }
 
 // MARK: CameraManagerProtocol
-extension TnCameraProxyServerNew/*: TnCameraProxyProtocol*/ {
+extension TnCameraProxyServerAsync/*: TnCameraProxyProtocol*/ {
     public func setup() {
         ble.setupBle()
     }
@@ -312,7 +312,7 @@ extension TnCameraProxyServerNew/*: TnCameraProxyProtocol*/ {
 }
 
 // MARK: TnNetworkDelegateServer
-extension TnCameraProxyServerNew: TnNetworkDelegateServer {
+extension TnCameraProxyServerAsync: TnNetworkDelegateServer {
     public func tnNetworkReady(_ server: TnNetworkServer) {
     }
     

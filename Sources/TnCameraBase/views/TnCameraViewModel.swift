@@ -36,23 +36,26 @@ public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {
     }
     
     public func listen(manager: TnCameraProtocol, withOrientation: Bool = true) {
-        manager.statusPublisher
-            .onReceive(debounceMs: 10, cancelables: &cancelables) { [self] v in
-                withAnimation {
-                    status = v
-                    logDebug("status changed", v)
+        Task {
+            await manager.statusPublisher
+                .onReceive(debounceMs: 10, cancelables: &cancelables) { [self] v in
+                    withAnimation {
+                        status = v
+                        logDebug("status changed", v)
+                    }
+                    delegate?.onChanged(settings: settings, status: status)
                 }
-                delegate?.onChanged(settings: settings, status: status)
-            }
 
-        manager.settingsPublisher
-            .onReceive(debounceMs: 10, cancelables: &cancelables) { [self] v in
-                withAnimation {
-                    settings = v
-                    logDebug("settings changed")
+            await manager.settingsPublisher
+                .onReceive(debounceMs: 10, cancelables: &cancelables) { [self] v in
+                    withAnimation {
+                        settings = v
+                        logDebug("settings changed")
+                    }
+                    delegate?.onChanged(settings: settings, status: status)
                 }
-                delegate?.onChanged(settings: settings, status: status)
-            }
+        }
+
 
         if withOrientation {
             let motionOrientation: DeviceMotionOrientationListener = .shared
