@@ -13,6 +13,8 @@ import UIKit
 import TnIosBase
 
 public actor TnCameraService: NSObject, TnLoggable {
+    public static let shared: TnCameraService = .init()
+    
     nonisolated public let LOG_NAME = "TnCameraService"
     
     @Published public var settings: TnCameraSettings = .init()
@@ -28,7 +30,7 @@ public actor TnCameraService: NSObject, TnLoggable {
                 
     typealias DoDeviceHandler = (AVCaptureDeviceInput, AVCaptureDevice) throws -> Void
     
-    public override init() {        
+    private override init() {
     }
 }
 

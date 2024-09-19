@@ -12,14 +12,14 @@ public struct TnCameraAppViewModelFactory {
     private init() {}
     
     struct ServerDelegate: TnCameraViewModelDelegate {
-        let cameraManager: TnCameraProxyServer
+        let cameraManager: TnCameraProxyProtocol
         
         func onChanged(settings: TnCameraBase.TnCameraSettings, status: TnCameraBase.TnCameraStatus) {
             cameraManager.send(
                 .getSettingsResponse,
-                TnCameraSettingsValue(settings: cameraManager.settings, status: status)
+                TnCameraSettingsValue(settings: settings, status: status)
             )
-            cameraManager.sendImage()
+//            cameraManager.sendImage()
         }
         
         func onVolumeButton() {
@@ -54,6 +54,24 @@ public struct TnCameraAppViewModelFactory {
         return appModel
     }
     
+    public static func createServerAsyncModel(delegate: TnCameraViewModelDelegate? = nil, EOM: String? = nil, MTU: Int? = nil) -> TnCameraAppViewModel<TnCameraProxyServerAsync> {
+        let appModel: TnCameraAppViewModel = .init(
+            cameraManager: TnCameraProxyServerAsync(TnCameraService.shared, networkInfo: TnCameraProxyServiceInfo.getInstance(EOM: EOM, MTU: MTU)),
+            cameraModel: TnCameraViewModel()
+        )
+        appModel.cameraModel.delegate = delegate ?? ServerDelegate(cameraManager: appModel.cameraManager)
+        appModel.cameraManager.bleDelegate = appModel.cameraManager
+//        appModel.cameraManager.captureCompletion = { capturedImage in
+//            DispatchQueue.main.async {
+//                withAnimation {
+//                    appModel.cameraModel.capturedImage = capturedImage
+//                }
+//                appModel.cameraManager.sendImage()
+//            }
+//        }
+        return appModel
+    }
+
     public static func createClientModel(delegate: TnCameraViewModelDelegate? = nil, EOM: String? = nil, MTU: Int? = nil) -> TnCameraAppViewModel<TnCameraProxyClient> {
         let appModel: TnCameraAppViewModel = .init(
             cameraManager: TnCameraProxyClient(networkInfo: TnCameraProxyServiceInfo.getInstance(EOM: EOM, MTU: MTU)),

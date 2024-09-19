@@ -17,7 +17,10 @@ public protocol TnCameraProtocol {
     var currentCiImagePublisher: Published<CIImage?>.Publisher { get async }
     var settingsPublisher: Published<TnCameraSettings>.Publisher { get async }
     var statusPublisher: Published<TnCameraStatus>.Publisher { get async }
-    
+
+    var settings: TnCameraSettings { get async }
+    var status: TnCameraStatus { get async }
+
     func toggleCapturing()
     func startCapturing()
     func stopCapturing()

@@ -72,29 +72,6 @@ extension TnCameraProxyServerAsync: TnBluetoothServerDelegate {
     }
 }
 
-// MARK: TnCameraSendMessageProtocol
-extension TnCameraProxyServerAsync: TnCameraSendMessageProtocol {
-    public func send(_ object: TnCameraMessageProtocol, useBle: Bool = false) {
-        if useBle {
-            try? ble.send(object: object)
-        } else {
-            try? network?.send(object: object)
-        }
-    }
-}
-
-extension TnCameraProxyServerAsync {
-    public func sendImage() {
-        Task {
-            if let currentCiImage = await cameraService.currentCiImage {
-                let transportScale = await cameraService.settings.transportScale,
-                    compressionQuality = await cameraService.settings.transportCompressQuality
-                send(.getImageResponse, currentCiImage.jpegData(scale: transportScale, compressionQuality: compressionQuality))
-            }
-        }
-    }
-}
-
 // MARK: solve messages
 extension TnCameraProxyServerAsync {
     func solveData(data: Data) {
@@ -172,35 +149,59 @@ extension TnCameraProxyServerAsync {
     }
 }
 
-// MARK: CameraManagerProtocol
-extension TnCameraProxyServerAsync/*: TnCameraProxyProtocol*/ {
+// MARK: TnCameraProxyProtocol
+extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
+    public var settings: TnCameraSettings {
+        get async {
+            await cameraService.settings
+        }
+    }
+    
+    public var status: TnCameraStatus {
+        get async {
+            await cameraService.status
+        }
+    }
+    
+    public func send(_ object: TnCameraMessageProtocol, useBle: Bool = false) {
+        if useBle {
+            try? ble.send(object: object)
+        } else {
+            try? network?.send(object: object)
+        }
+    }
+
+    public func sendImage() {
+        Task {
+            if let currentCiImage = await cameraService.currentCiImage {
+                let transportScale = await cameraService.settings.transportScale,
+                    compressionQuality = await cameraService.settings.transportCompressQuality
+                send(.getImageResponse, currentCiImage.jpegData(scale: transportScale, compressionQuality: compressionQuality))
+            }
+        }
+    }
+
     public func setup() {
         ble.setupBle()
     }
     
-//    public var currentCiImagePublisher: Published<CIImage?>.Publisher {
-//        cameraService.currentCiImagePublisher
-//    }
-//    
-//    public var currentCiImage: CIImage? {
-//        cameraService.currentCiImage
-//    }
-//    
-//    public var settingsPublisher: Published<TnCameraSettings>.Publisher {
-//        cameraService.settingsPublisher
-//    }
-//    
-//    public var settings: TnCameraSettings {
-//        cameraService.settings
-//    }
-//    
-//    public var statusPublisher: Published<TnCameraStatus>.Publisher {
-//        cameraService.statusPublisher
-//    }
-//    
-//    public var status: TnCameraStatus {
-//        cameraService.status
-//    }
+    public var currentCiImagePublisher: Published<CIImage?>.Publisher {
+        get async {
+            await cameraService.$currentCiImage
+        }
+    }
+    
+    public var settingsPublisher: Published<TnCameraSettings>.Publisher {
+        get async {
+            await cameraService.$settings
+        }
+    }
+    
+    public var statusPublisher: Published<TnCameraStatus>.Publisher {
+        get async {
+            await cameraService.$status
+        }
+    }
     
     public func startCapturing() {
         Task {

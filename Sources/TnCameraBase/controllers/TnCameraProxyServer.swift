@@ -15,12 +15,12 @@ import TnIosBase
 public class TnCameraProxyServer: TnLoggable {
     public let LOG_NAME = "TnCameraProxyServer"
 
-    private let cameraLocal: TnCameraLocal
+    private let cameraService: TnCameraLocal
     private var network: TnNetworkServer?
     private let ble: TnBluetoothServer
 
-    public init(_ cameraManager: TnCameraLocal, networkInfo: TnNetworkServiceInfo) {
-        self.cameraLocal = cameraManager
+    public init(_ cameraService: TnCameraLocal, networkInfo: TnNetworkServiceInfo) {
+        self.cameraService = cameraService
         ble = .init(info: networkInfo)
         if let address = TnNetworkHelper.getAddressList(for: [.wifi, .cellularBridge, .cellular]).first {
             network = .init(host: address.address, port: 1234, queue: .main, delegate: self, EOM: networkInfo.EOM, MTU: networkInfo.MTU)
@@ -41,10 +41,10 @@ public class TnCameraProxyServer: TnLoggable {
     
     public var captureCompletion: ((UIImage) -> Void)? {
         get {
-            cameraLocal.captureCompletion
+            cameraService.captureCompletion
         }
         set {
-            cameraLocal.captureCompletion = newValue
+            cameraService.captureCompletion = newValue
         }
     }
 
@@ -57,7 +57,7 @@ extension TnCameraProxyServer: TnBluetoothServerDelegate {
         case .inited:
             ble.start()
         case .started:
-            cameraLocal.startCapturing()
+            cameraService.startCapturing()
         default:
             return
         }
@@ -81,7 +81,7 @@ extension TnCameraProxyServer {
     }
     
     public func sendImage() {
-        if let currentCiImage = cameraLocal.currentCiImage {
+        if let currentCiImage = cameraService.currentCiImage {
             send(.getImageResponse, currentCiImage.jpegData(scale: settings.transportScale, compressionQuality: settings.transportCompressQuality))
         }
     }
@@ -103,7 +103,7 @@ extension TnCameraProxyServer {
 
         case .getSettings:
             // response settings
-            send(.getSettingsResponse, TnCameraSettingsValue(settings: cameraLocal.settings, status: cameraLocal.status, network: network), useBle: true)
+            send(.getSettingsResponse, TnCameraSettingsValue(settings: cameraService.settings, status: cameraService.status, network: network), useBle: true)
 
         case .getImage:
             sendImage()
@@ -165,93 +165,94 @@ extension TnCameraProxyServer: TnCameraProxyProtocol {
     }
     
     public var currentCiImagePublisher: Published<CIImage?>.Publisher {
-        cameraLocal.$currentCiImage
+        cameraService.$currentCiImage
     }
     
     public var settingsPublisher: Published<TnCameraSettings>.Publisher {
-        cameraLocal.$settings
+        cameraService.$settings
     }
     
     public var settings: TnCameraSettings {
-        cameraLocal.settings
+        cameraService.settings
     }
     
     public var statusPublisher: Published<TnCameraStatus>.Publisher {
-        cameraLocal.$status
+        cameraService.$status
     }
     
     public var status: TnCameraStatus {
-        cameraLocal.status
+        cameraService.status
     }
+
     public func startCapturing() {
-        cameraLocal.startCapturing()
+        cameraService.startCapturing()
     }
     
     public func stopCapturing() {
-        cameraLocal.stopCapturing()
+        cameraService.stopCapturing()
     }
 
     public func toggleCapturing() {
-        cameraLocal.toggleCapturing()
+        cameraService.toggleCapturing()
     }
     
     public func switchCamera() {
-        cameraLocal.switchCamera()
+        cameraService.switchCamera()
     }
     
     public func captureImage() {
-        cameraLocal.captureImage()
+        cameraService.captureImage()
     }
     
     public func setLivephoto(_ v: Bool) {
-        cameraLocal.setLivephoto(v)
+        cameraService.setLivephoto(v)
     }
     
     public func setFlash(_ v: AVCaptureDevice.FlashMode) {
-        cameraLocal.setFlash(v)
+        cameraService.setFlash(v)
     }
     
     public func setHDR(_ v: TnTripleState) {
-        cameraLocal.setHDR(v)
+        cameraService.setHDR(v)
     }
     
     public func setPreset(_ v: AVCaptureSession.Preset) {
-        cameraLocal.setPreset(v)
+        cameraService.setPreset(v)
     }
     
     public func setCameraType(_ v: AVCaptureDevice.DeviceType) {
-        cameraLocal.setCameraType(v)
+        cameraService.setCameraType(v)
     }
     
     public func setExposureMode(_ v: AVCaptureDevice.ExposureMode) {
-        cameraLocal.setExposureMode(v)
+        cameraService.setExposureMode(v)
     }
     
     public func setExposure(_ v: TnCameraExposureValue) {
-        cameraLocal.setExposure(v)
+        cameraService.setExposure(v)
     }
     
     public func setZoomFactor(_ v: TnCameraZoomFactorValue) {
-        cameraLocal.setZoomFactor(v)
+        cameraService.setZoomFactor(v)
     }
     
     public func setDepth(_ v: Bool) {
-        cameraLocal.setDepth(v)
+        cameraService.setDepth(v)
     }
     
     public func setPortrait(_ v: Bool) {
-        cameraLocal.setPortrait(v)
+        cameraService.setPortrait(v)
     }
     
     public func setQuality(_ v: AVCapturePhotoOutput.QualityPrioritization) {
-        cameraLocal.setQuality(v)
+        cameraService.setQuality(v)
     }
     
     public func setFocusMode(_ v: AVCaptureDevice.FocusMode) {
     }
     
     public func setTransport(_ v: TnCameraTransportValue) {
-        cameraLocal.setTransport(v)
+        cameraService.setTransport(v)
     }
 }
 
