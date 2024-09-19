@@ -266,6 +266,7 @@ extension TnCameraService {
             if sessionLock {
                 session.commitConfiguration()
             }
+            // start session
             if !session.isRunning {
                 session.startRunning()
                 status = .started
@@ -275,12 +276,13 @@ extension TnCameraService {
         }
         // lock session
         if sessionLock {
-            session.beginConfiguration()
             // stop session
             if session.isRunning {
                 session.stopRunning()
                 status = .inited
             }
+
+            session.beginConfiguration()
         }
         // setup device
         try setupDevice(deviceLock: deviceLock, deviceHandler: deviceHandler)
