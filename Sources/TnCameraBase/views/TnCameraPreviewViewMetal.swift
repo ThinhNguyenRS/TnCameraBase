@@ -11,7 +11,7 @@ import SwiftUI
 import Combine
 import TnIosBase
 
-public final class TnCameraPreviewViewMetal: TnLoggable {
+public struct TnCameraPreviewViewMetal: TnLoggable {
     public let LOG_NAME = "TnCameraPreviewViewMetal"
     
     public class InternalView: MTKView, TnLoggable {
@@ -111,16 +111,13 @@ public final class TnCameraPreviewViewMetal: TnLoggable {
         logDebug("inited")
     }
     
-    public init(imagePublisher: @escaping () async -> Published<CIImage?>.Publisher) {
+    public func setImagePublisher(imagePublisher: @escaping () async -> Published<CIImage?>.Publisher) -> Self {
         Task { /*@MainActor in*/
             await internalView.setImagePublisher(imagePublisher: await imagePublisher().eraseToAnyPublisher())
             logDebug("inited")
         }
+        return self
     }
-
-//    func setImagePublisher(imagePublisher: Published<CIImage?>.Publisher) {
-//        internalView.setImagePublisher(imagePublisher: imagePublisher.eraseToAnyPublisher())
-//    }
 }
 
 extension TnCameraPreviewViewMetal: UIViewRepresentable {
