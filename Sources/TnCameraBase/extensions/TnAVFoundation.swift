@@ -52,7 +52,8 @@ extension AVCaptureOutput {
     }
 }
 
-extension CMVideoDimensions: Hashable, Comparable {
+// MARK: CMVideoDimensions
+extension CMVideoDimensions: @retroactive Hashable, @retroactive Comparable {
     public static func < (lhs: CMVideoDimensions, rhs: CMVideoDimensions) -> Bool {
         lhs.width < rhs.width
     }
@@ -122,7 +123,7 @@ extension AVCaptureDevice.Format {
 }
 
 // MARK: AVCaptureSession.Preset
-extension AVCaptureSession.Preset: TnEnum {
+extension AVCaptureSession.Preset: @retroactive TnEnum {
     public static var allCases: [Self] = [
         .photo,
         .high,
@@ -141,7 +142,7 @@ extension AVCaptureSession.Preset: TnEnum {
 }
 
 // MARK: AVCaptureDevice.Position
-extension AVCaptureDevice.Position: TnEnum {
+extension AVCaptureDevice.Position: @retroactive TnEnum {
     public static var allCases: [Self] {
         [
             .back,
@@ -170,7 +171,7 @@ extension AVCaptureDevice.Position {
 }
 
 // MARK: AVCaptureDevice.FlashMode
-extension AVCaptureDevice.FlashMode: TnEnum {
+extension AVCaptureDevice.FlashMode: @retroactive TnEnum {
     public static var allCases: [Self] = [
         .off,
         .on,
@@ -197,7 +198,7 @@ extension AVCaptureDevice.FlashMode {
 }
 
 // MARK: torch
-extension AVCaptureDevice.TorchMode: TnEnum {
+extension AVCaptureDevice.TorchMode: @retroactive TnEnum {
     public static var allMap: [AVCaptureDevice.TorchMode: String] {
         [
             .off: "Off",
@@ -216,7 +217,7 @@ extension AVCaptureDevice.TorchMode: TnEnum {
 }
 
 // MARK: AVCaptureDevice.DeviceType
-extension AVCaptureDevice.DeviceType: TnEnum {
+extension AVCaptureDevice.DeviceType: @retroactive TnEnum {
     public static var allCases: [Self] = [
         // depth cams
         .builtInLiDARDepthCamera,
@@ -244,7 +245,7 @@ extension AVCaptureDevice.DeviceType: TnEnum {
 }
 
 // MARK: exposures
-extension AVCaptureDevice.ExposureMode: TnEnum {
+extension AVCaptureDevice.ExposureMode: @retroactive TnEnum {
     public static var allCases: [AVCaptureDevice.ExposureMode] {
         [
             .locked,
@@ -262,7 +263,7 @@ extension AVCaptureDevice.ExposureMode: TnEnum {
     ]
 }
 
-extension AVCapturePhotoOutput.QualityPrioritization: TnEnum {
+extension AVCapturePhotoOutput.QualityPrioritization: @retroactive TnEnum {
     public static var allCases: [Self] {
         [
             .speed,
@@ -271,7 +272,7 @@ extension AVCapturePhotoOutput.QualityPrioritization: TnEnum {
         ]
     }
     
-    public static var allMap: Dictionary<AVCapturePhotoOutput.QualityPrioritization, String> {
+    public static var allMap: Dictionary<Self, String> {
         [
             .speed: "Speed",
             .balanced: "Balanced",
@@ -280,7 +281,7 @@ extension AVCapturePhotoOutput.QualityPrioritization: TnEnum {
     }
 }
 
-extension AVCaptureDevice.FocusMode: TnEnum {
+extension AVCaptureDevice.FocusMode: @retroactive TnEnum {
     public static var allCases: [Self] {
         [
             .locked,

@@ -16,7 +16,7 @@ public class TnCameraLocal: NSObject, ObservableObject, TnLoggable {
     public static let shared = TnCameraLocal()
     private override init() {
     }
-    public let LOG_NAME = "CameraLocal"
+    public let LOG_NAME = "TnCameraLocal"
     
     @Published public var currentCiImage: CIImage?
     @Published public var settings: TnCameraSettings = .init()
@@ -29,13 +29,13 @@ public class TnCameraLocal: NSObject, ObservableObject, TnLoggable {
     private let photoOutput = AVCapturePhotoOutput()
     private let videoDataOutput = AVCaptureVideoDataOutput()
                 
-    typealias ApplyDeviceInputThrowableHandler = (_: AVCaptureDeviceInput, _: AVCaptureDevice) throws -> Void
-    typealias ApplyDeviceHandler = (_: AVCaptureDevice) -> Void
-    typealias SessionAsyncHandler = (_: TnCameraLocal) -> Void
+    typealias DoDeviceHandler = (AVCaptureDeviceInput, AVCaptureDevice) throws -> Void
+//    typealias ApplyDeviceHandler = (AVCaptureDevice) -> Void
+    typealias DoSessionHandler = (TnCameraLocal) -> Void
     
-    var captureImageCompletion: ((UIImage) -> Void)? = nil
+    var captureCompletion: ((UIImage) -> Void)? = nil
     private lazy var captureDelegator = TnCameraCaptureDelegate(completion: { uiImage in
-        self.captureImageCompletion?(uiImage)
+        self.captureCompletion?(uiImage)
     })
 }
 
@@ -68,20 +68,23 @@ extension TnCameraLocal {
             throw TnAppError.general(message: "Cannot add photo output to the session")
         }
         session.addOutput(photoOutput)
-        photoOutput.maxPhotoQualityPrioritization = .quality // prioritize quality
+        photoOutput.maxPhotoQualityPrioritization = settings.quality // prioritize quality
         photoOutput.orientation = .portrait
-        photoOutput.isPortraitEffectsMatteDeliveryEnabled = photoOutput.isPortraitEffectsMatteDeliverySupported
-        photoOutput.isDepthDataDeliveryEnabled = photoOutput.isDepthDataDeliverySupported
+        
+        if photoOutput.isDepthDataDeliverySupported {
+            photoOutput.isDepthDataDeliveryEnabled = settings.depth
+        }
+
+        if photoOutput.isPortraitEffectsMatteDeliverySupported {
+            photoOutput.isPortraitEffectsMatteDeliveryEnabled = settings.portrait
+        }
 
         // video output
         let sampleBufferQueue = DispatchQueue(label: "tn.tCamera.sampleBufferQueue")
         videoDataOutput.setSampleBufferDelegate(self, queue: sampleBufferQueue)
         videoDataOutput.alwaysDiscardsLateVideoFrames = true
-//        videoDataOutput.videoSettings = [kCVPixelBufferPixelFormatTypeKey as String: Int(kCMPixelFormat_32BGRA)]
-        videoDataOutput.videoSettings = [kCVPixelBufferPixelFormatTypeKey as String: Int(kCVPixelFormatType_32BGRA)]
-//        videoDataOutput.videoSettings = [
-//            kCVPixelBufferPixelFormatTypeKey as String: Int(kCVPixelFormatType_420YpCbCr8BiPlanarFullRange)
-//        ]
+        // need get from settings
+        videoDataOutput.videoSettings = [kCVPixelBufferPixelFormatTypeKey as String: settings.pixelFormat]
         if !session.canAddOutput(videoDataOutput) {
             throw TnAppError.general(message: "Cannot add video output to the session")
         }
@@ -91,15 +94,15 @@ extension TnCameraLocal {
         self.logDebug("addSessionOutputs !")
     }
     
-    private func sessionAsync(_ action: @escaping SessionAsyncHandler) {
+    private func doSessionQueue(_ action: @escaping DoSessionHandler) {
         sessionQueue.async { [weak self] in
             guard let self else { return }
             action(self)
         }
     }
 
-    private func applySession(name: String, handler: @escaping ApplyDeviceInputThrowableHandler, postHandler: ApplyDeviceInputThrowableHandler? = nil, setSettings: Bool = false) {
-        sessionAsync { me in
+    private func setupSession(name: String, handler: @escaping DoDeviceHandler, postHandler: DoDeviceHandler? = nil, setSettings: Bool = false) {
+        doSessionQueue { me in
             do {
                 self.logDebug(name, "...")
                 
@@ -147,32 +150,32 @@ extension TnCameraLocal {
         }
     }
     
-    private func applyDevice(name: String, handler:ApplyDeviceInputThrowableHandler?, postHandler: ApplyDeviceInputThrowableHandler? = nil) {
-        sessionAsync { me in
+    private func setupDevice(name: String, handler: @escaping DoDeviceHandler, postHandler: DoDeviceHandler? = nil) {
+        doSessionQueue { me in
             guard me.status == .started, let deviceInput = me.videoDeviceInput else { return }
             let device = deviceInput.device
             do {
-                defer {
-                    device.unlockForConfiguration()
-                }
                 try device.lockForConfiguration()
                                 
-                try handler?(deviceInput, device)
+                try handler(deviceInput, device)
+
+                device.unlockForConfiguration()
 
                 try postHandler?(deviceInput, device)
             } catch {
+                device.unlockForConfiguration()
                 me.logError(name, error.localizedDescription)
             }
         }
     }
 
-    private func getDevice(_ handler: @escaping ApplyDeviceHandler) {
-        guard status == .started, let device = self.videoDeviceInput?.device else { return }
-        handler(device)
+    private func getDevice(_ handler: @escaping DoDeviceHandler) {
+        guard status == .started, let deviceInput = self.videoDeviceInput else { return }
+        try? handler(deviceInput, deviceInput.device)
     }
     
     func startSession(completion: (() -> Void)? = nil) {
-        self.applySession(
+        self.setupSession(
             name: "startSession",
             handler: { [self] deviceInput, device in
                 // outputs
@@ -187,48 +190,6 @@ extension TnCameraLocal {
             }
         )
     }
-    
-//    func stopSession(handler: @escaping () -> Void) {
-//        sessionQueue.async { [weak self] in
-//            guard let self, configured else {
-//                return
-//            }
-//
-//            self.logDebug("stopSession ...")
-//
-//            if self.session.isRunning {
-//                self.session.stopRunning()
-//            }
-//
-//            session.beginConfiguration()
-//
-//            session.removeInput(videoDeviceInput!)
-//            //            session.removeOutput(photoOutput)
-//            session.removeOutput(videoDataOutput)
-//
-//            session.commitConfiguration()
-//
-//            configured = false
-//
-//            self.logDebug("stopSession !")
-//
-//            handler()
-//        }
-//    }
-//
-//    func toggleSession(handler: @escaping () -> Void) {
-//        sessionQueue.async { [weak self] in
-//            guard let self else {
-//                return
-//            }
-//
-//            if configured {
-//                stopSession(handler: handler)
-//            } else {
-//                startSession(handler: handler)
-//            }
-//        }
-//    }
 }
 
 // MARK: AVCaptureVideoDataOutputSampleBufferDelegate
@@ -259,7 +220,7 @@ extension TnCameraLocal: TnCameraProtocol {
     }
     
     public func startCapturing() {
-        sessionAsync { me in
+        doSessionQueue { me in
             if me.status < .inited {
                 me.startSession()
             } else {
@@ -272,7 +233,7 @@ extension TnCameraLocal: TnCameraProtocol {
     }
     
     public func stopCapturing() {
-        sessionAsync { me in
+        doSessionQueue { me in
             if me.session.isRunning {
                 me.session.startRunning()
                 me.status = .started
@@ -281,7 +242,7 @@ extension TnCameraLocal: TnCameraProtocol {
     }
     
     public func toggleCapturing() {
-        sessionAsync { me in
+        doSessionQueue { me in
             if me.status < .inited {
                 me.startSession()
             } else {
@@ -301,7 +262,7 @@ extension TnCameraLocal: TnCameraProtocol {
         // change cameratype if necessary
         forceValueInRange(&settings.cameraType, TnCameraDiscover.getAvailableDeviceTpes(for: settings.cameraPosition))
         
-        self.applySession(
+        self.setupSession(
             name: "switchCamera",
             handler: {_,_ in },
             postHandler: { [self] deviceInput, device in
@@ -311,19 +272,10 @@ extension TnCameraLocal: TnCameraProtocol {
     }
     
     public func setLivephoto(_ v: Bool) {
-        sessionAsync { [self] _ in
+        doSessionQueue { [self] _ in
             if settings.livephotoSupported {
-                if session.isRunning {
-                    session.stopRunning()
-                }
-                //                session.removeOutput(photoOutput)
-                
-                session.beginConfiguration()
                 photoOutput.isLivePhotoCaptureEnabled = v
-                session.commitConfiguration()
-                
-                session.startRunning()
-                settings.livephoto = photoOutput.isLivePhotoCaptureEnabled
+                settings.livephoto = v
             }
         }
     }
@@ -335,7 +287,7 @@ extension TnCameraLocal: TnCameraProtocol {
     }
     
     public func setHDR(_ v: TnTripleState) {
-        sessionAsync { [self] _ in
+        doSessionQueue { [self] _ in
             let device = videoDeviceInput!.device
             
             session.beginConfiguration()
@@ -362,7 +314,7 @@ extension TnCameraLocal: TnCameraProtocol {
     public func setPreset(_ v: AVCaptureSession.Preset) {
         if settings.preset != v && session.canSetSessionPreset(v) {
             settings.preset = v
-            applySession(
+            setupSession(
                 name: "setPreset",
                 handler: { _,_ in },
                 postHandler: { [self] _,_ in
@@ -375,7 +327,7 @@ extension TnCameraLocal: TnCameraProtocol {
     public func setCameraType(_ v: AVCaptureDevice.DeviceType) {
         if settings.cameraType != v {
             settings.cameraType = v
-            applySession(
+            setupSession(
                 name: "setCameraType",
                 handler: { _,_ in },
                 postHandler: { [self] _,_ in
@@ -387,7 +339,7 @@ extension TnCameraLocal: TnCameraProtocol {
     
     public func setExposureMode(_ v: AVCaptureDevice.ExposureMode) {
         if settings.exposureMode != v {
-            applyDevice(
+            setupDevice(
                 name: "setExposureMode",
                 handler: { _, device in
                     device.exposureMode = v
@@ -401,7 +353,7 @@ extension TnCameraLocal: TnCameraProtocol {
     
     public func setExposure(_ v: TnCameraExposureValue) {
         if settings.exposureMode == .custom {
-            applyDevice(
+            setupDevice(
                 name: "setExposure",
                 handler: { _, device in
                     device.setExposureModeCustom(
@@ -421,7 +373,7 @@ extension TnCameraLocal: TnCameraProtocol {
             return
         }
         var newV = v.value * settings.zoomMainFactor
-        self.applyDevice(
+        self.setupDevice(
             name: "setZoomFactor",
             handler: { [self] _, device in
                 if v.adjust {
@@ -444,7 +396,7 @@ extension TnCameraLocal: TnCameraProtocol {
             return
         }
         
-        sessionAsync { [self] _ in
+        doSessionQueue { [self] _ in
             session.beginConfiguration()
             
             photoOutput.isDepthDataDeliveryEnabled = v
@@ -474,7 +426,7 @@ extension TnCameraLocal: TnCameraProtocol {
         if !settings.portraitSupported {
             return
         }
-        sessionAsync { [self] _ in
+        doSessionQueue { [self] _ in
             session.beginConfiguration()
             photoOutput.isPortraitEffectsMatteDeliveryEnabled = v
             session.commitConfiguration()
@@ -488,7 +440,7 @@ extension TnCameraLocal: TnCameraProtocol {
     }
     
     public func setFocusMode(_ v: AVCaptureDevice.FocusMode) {
-        applyDevice(name: "setFocusMode", handler: { _, device in
+        setupDevice(name: "setFocusMode", handler: { _, device in
             device.focusMode = v
         })
     }
@@ -579,8 +531,8 @@ extension TnCameraLocal {
 // MARK: captureImage
 extension TnCameraLocal {
     public func captureImage() {
-        sessionAsync { me in
-            me.getDevice { device in
+        doSessionQueue { me in
+            me.getDevice { _, device in
                 var p: AVCapturePhotoSettings!
                 // Capture HEVC photos when supported
                 if me.photoOutput.availablePhotoCodecTypes.contains(.hevc) {

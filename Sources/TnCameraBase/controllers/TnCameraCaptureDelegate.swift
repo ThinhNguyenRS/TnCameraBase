@@ -32,8 +32,7 @@ public class TnCameraCaptureDelegate: NSObject, AVCapturePhotoCaptureDelegate, T
             logDebug("didFinishProcessingPhoto", "has depth")
         }
         
-        if let portraitEffectsMatte = photo.portraitEffectsMatte {
-            //            photo.resolvedSettings.portraitEffectsMatteDimensions
+        if photo.portraitEffectsMatte != nil {
             logDebug("didFinishProcessingPhoto", "has portrait")
         }
         

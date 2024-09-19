@@ -79,6 +79,7 @@ public struct TnCameraSettings: Codable {
     public var focusModes: [AVCaptureDevice.FocusMode] = []
     
     public var wideColor = true
+    public var pixelFormat: Int = Int(kCVPixelFormatType_32BGRA)
     
     public var transportScale: CGFloat = 0.25
     public var transportCompressQuality: CGFloat = 0.5

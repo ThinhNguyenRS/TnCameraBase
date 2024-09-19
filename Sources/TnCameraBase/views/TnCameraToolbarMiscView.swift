@@ -70,7 +70,7 @@ extension TnCameraToolbarMiscView {
             
     var miscView: some View {
         List {
-            Section("Camera type") {
+            Section("Capturing") {
                 TnPickerField.forEnum(
                     label: "Preset",
                     value: $cameraModel.settings.preset,
@@ -93,15 +93,17 @@ extension TnCameraToolbarMiscView {
                     cameraManager.setQuality(v)
                 })
                 
-                TnToggleField(label: "Live photo", value: $cameraModel.settings.livephoto) { v in
-                    cameraManager.setLivephoto(v)
-                }
-                .toggleStyle(.switch)
-                .disabled(!cameraModel.settings.livephotoSupported)
+//                TnToggleField(label: "Live photo", value: $cameraModel.settings.livephoto) { v in
+//                    cameraManager.setLivephoto(v)
+//                }
+//                .toggleStyle(.switch)
+//                .disabled(!cameraModel.settings.livephotoSupported)
 
                 TnToggleField(label: "Wide color", value: $cameraModel.settings.wideColor) { v in
                 }
                 .toggleStyle(.switch)
+
+                
             }
 
             Section("Light") {
@@ -177,19 +179,19 @@ extension TnCameraToolbarMiscView {
             }
             .disabled(!cameraModel.settings.exposureSupported)
             
-            Section("Virtual apecture") {
-                TnToggleField(label: "Embed depth data", value: $cameraModel.settings.depth) { v in
-                    cameraManager.setDepth(v)
-                }
-                .toggleStyle(.switch)
-                
-                TnToggleField(label: "Embed portrait matte", value: $cameraModel.settings.portrait) { v in
-                    cameraManager.setPortrait(v)
-                }
-                .toggleStyle(.switch)
-                .disabled(!(cameraModel.settings.depth && cameraModel.settings.portraitSupported))
-            }
-            .disabled(!cameraModel.settings.depthSupported)
+//            Section("Virtual apecture") {
+//                TnToggleField(label: "Embed depth data", value: $cameraModel.settings.depth) { v in
+//                    cameraManager.setDepth(v)
+//                }
+//                .toggleStyle(.switch)
+//                
+//                TnToggleField(label: "Embed portrait matte", value: $cameraModel.settings.portrait) { v in
+//                    cameraManager.setPortrait(v)
+//                }
+//                .toggleStyle(.switch)
+//                .disabled(!(cameraModel.settings.depth && cameraModel.settings.portraitSupported))
+//            }
+//            .disabled(!cameraModel.settings.depthSupported)
 
             Section("System") {
                 getSliderView(

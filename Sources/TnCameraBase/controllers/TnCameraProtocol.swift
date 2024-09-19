@@ -47,13 +47,12 @@ public protocol TnCameraProtocol {
     func setTransport(_ v: TnCameraTransportValue)
 }
 
-// MARK: CameraManagerProxyProtocol
-public protocol TnCameraProxyProtocol: TnCameraProtocol {
-    func setup()
+// MARK: TnCameraSendMessageProtocol
+public protocol TnCameraSendMessageProtocol {
     func send(_ object: TnCameraMessageProtocol, useBle: Bool)
 }
 
-extension TnCameraProxyProtocol {
+extension TnCameraSendMessageProtocol {
     public func send(_ messageType: TnCameraMessageType, useBle: Bool = false) {
         self.send(TnCameraMessage(messageType), useBle: useBle)
     }
@@ -62,20 +61,15 @@ extension TnCameraProxyProtocol {
         self.send(TnCameraMessageValue(messageType, value), useBle: useBle)
     }
     
-//    public func getMessageValue<TValue: Codable>(_ receivedMsg: TnMessage) -> TValue? {
-//        let msg: TnCameraMessageValue<TValue>? = receivedMsg.toObject()
-//        return msg?.value
-//    }
-//
-//    public func solveMsg<TMessage: Codable>(_ receivedMsg: TnMessage, handler: (TMessage) -> Void) {
-//        if let msg: TMessage = receivedMsg.toObject() {
-//            handler(msg)
-//        }
-//    }
-
     public func solveMsgValue<TMessageValue: Codable>(_ receivedMsg: TnMessage, handler: (TMessageValue) -> Void) {
         if let msg: TnCameraMessageValue<TMessageValue> = receivedMsg.toObject() {
             handler(msg.value)
         }
     }
 }
+
+// MARK: CameraManagerProxyProtocol
+public protocol TnCameraProxyProtocol: TnCameraProtocol, TnCameraSendMessageProtocol {
+    func setup()
+}
+
