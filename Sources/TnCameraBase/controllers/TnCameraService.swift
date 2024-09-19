@@ -399,7 +399,7 @@ extension TnCameraService {
     public func setExposureMode(_ v: AVCaptureDevice.ExposureMode) throws {
         guard settings.exposureMode != v else { return }
 
-        try configSession(name: "setExposureMode", sessionLock: false, deviceLock: false) { _, device in
+        try configSession(name: "setExposureMode", sessionLock: false, deviceLock: true) { _, device in
             device.exposureMode = v
         }
     }
@@ -407,7 +407,7 @@ extension TnCameraService {
     public func setExposure(_ v: TnCameraExposureValue) throws {
         guard settings.exposureMode == .custom else { return }
 
-        try configSession(name: "setExposure", sessionLock: false, deviceLock: false) { _, device in
+        try configSession(name: "setExposure", sessionLock: false, deviceLock: true) { _, device in
             let defaultISO = device.iso /*AVCaptureDevice.currentISO*/
             let defaultDuration = device.exposureDuration /*AVCaptureDevice.currentExposureDuration*/
             
