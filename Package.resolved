@@ -2,21 +2,12 @@
   "originHash" : "ec61695d7cc413cb7d2523f7ab5041c3b0980d84e1096352900b69c17ea45815",
   "pins" : [
     {
-      "identity" : "binarycodable",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/christophhagen/BinaryCodable",
-      "state" : {
-        "revision" : "f4bdd82c5da4a825634bd32c3b2ef70faa773143",
-        "version" : "3.0.3"
-      }
-    },
-    {
       "identity" : "tniosbase",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ThinhNguyenRS/TnIosBase",
       "state" : {
         "branch" : "main",
-        "revision" : "cd4dee17c73af586d50aea7e0e94da9a1c71b847"
+        "revision" : "f76f73916ce498f986fd0d7b67fdc8a811dd2423"
       }
     }
   ],
