@@ -277,7 +277,7 @@ extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
     
     public func setZoomFactor(_ v: TnCameraZoomFactorValue) {
         Task {
-            await cameraService.setZoomFactor(v)
+            try? await cameraService.setZoomFactor(v)
         }
     }
     

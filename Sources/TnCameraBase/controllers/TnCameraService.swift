@@ -426,17 +426,28 @@ extension TnCameraService {
         }
     }
 
-    public func setZoomFactor(_ v: TnCameraZoomFactorValue) {
-        guard let device = videoDeviceInput?.device else { return }
+    public func setZoomFactor(_ v: TnCameraZoomFactorValue) throws {
         
-        var newV = v.value * settings.zoomMainFactor
-        if v.adjust {
-            newV = getValueInRange(device.videoZoomFactor + v.value - 1, device.minAvailableVideoZoomFactor, device.maxAvailableVideoZoomFactor)
+        try configSession(name: "set", deviceLock: true) { [self] _, device in
+            var newV = v.value * settings.zoomMainFactor
+            if v.adjust {
+                newV = getValueInRange(device.videoZoomFactor + v.value - 1, device.minAvailableVideoZoomFactor, device.maxAvailableVideoZoomFactor)
+            }
+            guard settings.zoomRange.contains(v.value) && newV != device.videoZoomFactor else { return }
+            
+            device.ramp(toVideoZoomFactor: newV, withRate: v.withRate * Float(settings.zoomMainFactor))
         }
-        guard settings.zoomRange.contains(v.value) && newV != device.videoZoomFactor else { return }
         
-        device.ramp(toVideoZoomFactor: newV, withRate: v.withRate * Float(settings.zoomMainFactor))
-        settings.zoomFactor = v.value
+//        guard let device = videoDeviceInput?.device else { return }
+//        
+//        var newV = v.value * settings.zoomMainFactor
+//        if v.adjust {
+//            newV = getValueInRange(device.videoZoomFactor + v.value - 1, device.minAvailableVideoZoomFactor, device.maxAvailableVideoZoomFactor)
+//        }
+//        guard settings.zoomRange.contains(v.value) && newV != device.videoZoomFactor else { return }
+//        
+//        device.ramp(toVideoZoomFactor: newV, withRate: v.withRate * Float(settings.zoomMainFactor))
+//        settings.zoomFactor = v.value
     }
 
     public func setFlash(_ v: AVCaptureDevice.FlashMode) {

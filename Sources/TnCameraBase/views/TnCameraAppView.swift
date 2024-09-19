@@ -27,13 +27,6 @@ extension TnCameraAppView: View {
         ZStack {
             if cameraModel.status == .started {
                 // preview
-//                TnCameraPreviewViewMetal(imagePublisher: { await cameraService.$currentCiImage })
-//                    .onTapGesture {
-//                        withAnimation {
-//                            appModel.showToolbar.toggle()
-//                        }
-//                    }
-                
                 preview
                     .onTapGesture {
                         withAnimation {
