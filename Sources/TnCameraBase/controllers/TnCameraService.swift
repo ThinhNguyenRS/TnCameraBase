@@ -421,7 +421,7 @@ extension TnCameraService {
     public func setFocusMode(_ v: AVCaptureDevice.FocusMode) throws {
         guard settings.focusMode != v else { return }
 
-        try configSession(name: "setFocusMode", sessionLock: false, deviceLock: false) { _, device in
+        try configSession(name: "setFocusMode", sessionLock: false, deviceLock: true) { _, device in
             device.focusMode = v
         }
     }
