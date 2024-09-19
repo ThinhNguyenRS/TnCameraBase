@@ -210,6 +210,7 @@ extension TnCameraService {
         // stop capturing if reset
         if reset {
             session.stopRunning()
+            status = .inited
         }
         session.beginConfiguration()
         
@@ -218,6 +219,7 @@ extension TnCameraService {
             // start capturing if reset
             if reset && !session.isRunning {
                 session.startRunning()
+                status = .started
             }
         }
         
@@ -266,6 +268,7 @@ extension TnCameraService {
             }
             if !session.isRunning {
                 session.startRunning()
+                status = .started
             }
             fetchSettings()
             logDebug("config session", name, "!")
@@ -276,6 +279,7 @@ extension TnCameraService {
             // stop session
             if session.isRunning {
                 session.stopRunning()
+                status = .inited
             }
         }
         // setup device
