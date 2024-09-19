@@ -15,8 +15,7 @@ public struct TnCameraAppView<TCameraManager: TnCameraProxyProtocol, TBottom: Vi
     @EnvironmentObject var appModel: TnCameraAppViewModel<TCameraManager>
     @EnvironmentObject var cameraModel: TnCameraViewModel
     
-//    let cameraService: TnCameraService = .init()
-
+    let preview = TnCameraPreviewViewMetal()
     public init(_ type: TCameraManager.Type, @ViewBuilder bottom: @escaping () -> TBottom) {
         self.bottom = bottom
         logDebug("inited")
@@ -34,7 +33,8 @@ extension TnCameraAppView: View {
 //                            appModel.showToolbar.toggle()
 //                        }
 //                    }
-                TnCameraPreviewViewMetal().setImagePublisher(imagePublisher: { await appModel.cameraManager.currentCiImagePublisher })
+                
+                preview
                     .onTapGesture {
                         withAnimation {
                             appModel.showToolbar.toggle()
@@ -52,6 +52,7 @@ extension TnCameraAppView: View {
             }
         }
         .onAppear {
+            _ = preview.setImagePublisher(imagePublisher: { await appModel.cameraManager.currentCiImagePublisher })
             appModel.setup()
         }
     }
