@@ -68,8 +68,8 @@ public class TnCameraCaptureDelegate: NSObject, AVCapturePhotoCaptureDelegate, T
             },
             completionHandler: { [self] success, error in
                 if success {
-                    logDebug("Image saved to gallery.")
-                    continuation.resume(with: .success(.init(imageData: capturedImageData)))
+                    logDebug("saveImageToGallery", "!")
+                    continuation.resume(returning: .init(imageData: capturedImageData))
                 } else if let error {
                     continuation.resume(throwing: TnCameraPhotoOutputError.general(name: "saveImageToGallery", error: error.localizedDescription))
                 } else {
@@ -107,7 +107,7 @@ public class TnCameraCaptureDelegate: NSObject, AVCapturePhotoCaptureDelegate, T
             // Handle completion.
             if success {
                 logDebug("saveLivephotoToGallery", "!")
-                continuation.resume(with: .success(.init(livePhotoMovieURL: outputFileURL)))
+                continuation.resume(returning: .init(livePhotoMovieURL: outputFileURL))
                 return
             }
 
