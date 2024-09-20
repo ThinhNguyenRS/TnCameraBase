@@ -39,8 +39,9 @@ public protocol TnCameraProtocol {
     
     func setDepth(_ v: Bool)
     func setPortrait(_ v: Bool)
-    func setQuality(_ v: AVCapturePhotoOutput.QualityPrioritization)
+    func setPriority(_ v: AVCapturePhotoOutput.QualityPrioritization)
     func setFocusMode(_ v: AVCaptureDevice.FocusMode)
+    func setWideColor(_ v: Bool)
     
     func setTransport(_ v: TnCameraTransportValue)
 }

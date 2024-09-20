@@ -98,6 +98,10 @@ extension TnCameraProxyClient: TnCameraProxyProtocol {
         send(.setCameraType, v)
     }
     
+    public func setWideColor(_ v: Bool) {
+        send(.setWideColor, v)
+    }
+
     public func setExposureMode(_ v: AVCaptureDevice.ExposureMode) {
         send(.setExposureMode, v)
     }
@@ -117,7 +121,7 @@ extension TnCameraProxyClient: TnCameraProxyProtocol {
         send(.setPortrait, v)
     }
     
-    public func setQuality(_ v: AVCapturePhotoOutput.QualityPrioritization) {
+    public func setPriority(_ v: AVCapturePhotoOutput.QualityPrioritization) {
         send(.setQuality, v)
     }
     

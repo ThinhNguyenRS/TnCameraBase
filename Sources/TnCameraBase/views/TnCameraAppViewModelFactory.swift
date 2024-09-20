@@ -36,23 +36,23 @@ public struct TnCameraAppViewModelFactory {
         }
     }
     
-    public static func createServerModel(delegate: TnCameraViewModelDelegate? = nil, EOM: String? = nil, MTU: Int? = nil) -> TnCameraAppViewModel<TnCameraProxyServer> {
-        let appModel: TnCameraAppViewModel = .init(
-            cameraManager: TnCameraProxyServer(TnCameraLocal.shared, networkInfo: TnCameraProxyServiceInfo.getInstance(EOM: EOM, MTU: MTU)),
-            cameraModel: TnCameraViewModel()
-        )
-        appModel.cameraModel.delegate = delegate ?? ServerDelegate(cameraManager: appModel.cameraManager)
-        appModel.cameraManager.bleDelegate = appModel.cameraManager
-        appModel.cameraManager.captureCompletion = { capturedImage in
-            DispatchQueue.main.async {
-                withAnimation {
-                    appModel.cameraModel.capturedImage = capturedImage
-                }
-                appModel.cameraManager.sendImage()
-            }
-        }
-        return appModel
-    }
+//    public static func createServerModel(delegate: TnCameraViewModelDelegate? = nil, EOM: String? = nil, MTU: Int? = nil) -> TnCameraAppViewModel<TnCameraProxyServer> {
+//        let appModel: TnCameraAppViewModel = .init(
+//            cameraManager: TnCameraProxyServer(TnCameraLocal.shared, networkInfo: TnCameraProxyServiceInfo.getInstance(EOM: EOM, MTU: MTU)),
+//            cameraModel: TnCameraViewModel()
+//        )
+//        appModel.cameraModel.delegate = delegate ?? ServerDelegate(cameraManager: appModel.cameraManager)
+//        appModel.cameraManager.bleDelegate = appModel.cameraManager
+//        appModel.cameraManager.captureCompletion = { capturedImage in
+//            DispatchQueue.main.async {
+//                withAnimation {
+//                    appModel.cameraModel.capturedImage = capturedImage
+//                }
+//                appModel.cameraManager.sendImage()
+//            }
+//        }
+//        return appModel
+//    }
     
     public static func createServerAsyncModel(delegate: TnCameraViewModelDelegate? = nil, EOM: String? = nil, MTU: Int? = nil) -> TnCameraAppViewModel<TnCameraProxyServerAsync> {
         let appModel: TnCameraAppViewModel = .init(

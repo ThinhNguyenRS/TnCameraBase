@@ -131,7 +131,7 @@ extension TnCameraProxyServerAsync {
             
         case .setQuality:
             solveMsgValue(receivedMsg) { (v: AVCapturePhotoOutput.QualityPrioritization) in
-                setQuality(v)
+                setPriority(v)
             }
             
         case .setFocusMode:
@@ -263,6 +263,12 @@ extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
         }
     }
     
+    public func setWideColor(_ v: Bool) {
+        Task {
+            try? await cameraService.setWideColor(v)
+        }
+    }
+
     public func setExposureMode(_ v: AVCaptureDevice.ExposureMode) {
         Task {
             try? await cameraService.setExposureMode(v)
@@ -293,9 +299,9 @@ extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
         }
     }
     
-    public func setQuality(_ v: AVCapturePhotoOutput.QualityPrioritization) {
+    public func setPriority(_ v: AVCapturePhotoOutput.QualityPrioritization) {
         Task {
-            try? await cameraService.setQuality(v)
+            try? await cameraService.setPriority(v)
         }
     }
     

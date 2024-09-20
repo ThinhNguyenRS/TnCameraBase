@@ -45,7 +45,7 @@ extension TnCameraAppView: View {
             }
         }
         .onAppear {
-            _ = preview.setImagePublisher(imagePublisher: { await appModel.cameraManager.currentCiImagePublisher })
+            preview.setImagePublisher(imagePublisher: { await appModel.cameraManager.currentCiImagePublisher })
             appModel.setup()
         }
     }

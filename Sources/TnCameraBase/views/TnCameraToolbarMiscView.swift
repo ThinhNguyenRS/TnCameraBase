@@ -89,55 +89,60 @@ extension TnCameraToolbarMiscView {
                     }
                 )
                 
-                TnPickerField.forEnum(label: "Priority", value: $cameraModel.settings.quality, onChanged: { v in
-                    cameraManager.setQuality(v)
+                TnPickerField.forEnum(label: "Priority", value: $cameraModel.settings.priority, onChanged: { v in
+                    cameraManager.setPriority(v)
                 })
                 
-//                TnToggleField(label: "Live photo", value: $cameraModel.settings.livephoto) { v in
-//                    cameraManager.setLivephoto(v)
-//                }
-//                .toggleStyle(.switch)
-//                .disabled(!cameraModel.settings.livephotoSupported)
-
                 TnToggleField(label: "Wide color", value: $cameraModel.settings.wideColor) { v in
+                    cameraManager.setWideColor(v)
                 }
                 .toggleStyle(.switch)
 
-                
+                if cameraModel.settings.livephotoSupported {
+                    TnToggleField(label: "Live photo", value: $cameraModel.settings.livephoto) { v in
+                        cameraManager.setLivephoto(v)
+                    }
+                    .toggleStyle(.switch)
+                }
             }
 
             Section("Light") {
-                TnPickerField.forEnum(
-                    label: "Flash",
-                    value: $cameraModel.settings.flashMode,
-                    values: cameraModel.settings.flashModes,
-                    onChanged: { v in
-                        cameraManager.setFlash(v)
-                    }
-                )
-                .disabled(!cameraModel.settings.flashSupported)
+                if cameraModel.settings.flashSupported {
+                    TnPickerField.forEnum(
+                        label: "Flash",
+                        value: $cameraModel.settings.flashMode,
+                        values: cameraModel.settings.flashModes,
+                        onChanged: { v in
+                            cameraManager.setFlash(v)
+                        }
+                    )
+                }
                 
-                TnPickerField.forEnum(
-                    label: "HDR",
-                    value: $cameraModel.settings.hdr,
-                    onChanged: { v in
-                        cameraManager.setHDR(v)
-                    }
-                )
-                .disabled(!cameraModel.settings.hdrSupported)
+                if cameraModel.settings.hdrSupported {
+                    TnPickerField.forEnum(
+                        label: "HDR",
+                        value: $cameraModel.settings.hdr,
+                        onChanged: { v in
+                            cameraManager.setHDR(v)
+                        }
+                    )
+
+                }
             }
             
             
             Section("Exposure & Focus") {
-                TnPickerField.forEnum(
-                    label: "Focus mode",
-                    value: $cameraModel.settings.focusMode,
-                    values: cameraModel.settings.focusModes,
-                    onChanged: { v in
-                        cameraManager.setFocusMode(v)
-                    }
-                )
-                
+                if !cameraModel.settings.focusModes.isEmpty {
+                    TnPickerField.forEnum(
+                        label: "Focus mode",
+                        value: $cameraModel.settings.focusMode,
+                        values: cameraModel.settings.focusModes,
+                        onChanged: { v in
+                            cameraManager.setFocusMode(v)
+                        }
+                    )
+                }
+
                 TnPickerField.forEnum(
                     label: "Exposure mode",
                     value: $cameraModel.settings.exposureMode,
@@ -147,51 +152,53 @@ extension TnCameraToolbarMiscView {
                     }
                 )
                 
-                VStack {
-                    getSliderView(
-                        value: $cameraModel.settings.iso,
-                        label: "ISO",
-                        bounds: cameraModel.settings.isoRange,
-                        step: 50,
-                        onChanged: { _ in},
-                        onChanging: { [self] v in
-                            cameraManager.setExposure(.init(iso: v))
-                        },
-                        formatter: getNumberFormatter("%.0f"),
-                        closeable: false
-                    )
-                    
-                    getSliderView(
-                        value: $cameraModel.settings.exposureDuration,
-                        label: "Shutter speed",
-                        bounds: cameraModel.settings.exposureDurationRange,
-                        step: 0.001,
-                        onChanged: { _ in},
-                        onChanging: { [self] v in
-                            cameraManager.setExposure(.init(duration: v))
-                        },
-                        formatter: getNumberFormatter("%.3f"),
-                        closeable: false
-                    )
+                if cameraModel.settings.exposureMode == .custom {
+                    VStack {
+                        getSliderView(
+                            value: $cameraModel.settings.iso,
+                            label: "ISO",
+                            bounds: cameraModel.settings.isoRange,
+                            step: 50,
+                            onChanged: { _ in},
+                            onChanging: { [self] v in
+                                cameraManager.setExposure(.init(iso: v))
+                            },
+                            formatter: getNumberFormatter("%.0f"),
+                            closeable: false
+                        )
+                        
+                        getSliderView(
+                            value: $cameraModel.settings.exposureDuration,
+                            label: "Shutter speed",
+                            bounds: cameraModel.settings.exposureDurationRange,
+                            step: 0.001,
+                            onChanged: { _ in},
+                            onChanging: { [self] v in
+                                cameraManager.setExposure(.init(duration: v))
+                            },
+                            formatter: getNumberFormatter("%.3f"),
+                            closeable: false
+                        )
+                    }
+                    .padding(.horizontal, 16)
                 }
-                .padding(.horizontal, 16)
-                .disabled(cameraModel.settings.exposureMode != .custom)
             }
-            .disabled(!cameraModel.settings.exposureSupported)
             
-//            Section("Virtual apecture") {
-//                TnToggleField(label: "Embed depth data", value: $cameraModel.settings.depth) { v in
-//                    cameraManager.setDepth(v)
-//                }
-//                .toggleStyle(.switch)
-//                
-//                TnToggleField(label: "Embed portrait matte", value: $cameraModel.settings.portrait) { v in
-//                    cameraManager.setPortrait(v)
-//                }
-//                .toggleStyle(.switch)
-//                .disabled(!(cameraModel.settings.depth && cameraModel.settings.portraitSupported))
-//            }
-//            .disabled(!cameraModel.settings.depthSupported)
+            if cameraModel.settings.depthSupported {
+                Section("Virtual apecture") {
+                    TnToggleField(label: "Embed depth data", value: $cameraModel.settings.depth) { v in
+                        cameraManager.setDepth(v)
+                    }
+                    .toggleStyle(.switch)
+                    
+                    if cameraModel.settings.portraitSupported {
+                        TnToggleField(label: "Embed portrait data", value: $cameraModel.settings.portrait) { v in
+                            cameraManager.setPortrait(v)
+                        }
+                        .toggleStyle(.switch)
+                    }
+                }
+            }
 
             Section("System") {
                 getSliderView(
@@ -203,9 +210,7 @@ extension TnCameraToolbarMiscView {
                     onChanging: { [self] v in
                         cameraManager.setTransport(.init(scale: v))
                     },
-                    formatter: { v in
-                        (v*100).toString("%.0f%%")
-                    },
+                    formatter: getNumberPercentFormatter(),
                     closeable: false,
                     adjustBounds: false
                 )
@@ -219,9 +224,7 @@ extension TnCameraToolbarMiscView {
                     onChanging: { [self] v in
                         cameraManager.setTransport(.init(compressQuality: v))
                     },
-                    formatter: { v in
-                        (v*100).toString("%.0f%%")
-                    },
+                    formatter: getNumberPercentFormatter(),
                     closeable: false,
                     adjustBounds: false
                 )

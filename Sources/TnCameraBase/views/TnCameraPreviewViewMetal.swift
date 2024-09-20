@@ -115,6 +115,7 @@ public struct TnCameraPreviewViewMetal: TnLoggable {
         logDebug("inited")
     }
     
+    @discardableResult
     public func setImagePublisher(imagePublisher: @escaping () async -> Published<CIImage?>.Publisher) -> Self {
         Task { /*@MainActor in*/
             await internalView.setImagePublisher(imagePublisher: await imagePublisher().eraseToAnyPublisher())

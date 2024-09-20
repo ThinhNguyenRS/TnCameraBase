@@ -43,6 +43,7 @@ public enum TnCameraMessageType: UInt8, Codable {
     case captureImage
     
     case setTransport
+    case setWideColor
 }
 
 // MARK: TnCameraMessageProtocol

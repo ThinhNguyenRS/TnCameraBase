@@ -51,9 +51,6 @@ extension TnCameraService {
         settings.hdrSupported = device.activeFormat.isVideoHDRSupported
         settings.hdr = .fromTwoBool(device.automaticallyAdjustsVideoHDREnabled, device.isVideoHDREnabled)
 
-        // zoom
-        calcZoomFactors()
-
         // exposure
         settings.exposureMode = device.exposureMode
         settings.exposureModes = AVCaptureDevice.ExposureMode.allCases.filter { v in
@@ -77,12 +74,15 @@ extension TnCameraService {
         settings.portraitSupported = photoOutput.isPortraitEffectsMatteDeliverySupported
         settings.portrait = photoOutput.isPortraitEffectsMatteDeliveryEnabled
 
-        settings.quality = photoOutput.maxPhotoQualityPrioritization
+        settings.priority = photoOutput.maxPhotoQualityPrioritization
 
         settings.focusMode = device.focusMode
         settings.focusModes = AVCaptureDevice.FocusMode.allCases.filter { v in
             device.isFocusModeSupported(v)
         }
+
+        // zoom
+        calcZoomFactors()
     }
 
     private func calcZoomFactors() {
@@ -165,7 +165,7 @@ extension TnCameraService {
             throw TnAppError.general(message: "Cannot add photo output to the session")
         }
         session.addOutput(photoOutput)
-        photoOutput.maxPhotoQualityPrioritization = settings.quality
+        photoOutput.maxPhotoQualityPrioritization = settings.priority
         photoOutput.isLivePhotoCaptureEnabled = photoOutput.isLivePhotoCaptureSupported && settings.livephoto
         photoOutput.isDepthDataDeliveryEnabled = photoOutput.isDepthDataDeliverySupported && settings.depth
         photoOutput.isPortraitEffectsMatteDeliveryEnabled = photoOutput.isPortraitEffectsMatteDeliverySupported && settings.portrait
@@ -221,6 +221,7 @@ extension TnCameraService {
                 session.startRunning()
                 status = .started
             }
+            fetchSettings()
         }
         
         if !session.canSetSessionPreset(settings.preset) {
@@ -243,8 +244,6 @@ extension TnCameraService {
             
             status = .inited
             
-            fetchSettings()
-            
             logDebug("setup", "!")
         } catch {
             status = .failed
@@ -257,6 +256,14 @@ extension TnCameraService {
         logDebug("reset session", name, "...")
         try setupSession(reset: true, deviceLock: deviceLock, deviceHandler: deviceHandler)
         logDebug("reset session", name, "!")
+    }
+
+    public func resetSession<TValue:  Equatable>(name: String, _ keyPath: WritableKeyPath<TnCameraSettings, TValue>, _ v: TValue) throws {
+        guard settings[keyPath: keyPath] != v else { return }
+
+        settings[keyPath: keyPath] = v
+        // then reset the session
+        try resetSession(name: name)
     }
 
     private func configSession(name: String, sessionLock: Bool = false, deviceLock: Bool = false, deviceHandler: DoDeviceHandler? = nil) throws {
@@ -292,7 +299,7 @@ extension TnCameraService {
 
 // MARK: public services
 extension TnCameraService {
-    func startCapturing() async throws {
+    public func startCapturing() async throws {
         guard await isAuthorized, !session.isRunning else { return }
         try setupSession(reset: false)
         
@@ -329,32 +336,23 @@ extension TnCameraService {
     public func setLivephoto(_ v: Bool) throws {
         guard settings.livephotoSupported && settings.livephoto != v else { return }
         
-        try configSession(name: "", sessionLock: true) { [self] _, _ in
+        try configSession(name: "setLivephoto", sessionLock: true) { [self] _, _ in
             photoOutput.isLivePhotoCaptureEnabled = photoOutput.isLivePhotoCaptureSupported && v
         }
-        
     }
     
     public func setPreset(_ v: AVCaptureSession.Preset) throws {
-        guard settings.preset != v && session.canSetSessionPreset(v) else { return }
-        
-        settings.preset = v
-        // then reset the session
-        try resetSession(name: "setPreset")
-        // set orientation
-        videoDataOutput.orientation = .portrait
+        try resetSession(name: "setPreset", \.preset, v)
     }
     
     public func setCameraType(_ v: AVCaptureDevice.DeviceType) throws {
-        guard settings.cameraType != v else { return }
-        
-        settings.cameraType = v
-        // then reset the session
-        try resetSession(name: "setCameraType")
-        // set orientation
-        videoDataOutput.orientation = .portrait
+        try resetSession(name: "setCameraType", \.cameraType, v)
     }
     
+    public func setWideColor(_ v: Bool) throws {
+        try resetSession(name: "setWideColor", \.wideColor, v)
+    }
+
     public func setDepth(_ v: Bool) throws {
         guard settings.depthSupported && settings.depth != v else { return }
         
@@ -378,22 +376,15 @@ extension TnCameraService {
         guard settings.hdr != v else { return }
 
         try configSession(name: "setHDR", sessionLock: true, deviceLock: true) { _, device in
-            switch v {
-            case .auto:
-                device.automaticallyAdjustsVideoHDREnabled = true
-            default:
-                device.automaticallyAdjustsVideoHDREnabled = false
+            device.automaticallyAdjustsVideoHDREnabled = v == .auto
+            if v != .auto {
                 device.isVideoHDREnabled = v.toBool()!
             }
         }
     }
     
-    public func setQuality(_ v: AVCapturePhotoOutput.QualityPrioritization) throws {
-        guard settings.quality != v else { return }
-        
-        settings.quality = v
-        // then reset the session
-        try resetSession(name: "setQuality")
+    public func setPriority(_ v: AVCapturePhotoOutput.QualityPrioritization) throws {
+        try resetSession(name: "setQuality", \.priority, v)
     }
     
     public func setExposureMode(_ v: AVCaptureDevice.ExposureMode) throws {
@@ -426,9 +417,8 @@ extension TnCameraService {
         }
     }
 
-    public func setZoomFactor(_ v: TnCameraZoomFactorValue) throws {
-        
-        try configSession(name: "set", deviceLock: true) { [self] _, device in
+    public func setZoomFactor(_ v: TnCameraZoomFactorValue) throws {        
+        try configSession(name: "setZoomFactor", deviceLock: true) { [self] _, device in
             var newV = v.value * settings.zoomMainFactor
             if v.adjust {
                 newV = getValueInRange(device.videoZoomFactor + v.value - 1, device.minAvailableVideoZoomFactor, device.maxAvailableVideoZoomFactor)
@@ -437,17 +427,6 @@ extension TnCameraService {
             
             device.ramp(toVideoZoomFactor: newV, withRate: v.withRate * Float(settings.zoomMainFactor))
         }
-        
-//        guard let device = videoDeviceInput?.device else { return }
-//        
-//        var newV = v.value * settings.zoomMainFactor
-//        if v.adjust {
-//            newV = getValueInRange(device.videoZoomFactor + v.value - 1, device.minAvailableVideoZoomFactor, device.maxAvailableVideoZoomFactor)
-//        }
-//        guard settings.zoomRange.contains(v.value) && newV != device.videoZoomFactor else { return }
-//        
-//        device.ramp(toVideoZoomFactor: newV, withRate: v.withRate * Float(settings.zoomMainFactor))
-//        settings.zoomFactor = v.value
     }
 
     public func setFlash(_ v: AVCaptureDevice.FlashMode) {
@@ -484,7 +463,7 @@ extension TnCameraService {
         if let previewPhotoPixelFormatType = p.availablePreviewPhotoPixelFormatTypes.first {
             p.previewPhotoFormat = [kCVPixelBufferPixelFormatTypeKey as String: previewPhotoPixelFormatType]
         }
-        p.photoQualityPrioritization = settings.quality
+        p.photoQualityPrioritization = settings.priority
         
         // depth
         if settings.depthSupported {

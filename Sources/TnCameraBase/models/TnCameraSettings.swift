@@ -73,7 +73,7 @@ public struct TnCameraSettings: Codable {
     public var portraitSupported = false
     public var portrait = false
     
-    public var quality: AVCapturePhotoOutput.QualityPrioritization = .quality
+    public var priority: AVCapturePhotoOutput.QualityPrioritization = .quality
     
     public var focusMode: AVCaptureDevice.FocusMode = .autoFocus
     public var focusModes: [AVCaptureDevice.FocusMode] = []
