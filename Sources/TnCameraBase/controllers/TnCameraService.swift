@@ -14,7 +14,9 @@ import TnIosBase
 
 public actor TnCameraService: NSObject, TnLoggable {
     public static let shared: TnCameraService = .init()
-    
+
+    typealias DoDeviceHandler = (AVCaptureDeviceInput, AVCaptureDevice) throws -> Void
+
     nonisolated public let LOG_NAME = "TnCameraService"
     
     @Published public var settings: TnCameraSettings = .init()
@@ -22,13 +24,10 @@ public actor TnCameraService: NSObject, TnLoggable {
     @Published public var currentCiImage: CIImage?
     
     private let session = AVCaptureSession()
-    private let sessionQueue = DispatchQueue(label: "tn.tCamera.sessionQueue")
     
     private var videoDeviceInput: AVCaptureDeviceInput?
     private let photoOutput = AVCapturePhotoOutput()
     private let videoDataOutput = AVCaptureVideoDataOutput()
-                
-    typealias DoDeviceHandler = (AVCaptureDeviceInput, AVCaptureDevice) throws -> Void
     
     private override init() {
     }
@@ -185,27 +184,30 @@ extension TnCameraService {
         self.logDebug("addSessionOutputs !")
     }
     
-    private func setupDevice(deviceLock: Bool = false, deviceHandler: DoDeviceHandler? = nil) throws {
+    private func setupDevice(name: String, deviceLock: Bool = false, deviceHandler: DoDeviceHandler? = nil) throws {
         if let deviceHandler {
+            logDebug("setup device", name, "...")
             let deviceInput = videoDeviceInput!, device = deviceInput.device
             defer {
                 if deviceLock {
                     device.unlockForConfiguration()
                 }
+                logDebug("setup device", name, "!")
             }
             if deviceLock {
                 try device.lockForConfiguration()
             }
+            
             try deviceHandler(deviceInput, device)
         }
     }
     
-    private func setupSession(reset: Bool, deviceLock: Bool = false, deviceHandler: DoDeviceHandler? = nil) throws {
+    private func setupSession(name: String, reset: Bool, deviceLock: Bool = false, deviceHandler: DoDeviceHandler? = nil) throws {
         guard reset || status < .inited else {
             return
         }
         
-        self.logDebug("setup", "...")
+        self.logDebug("setup session", name, "...")
         
         // stop capturing if reset
         if reset {
@@ -222,6 +224,7 @@ extension TnCameraService {
                 status = .started
             }
             fetchSettings()
+            self.logDebug("setup session", name, "!")
         }
         
         if !session.canSetSessionPreset(settings.preset) {
@@ -240,21 +243,21 @@ extension TnCameraService {
             try addOutputs()
 
             // setup device
-            try setupDevice(deviceLock: deviceLock, deviceHandler: deviceHandler)
+            try setupDevice(name: name, deviceLock: deviceLock, deviceHandler: deviceHandler)
             
             status = .inited
             
-            logDebug("setup", "!")
+            logDebug("setup session", "!")
         } catch {
             status = .failed
-            logError("setup", "failed !")
+            logError("setup session", "failed !")
             throw error
         }
     }
     
     private func resetSession(name: String, deviceLock: Bool = false, deviceHandler: DoDeviceHandler? = nil) throws {
         logDebug("reset session", name, "...")
-        try setupSession(reset: true, deviceLock: deviceLock, deviceHandler: deviceHandler)
+        try setupSession(name: name, reset: true, deviceLock: deviceLock, deviceHandler: deviceHandler)
         logDebug("reset session", name, "!")
     }
 
@@ -292,7 +295,7 @@ extension TnCameraService {
             session.beginConfiguration()
         }
         // setup device
-        try setupDevice(deviceLock: deviceLock, deviceHandler: deviceHandler)
+        try setupDevice(name: name, deviceLock: deviceLock, deviceHandler: deviceHandler)
     }
 }
 
@@ -301,7 +304,7 @@ extension TnCameraService {
 extension TnCameraService {
     public func startCapturing() async throws {
         guard await isAuthorized, !session.isRunning else { return }
-        try setupSession(reset: false)
+        try setupSession(name: "startCapturing", reset: false)
         
         session.startRunning()
         status = .started
@@ -384,7 +387,8 @@ extension TnCameraService {
     }
     
     public func setPriority(_ v: AVCapturePhotoOutput.QualityPrioritization) throws {
-        try resetSession(name: "setQuality", \.priority, v)
+        guard settings.priority != v else { return }
+        settings.priority = v
     }
     
     public func setExposureMode(_ v: AVCaptureDevice.ExposureMode) throws {
@@ -449,7 +453,7 @@ extension TnCameraService {
 
 // MARK: captureImage
 extension TnCameraService {
-    public func captureImage(delegate: any AVCapturePhotoCaptureDelegate) {
+    private func createPhotoSettings() -> AVCapturePhotoSettings {
         var p: AVCapturePhotoSettings!
         // Capture HEVC photos when supported
         if photoOutput.availablePhotoCodecTypes.contains(.hevc) {
@@ -463,6 +467,11 @@ extension TnCameraService {
         if let previewPhotoPixelFormatType = p.availablePreviewPhotoPixelFormatTypes.first {
             p.previewPhotoFormat = [kCVPixelBufferPixelFormatTypeKey as String: previewPhotoPixelFormatType]
         }
+        // maxPhotoDimensions
+        if #available(iOS 16.0, *) {
+            p.maxPhotoDimensions = photoOutput.maxPhotoDimensions
+        }
+        // priority
         p.photoQualityPrioritization = settings.priority
         
         // depth
@@ -477,29 +486,34 @@ extension TnCameraService {
             p.embedsPortraitEffectsMatteInPhoto = settings.portrait
         }
         
+        // live photo
+        if photoOutput.isLivePhotoCaptureEnabled {
+            p.livePhotoMovieFileURL = URL(fileURLWithPath: NSTemporaryDirectory() + UUID().uuidString).appendingPathExtension(for: .quickTimeMovie)
+        }
+        
+        return p
+    }
+    
+    private func captureImage<TDelegate: AVCapturePhotoCaptureDelegate>(delegate: TDelegate) {
         photoOutput.orientation = .fromUI(DeviceMotionOrientationListener.shared.orientation)
         
-        if photoOutput.isLivePhotoCaptureEnabled {
-            let filePath = "\(NSTemporaryDirectory())\(UUID().uuidString).mov"
-            p.livePhotoMovieFileURL = .init(fileURLWithPath: filePath)
-        }
+        let p = createPhotoSettings()
         photoOutput.capturePhoto(with: p, delegate: delegate)
     }
-
-    public func captureImage(completion: @escaping (UIImage) -> Void) {
-        captureImage(delegate: TnCameraCaptureDelegate(completion: completion))
-    }
     
-    public func captureImage() async -> UIImage {
-        await withCheckedContinuation { continuation in
-            captureImage(completion: { uiImage in
-                continuation.resume(returning: uiImage)
-            })
+    private func captureImage() async throws -> TnCameraPhotoOutput {
+        try await withCheckedThrowingContinuation { continuation in
+            let delegate = TnCameraCaptureDelegate(continuation: continuation)
+            captureImage(delegate: delegate)
         }
     }
     
-//    public func captureImage() async {
-//    }
+    public func captureImage(_ v: TnCameraCaptureValue, completion: TnCameraPhotoOutputCompletion?) async throws {
+        for _ in 0..<v.count {
+            let output = try await captureImage()
+            completion?(output)
+        }
+    }
 }
 
 extension TnCameraService: AVCaptureVideoDataOutputSampleBufferDelegate {

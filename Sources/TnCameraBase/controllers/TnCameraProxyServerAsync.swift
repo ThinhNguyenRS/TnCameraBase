@@ -38,15 +38,8 @@ public class TnCameraProxyServerAsync: TnLoggable {
             ble.delegate = newValue
         }
     }
-    
-//    public var captureCompletion: ((UIImage) -> Void)? {
-//        get {
-//            cameraService.captureCompletion
-//        }
-//        set {
-//            cameraService.captureCompletion = newValue
-//        }
-//    }
+
+    public var captureCompletion: TnCameraPhotoOutputCompletion?
 }
 
 // MARK: TnBluetoothServerDelegate
@@ -87,7 +80,9 @@ extension TnCameraProxyServerAsync {
             switchCamera()
             
         case .captureImage:
-            captureImage()
+            solveMsgValue(receivedMsg) { (v: TnCameraCaptureValue) in
+                captureImage(v)
+            }
 
         case .getSettings:
             // response settings
@@ -227,9 +222,9 @@ extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
         }
     }
     
-    public func captureImage() {
+    public func captureImage(_ v: TnCameraCaptureValue) {
         Task {
-            await cameraService.captureImage()
+            try? await cameraService.captureImage(v, completion: captureCompletion)
         }
     }
     

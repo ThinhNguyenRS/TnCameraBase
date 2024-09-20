@@ -26,7 +26,7 @@ public protocol TnCameraProtocol {
     func stopCapturing()
     func switchCamera()
     
-    func captureImage()
+    func captureImage(_ v: TnCameraCaptureValue)
     
     func setLivephoto(_ v: Bool)
     func setFlash(_ v: AVCaptureDevice.FlashMode)

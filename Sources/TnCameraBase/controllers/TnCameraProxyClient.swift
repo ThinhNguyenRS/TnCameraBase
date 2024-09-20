@@ -74,8 +74,8 @@ extension TnCameraProxyClient: TnCameraProxyProtocol {
         send(.switchCamera)
     }
     
-    public func captureImage() {
-        send(.captureImage)
+    public func captureImage(_ v: TnCameraCaptureValue) {
+        send(.captureImage, v)
     }
     
     public func setLivephoto(_ v: Bool) {

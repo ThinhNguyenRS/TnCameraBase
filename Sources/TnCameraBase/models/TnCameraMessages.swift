@@ -131,11 +131,15 @@ public struct TnCameraExposureValue: Codable {
 public struct TnCameraCaptureValue: Codable {
     public let library: String?
     public let delay: Double?
-    public let count: Int?
+    public let count: Int
     
-    public init(library: String?, delay: Double? = nil, count: Int? = nil) {
+    public init(library: String? = nil, delay: Double? = nil, count: Int = 1) {
         self.library = library
         self.delay = delay
         self.count = count
+    }
+    
+    public static var `default`: Self {
+        .init()
     }
 }
