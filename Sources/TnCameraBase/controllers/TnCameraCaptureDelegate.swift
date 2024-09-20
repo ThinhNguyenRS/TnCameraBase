@@ -21,42 +21,46 @@ public class TnCameraCaptureDelegate: NSObject, AVCapturePhotoCaptureDelegate, T
     }
     
     public func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
+        logDebug("didFinishProcessingPhoto", "...")
+
         if let error {
             continuation.resume(throwing: TnCameraPhotoOutputError.general(name: "didFinishProcessingPhoto", error: error.localizedDescription))
-            return
-        }
-        
-        if photo.depthData != nil {
-            logDebug("didFinishProcessingPhoto", "has depth")
-        }
-        
-        if photo.portraitEffectsMatte != nil {
-            logDebug("didFinishProcessingPhoto", "has portrait")
-        }
-        
-        if let imageData = photo.fileDataRepresentation() {
-            self.capturedImageData = imageData
-            if !output.isLivePhotoCaptureEnabled {
-                saveImageToGallery()
-            }
         } else {
-            continuation.resume(throwing: TnCameraPhotoOutputError.general(name: "didFinishProcessingPhoto", error: "cannot fetch image"))
-        }
+            if photo.depthData != nil {
+                logDebug("didFinishProcessingPhoto", "has depth")
+            }
+            
+            if photo.portraitEffectsMatte != nil {
+                logDebug("didFinishProcessingPhoto", "has portrait")
+            }
+            
+            if let imageData = photo.fileDataRepresentation() {
+                self.capturedImageData = imageData
+                if !output.isLivePhotoCaptureEnabled {
+                    saveImageToGallery()
+                }
+            } else {
+                continuation.resume(throwing: TnCameraPhotoOutputError.general(name: "didFinishProcessingPhoto", error: "cannot fetch image"))
+            }
+        }        
+        logDebug("didFinishProcessingPhoto", "!")
     }
     
     public func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingLivePhotoToMovieFileAt outputFileURL: URL, duration: CMTime, photoDisplayTime: CMTime, resolvedSettings: AVCaptureResolvedPhotoSettings, error: (any Error)?) {
-        logDebug("didFinishProcessingLivePhotoToMovieFileAt", outputFileURL.absoluteString)
+        logDebug("didFinishProcessingLivePhotoToMovieFileAt", "...")
         
         if let error {
             continuation.resume(throwing: TnCameraPhotoOutputError.general(name: "didFinishProcessingLivePhotoToMovieFileAt", error: error.localizedDescription))
-            return
+        } else {
+            // Save Live Photo.
+            saveLivephotoToGallery(outputFileURL)
         }
-        
-        // Save Live Photo.
-        saveLivephotoToGallery(outputFileURL)
+        logDebug("didFinishProcessingLivePhotoToMovieFileAt", "!")
     }
     
     func saveImageToGallery() {
+        logDebug("saveImageToGallery", "...")
+
         guard let capturedImageData = self.capturedImageData, let capturedImage = UIImage(data: capturedImageData) else {
             continuation.resume(throwing: TnCameraPhotoOutputError.general(name: "saveImageToGallery", error: "cannot fetch image"))
             return
@@ -68,18 +72,20 @@ public class TnCameraCaptureDelegate: NSObject, AVCapturePhotoCaptureDelegate, T
             },
             completionHandler: { [self] success, error in
                 if success {
-                    logDebug("saveImageToGallery", "!")
                     continuation.resume(returning: .init(imageData: capturedImageData))
                 } else if let error {
                     continuation.resume(throwing: TnCameraPhotoOutputError.general(name: "saveImageToGallery", error: error.localizedDescription))
                 } else {
                     continuation.resume(throwing: TnCameraPhotoOutputError.general(name: "saveImageToGallery", error: "unknown"))
                 }
+                logDebug("saveImageToGallery", "!")
             }
         )
     }
     
     func saveLivephotoToGallery(_ outputFileURL: URL) {
+        logDebug("saveLivephotoToGallery", "...")
+
         PHPhotoLibrary.requestAuthorization { [self] status in
             guard status == .authorized else {
                 continuation.resume(throwing: TnCameraPhotoOutputError.general(name: "saveLivephotoToGallery", error: "unauthorized"))
@@ -91,8 +97,6 @@ public class TnCameraCaptureDelegate: NSObject, AVCapturePhotoCaptureDelegate, T
             continuation.resume(throwing: TnCameraPhotoOutputError.general(name: "saveImageToGallery", error: "cannot fetch image"))
             return
         }
-
-        logDebug("saveLivephotoToGallery", "...")
         
         PHPhotoLibrary.shared().performChanges({
             // Add the captured photo's file data as the main resource for the Photos asset.
@@ -106,17 +110,13 @@ public class TnCameraCaptureDelegate: NSObject, AVCapturePhotoCaptureDelegate, T
         }) { [self] success, error in
             // Handle completion.
             if success {
-                logDebug("saveLivephotoToGallery", "!")
                 continuation.resume(returning: .init(livePhotoMovieURL: outputFileURL))
-                return
-            }
-
-            if let error {
+            } else if let error {
                 continuation.resume(throwing: TnCameraPhotoOutputError.general(name: "saveImageToGallery", error: error.localizedDescription))
-                return
+            } else {
+                continuation.resume(throwing: TnCameraPhotoOutputError.general(name: "saveLivephotoToGallery.capturedImageData", error: "unknown"))
             }
-            
-            continuation.resume(throwing: TnCameraPhotoOutputError.general(name: "saveLivephotoToGallery.capturedImageData", error: "unknown"))
+            logDebug("saveLivephotoToGallery", "!")
         }
     }
 }
