@@ -8,22 +8,18 @@
 import Foundation
 
 public struct TnCameraPhotoOutput {
-    public let imageData: Data?
-    public let livePhotoMovieURL: URL?
-    
-    public init(imageData: Data) {
-        self.imageData = imageData
-        self.livePhotoMovieURL = nil
-    }
+    public let photoData: Data
+    public let photoLiveURL: URL?
 
-    public init(livePhotoMovieURL: URL) {
-        self.imageData = nil
-        self.livePhotoMovieURL = livePhotoMovieURL
+    public init(photoData: Data, photoLiveURL: URL?) {
+        self.photoData = photoData
+        self.photoLiveURL = photoLiveURL
     }
 }
 
 public enum TnCameraPhotoOutputError: Error {
-    case general(name: String, error: String)
+    case general(error: String)
+    case noData
 }
 
 public typealias TnCameraPhotoOutputContinuation = CheckedContinuation<TnCameraPhotoOutput, Error>

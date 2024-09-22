@@ -508,11 +508,12 @@ extension TnCameraService {
         }
     }
     
-    public func captureImage(_ v: TnCameraCaptureValue, completion: TnCameraPhotoOutputCompletion?) async throws {
-        for _ in 0..<v.count {
-            let output = try await captureImage()
-            completion?(output)
-        }
+    public func captureImage(_ v: TnCameraCaptureValue) async throws -> TnCameraPhotoOutput {
+        try await captureImage()
+//        for _ in 0..<v.count {
+//            let output = try await captureImage()
+//            completion?(output)
+//        }
     }
 }
 

@@ -224,7 +224,9 @@ extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
     
     public func captureImage(_ v: TnCameraCaptureValue) {
         Task {
-            try? await cameraService.captureImage(v, completion: captureCompletion)
+            if let output = try? await cameraService.captureImage(v) {
+                captureCompletion?(output)
+            }
         }
     }
     
