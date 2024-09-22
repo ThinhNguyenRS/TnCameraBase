@@ -67,7 +67,7 @@ public class TnCameraCaptureDelegate: NSObject, AVCapturePhotoCaptureDelegate, T
             return
         }
         
-        logError("didFinishCaptureFor", "!")
+        logDebug("didFinishCaptureFor", "!")
 
         // Resume the continuation by returning the captured photo.
         let output = TnCameraPhotoOutput(photoData: photoData, photoLiveURL: photoLiveURL)
