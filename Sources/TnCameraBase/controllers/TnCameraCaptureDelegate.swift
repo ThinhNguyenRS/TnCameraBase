@@ -13,15 +13,12 @@ import TnIosBase
 
 public class TnCameraCaptureDelegate: NSObject, AVCapturePhotoCaptureDelegate, TnLoggable {
     public let LOG_NAME = "TnCameraCaptureDelegate"
-    private let continuation: TnCameraPhotoOutputContinuation
 
     private var photoData: Data? = nil
     private var photoLiveURL: URL?
     
-    init(continuation: TnCameraPhotoOutputContinuation) {
-        self.continuation = continuation
-    }
-    
+    var continuation: TnCameraPhotoOutputContinuation? = nil
+
     public func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         logDebug("didFinishProcessingPhoto", "...")
 
@@ -49,23 +46,24 @@ public class TnCameraCaptureDelegate: NSObject, AVCapturePhotoCaptureDelegate, T
         // If an error occurs, resume the continuation by throwing an error, and return.
         if let error {
             logError("didFinishCaptureFor", error.localizedDescription)
-            continuation.resume(throwing: TnCameraPhotoOutputError.general(error: error.localizedDescription))
+            continuation?.resume(throwing: TnCameraPhotoOutputError.general(error: error.localizedDescription))
             return
         }
         
         // If the app captures no photo data, resume the continuation by throwing an error, and return.
         guard let photoData else {
             logError("didFinishCaptureFor", "noData")
-            continuation.resume(throwing: TnCameraPhotoOutputError.noData)
+            continuation?.resume(throwing: TnCameraPhotoOutputError.noData)
             return
         }
         
         logError("didFinishCaptureFor", "!")
 
-        /// Create a photo object to save to the `MediaLibrary`.
-        let output = TnCameraPhotoOutput(photoData: photoData, photoLiveURL: photoLiveURL)
         // Resume the continuation by returning the captured photo.
-        continuation.resume(returning: output)
+        if let continuation {
+            let output = TnCameraPhotoOutput(photoData: photoData, photoLiveURL: photoLiveURL)
+            continuation.resume(returning: output)
+        }
     }
 }
 
