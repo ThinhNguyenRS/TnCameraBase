@@ -107,10 +107,10 @@ extension TnCameraToolbarMiscView {
             }
             
             Section("Capturing") {
-                Stepper("Count", value: $cameraModel.settings.capture.count, onEditingChanged: { _ in
+                Stepper("Count: \(cameraModel.settings.capture.count)", value: $cameraModel.settings.capture.count, onEditingChanged: { _ in
                     cameraManager.setCapturing(cameraModel.settings.capture)
                 })
-                Stepper("Delay", value: $cameraModel.settings.capture.delay, in: 0...10, onEditingChanged: { _ in
+                Stepper("Delay: \(cameraModel.settings.capture.delay)s", value: $cameraModel.settings.capture.delay, in: 0...10, onEditingChanged: { _ in
                     cameraManager.setCapturing(cameraModel.settings.capture)
                 })
                 TextField("Library", text: $cameraModel.settings.capture.library, onEditingChanged: { _ in
