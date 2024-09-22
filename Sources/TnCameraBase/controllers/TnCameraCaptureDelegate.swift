@@ -18,6 +18,16 @@ public class TnCameraCaptureDelegate: NSObject, AVCapturePhotoCaptureDelegate, T
     private var photoLiveURL: URL?
     
     var continuation: TnCameraPhotoOutputContinuation? = nil
+    
+    init(continuation: TnCameraPhotoOutputContinuation? = nil) {
+        super.init()
+        
+        logDebug("inited")
+    }
+    
+    deinit {
+        logDebug("de-inited")
+    }
 
     public func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         logDebug("didFinishProcessingPhoto", "...")
