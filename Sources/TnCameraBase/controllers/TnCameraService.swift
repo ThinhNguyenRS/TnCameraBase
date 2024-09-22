@@ -506,10 +506,15 @@ extension TnCameraService {
     }
     
     public func captureImage() async throws -> TnCameraPhotoOutput {
+        if settings.capture.delay > 0 {
+            try await Task.sleep(nanoseconds: settings.capture.delayNanoseconds)
+        }
+        
         var lastOutput: TnCameraPhotoOutput!
         for _ in 1...settings.capture.count {
             lastOutput = try await captureImageInternal()
-        }        
+        }
+        
         return lastOutput
     }
 }

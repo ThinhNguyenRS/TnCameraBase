@@ -134,6 +134,9 @@ public struct TnCameraCapturingValue: Codable {
     public var delay: Int
     public var count: Int
     
+    var delayNanoseconds: UInt64 {
+        UInt64(delay*1000000000)
+    }
     public init(library: String = "", delay: Int = 0, count: Int = 1) {
         self.library = library
         self.delay = delay
