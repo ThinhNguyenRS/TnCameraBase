@@ -440,16 +440,12 @@ extension TnCameraService {
         settings.flashMode = v
     }
 
-    public func setTransport(_ v: TnCameraTransportValue) {
-        if let scale = v.scale {
-            settings.transportScale = scale
-        }
-        if let imageCompressQuality = v.compressQuality {
-            settings.transportCompressQuality = imageCompressQuality
-        }
-        if let imageContinuous = v.continuous {
-            settings.transportContinuous = imageContinuous
-        }
+    public func setTransport(_ v: TnCameraTransportingValue) {
+        settings.transport = v
+    }
+    
+    public func setCapturing(_ v: TnCameraCapturingValue) {
+        settings.capture = v
     }
 }
 
@@ -496,7 +492,7 @@ extension TnCameraService {
         return p
     }
     
-    private func captureImage() async throws -> TnCameraPhotoOutput {
+    private func captureImageInternal() async throws -> TnCameraPhotoOutput {
         defer {
             captureDelegate = nil
         }
@@ -509,12 +505,12 @@ extension TnCameraService {
         }
     }
     
-    public func captureImage(_ v: TnCameraCaptureValue) async throws -> TnCameraPhotoOutput {
-        try await captureImage()
-//        for _ in 0..<v.count {
-//            let output = try await captureImage()
-//            completion?(output)
-//        }
+    public func captureImage() async throws -> TnCameraPhotoOutput {
+        var lastOutput: TnCameraPhotoOutput!
+        for _ in 1...settings.capture.count {
+            lastOutput = try await captureImageInternal()
+        }        
+        return lastOutput
     }
 }
 

@@ -80,9 +80,7 @@ extension TnCameraProxyServerAsync {
             switchCamera()
             
         case .captureImage:
-            solveMsgValue(receivedMsg) { (v: TnCameraCaptureValue) in
-                captureImage(v)
-            }
+            captureImage()
 
         case .getSettings:
             // response settings
@@ -134,8 +132,8 @@ extension TnCameraProxyServerAsync {
                 setFocusMode(v)
             }
 
-        case .setTransport:
-            solveMsgValue(receivedMsg) { (v: TnCameraTransportValue) in
+        case .setTransporting:
+            solveMsgValue(receivedMsg) { (v: TnCameraTransportingValue) in
                 setTransport(v)
             }
         default:
@@ -169,8 +167,8 @@ extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
     public func sendImage() {
         Task {
             if let currentCiImage = await cameraService.currentCiImage {
-                let transportScale = await cameraService.settings.transportScale,
-                    compressionQuality = await cameraService.settings.transportCompressQuality
+                let transportScale = await cameraService.settings.transport.scale,
+                    compressionQuality = await cameraService.settings.transport.compressQuality
                 send(.getImageResponse, currentCiImage.jpegData(scale: transportScale, compressionQuality: compressionQuality))
             }
         }
@@ -221,10 +219,11 @@ extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
             try? await cameraService.switchCamera()
         }
     }
-    
-    public func captureImage(_ v: TnCameraCaptureValue) {
+
+    // MARK: captureImage
+    public func captureImage() {
         Task {
-            let output = try? await cameraService.captureImage(v)
+            let output = try? await cameraService.captureImage()
             if let output {
                 captureCompletion?(output)
             }
@@ -309,9 +308,15 @@ extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
         }
     }
     
-    public func setTransport(_ v: TnCameraTransportValue) {
+    public func setTransport(_ v: TnCameraTransportingValue) {
         Task {
             await cameraService.setTransport(v)
+        }
+    }
+
+    public func setCapturing(_ v: TnCameraCapturingValue) {
+        Task {
+            await cameraService.setCapturing(v)
         }
     }
 }

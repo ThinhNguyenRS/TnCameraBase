@@ -42,8 +42,9 @@ public enum TnCameraMessageType: UInt8, Codable {
 
     case captureImage
     
-    case setTransport
+    case setTransporting
     case setWideColor
+    case setCapturing
 }
 
 // MARK: TnCameraMessageProtocol
@@ -106,12 +107,12 @@ public struct TnCameraZoomFactorValue: Codable {
     }
 }
 
-public struct TnCameraTransportValue: Codable {
-    public let scale: CGFloat?
-    public let compressQuality: CGFloat?
-    public let continuous: Bool?
+public struct TnCameraTransportingValue: Codable {
+    public var scale: CGFloat
+    public var compressQuality: CGFloat
+    public var continuous: Bool
     
-    public init(scale: CGFloat? = nil, compressQuality: CGFloat? = nil, continuous: Bool? = nil) {
+    public init(scale: CGFloat = 0.25, compressQuality: CGFloat = 0.5, continuous: Bool = false) {
         self.scale = scale
         self.compressQuality = compressQuality
         self.continuous = continuous
@@ -128,12 +129,12 @@ public struct TnCameraExposureValue: Codable {
     }
 }
 
-public struct TnCameraCaptureValue: Codable {
-    public let library: String?
-    public let delay: Double?
-    public let count: Int
+public struct TnCameraCapturingValue: Codable {
+    public var library: String
+    public var delay: Int
+    public var count: Int
     
-    public init(library: String? = nil, delay: Double? = nil, count: Int = 1) {
+    public init(library: String = "", delay: Int = 0, count: Int = 1) {
         self.library = library
         self.delay = delay
         self.count = count

@@ -74,8 +74,8 @@ extension TnCameraProxyClient: TnCameraProxyProtocol {
         send(.switchCamera)
     }
     
-    public func captureImage(_ v: TnCameraCaptureValue) {
-        send(.captureImage, v)
+    public func captureImage() {
+        send(.captureImage)
     }
     
     public func setLivephoto(_ v: Bool) {
@@ -101,7 +101,7 @@ extension TnCameraProxyClient: TnCameraProxyProtocol {
     public func setWideColor(_ v: Bool) {
         send(.setWideColor, v)
     }
-
+    
     public func setExposureMode(_ v: AVCaptureDevice.ExposureMode) {
         send(.setExposureMode, v)
     }
@@ -129,8 +129,12 @@ extension TnCameraProxyClient: TnCameraProxyProtocol {
         send(.setFocusMode, v)
     }
     
-    public func setTransport(_ v: TnCameraTransportValue) {
-        send(.setTransport, v)
+    public func setTransport(_ v: TnCameraTransportingValue) {
+        send(.setTransporting, v)
+    }
+    
+    public func setCapturing(_ v: TnCameraCapturingValue) {
+        send(.setCapturing, v)
     }
 }
 
@@ -193,7 +197,7 @@ extension TnCameraProxyClient {
                 self.currentCiImage = ciImage
             }
 
-            if settings.transportContinuous {
+            if settings.transport.continuous {
                 send(.getImage)
             }
         default:

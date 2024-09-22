@@ -70,7 +70,7 @@ extension TnCameraToolbarMiscView {
             
     var miscView: some View {
         List {
-            Section("Capturing") {
+            Section("Camera Type") {
                 TnPickerField.forEnum(
                     label: "Preset",
                     value: $cameraModel.settings.preset,
@@ -105,7 +105,19 @@ extension TnCameraToolbarMiscView {
                     .toggleStyle(.switch)
                 }
             }
-
+            
+            Section("Capturing") {
+                Stepper("Count", value: $cameraModel.settings.capture.count, onEditingChanged: { _ in
+                    cameraManager.setCapturing(cameraModel.settings.capture)
+                })
+                Stepper("Delay", value: $cameraModel.settings.capture.delay, in: 0...10, onEditingChanged: { _ in
+                    cameraManager.setCapturing(cameraModel.settings.capture)
+                })
+                TextField("Library", text: $cameraModel.settings.capture.library, onEditingChanged: { _ in
+                    cameraManager.setCapturing(cameraModel.settings.capture)
+                })
+            }
+            
             Section("Light") {
                 if cameraModel.settings.flashSupported {
                     TnPickerField.forEnum(
@@ -129,7 +141,6 @@ extension TnCameraToolbarMiscView {
 
                 }
             }
-            
             
             Section("Exposure & Focus") {
                 if !cameraModel.settings.focusModes.isEmpty {
@@ -200,15 +211,15 @@ extension TnCameraToolbarMiscView {
                 }
             }
 
-            Section("System") {
+            Section("Image Mirroring") {
                 getSliderView(
-                    value: $cameraModel.settings.transportScale,
-                    label: "Image scale",
+                    value: $cameraModel.settings.transport.scale,
+                    label: "Scale",
                     bounds: 0.02...0.40,
                     step: 0.01,
                     onChanged: { _ in},
                     onChanging: { [self] v in
-                        cameraManager.setTransport(.init(scale: v))
+                        cameraManager.setTransport(cameraModel.settings.transport)
                     },
                     formatter: getNumberPercentFormatter(),
                     closeable: false,
@@ -216,21 +227,21 @@ extension TnCameraToolbarMiscView {
                 )
 
                 getSliderView(
-                    value: $cameraModel.settings.transportCompressQuality,
-                    label: "Image compress quality",
+                    value: $cameraModel.settings.transport.compressQuality,
+                    label: "Compress quality",
                     bounds: 0.25...1,
                     step: 0.05,
                     onChanged: { _ in},
                     onChanging: { [self] v in
-                        cameraManager.setTransport(.init(compressQuality: v))
+                        cameraManager.setTransport(cameraModel.settings.transport)
                     },
                     formatter: getNumberPercentFormatter(),
                     closeable: false,
                     adjustBounds: false
                 )
 
-                TnToggleField(label: "Image continuous", value: $cameraModel.settings.transportContinuous) { v in
-                    cameraManager.setTransport(.init(continuous: v))
+                TnToggleField(label: "Continuous", value: $cameraModel.settings.transport.continuous) { v in
+                    cameraManager.setTransport(cameraModel.settings.transport)
                 }
                 .toggleStyle(.switch)
             }

@@ -26,7 +26,7 @@ public protocol TnCameraProtocol {
     func stopCapturing()
     func switchCamera()
     
-    func captureImage(_ v: TnCameraCaptureValue)
+    func captureImage()
     
     func setLivephoto(_ v: Bool)
     func setFlash(_ v: AVCaptureDevice.FlashMode)
@@ -43,7 +43,8 @@ public protocol TnCameraProtocol {
     func setFocusMode(_ v: AVCaptureDevice.FocusMode)
     func setWideColor(_ v: Bool)
     
-    func setTransport(_ v: TnCameraTransportValue)
+    func setTransport(_ v: TnCameraTransportingValue)
+    func setCapturing(_ v: TnCameraCapturingValue)
 }
 
 // MARK: TnCameraSendMessageProtocol

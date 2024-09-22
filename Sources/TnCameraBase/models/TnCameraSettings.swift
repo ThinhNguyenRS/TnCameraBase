@@ -81,8 +81,8 @@ public struct TnCameraSettings: Codable {
     public var wideColor = true
     public var pixelFormat: Int = Int(kCVPixelFormatType_32BGRA)
     
-    public var transportScale: CGFloat = 0.25
-    public var transportCompressQuality: CGFloat = 0.5
-    public var transportContinuous = false
+    public var transport: TnCameraTransportingValue = .init()
+    
+    public var capture: TnCameraCapturingValue = .init()
 }
 
