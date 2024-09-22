@@ -29,7 +29,7 @@ public actor TnCameraService: NSObject, TnLoggable {
     private let photoOutput = AVCapturePhotoOutput()
     private let videoDataOutput = AVCaptureVideoDataOutput()
     
-    let captureDelegate = TnCameraCaptureDelegate()
+    var captureDelegate: TnCameraCaptureDelegate? = nil
 
     private override init() {
     }
@@ -497,14 +497,15 @@ extension TnCameraService {
     }
     
     private func captureImage() async throws -> TnCameraPhotoOutput {
-        try await withCheckedThrowingContinuation { continuation in
+        defer {
+            captureDelegate = nil
+        }
+        return try await withCheckedThrowingContinuation { continuation in
             photoOutput.orientation = .fromUI(DeviceMotionOrientationListener.shared.orientation)
 
             let p = createPhotoSettings()
-            let delegate = TnCameraCaptureDelegate(continuation: continuation)
-//            delegate.continuation = continuation
-
-            photoOutput.capturePhoto(with: p, delegate: delegate)
+            captureDelegate = TnCameraCaptureDelegate(continuation: continuation)
+            photoOutput.capturePhoto(with: p, delegate: captureDelegate!)
         }
     }
     

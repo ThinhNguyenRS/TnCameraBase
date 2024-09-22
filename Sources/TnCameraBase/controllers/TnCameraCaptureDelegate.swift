@@ -17,9 +17,9 @@ public class TnCameraCaptureDelegate: NSObject, AVCapturePhotoCaptureDelegate, T
     private var photoData: Data? = nil
     private var photoLiveURL: URL?
     
-    var continuation: TnCameraPhotoOutputContinuation? = nil
-    
-    init(continuation: TnCameraPhotoOutputContinuation? = nil) {
+    private let continuation: TnCameraPhotoOutputContinuation
+    init(continuation: TnCameraPhotoOutputContinuation) {
+        self.continuation = continuation
         super.init()
         
         logDebug("inited")
@@ -56,24 +56,22 @@ public class TnCameraCaptureDelegate: NSObject, AVCapturePhotoCaptureDelegate, T
         // If an error occurs, resume the continuation by throwing an error, and return.
         if let error {
             logError("didFinishCaptureFor", error.localizedDescription)
-            continuation?.resume(throwing: TnCameraPhotoOutputError.general(error: error.localizedDescription))
+            continuation.resume(throwing: TnCameraPhotoOutputError.general(error: error.localizedDescription))
             return
         }
         
         // If the app captures no photo data, resume the continuation by throwing an error, and return.
         guard let photoData else {
             logError("didFinishCaptureFor", "noData")
-            continuation?.resume(throwing: TnCameraPhotoOutputError.noData)
+            continuation.resume(throwing: TnCameraPhotoOutputError.noData)
             return
         }
         
         logError("didFinishCaptureFor", "!")
 
         // Resume the continuation by returning the captured photo.
-        if let continuation {
-            let output = TnCameraPhotoOutput(photoData: photoData, photoLiveURL: photoLiveURL)
-            continuation.resume(returning: output)
-        }
+        let output = TnCameraPhotoOutput(photoData: photoData, photoLiveURL: photoLiveURL)
+        continuation.resume(returning: output)
     }
 }
 
