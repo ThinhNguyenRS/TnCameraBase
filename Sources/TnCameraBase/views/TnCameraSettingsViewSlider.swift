@@ -32,6 +32,7 @@ public struct TnCameraSettingsViewSlider<TValue, TTopView: View, TBottomView: Vi
                 topView()
 
                 TnSliderField(value: $value, bounds: bounds, step: step, formatter: formatter, onEdited:  { v in
+                    value = v
                     onChanged?(v)
                 }, adjustBounds: adjustBounds)
 
