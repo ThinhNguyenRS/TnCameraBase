@@ -11,6 +11,7 @@ import CoreImage
 import Combine
 import UIKit
 import TnIosBase
+import Photos
 
 public actor TnCameraService: NSObject, TnLoggable {
     public static let shared: TnCameraService = .init()
@@ -28,6 +29,8 @@ public actor TnCameraService: NSObject, TnLoggable {
     private let videoDataOutput = AVCaptureVideoDataOutput()
     
     var captureDelegate: TnCameraCaptureDelegate? = nil
+
+    let library = TnPhotoLibrary()
 
     private override init() {
     }
@@ -439,11 +442,11 @@ extension TnCameraService {
     }
 
     public func setTransport(_ v: TnCameraTransportingValue) {
-        settings.transport = v
+        settings.transporting = v
     }
     
     public func setCapturing(_ v: TnCameraCapturingValue) {
-        settings.capture = v
+        settings.capturing = v
     }
 }
 
@@ -503,14 +506,23 @@ extension TnCameraService {
         }
     }
     
+    // MARK: captureImage routine
     public func captureImage() async throws -> TnCameraPhotoOutput {
-        if settings.capture.delay > 0 {
-            try await Task.sleep(nanoseconds: settings.capture.delayNanoseconds)
+        let capturing = settings.capturing
+        
+        if capturing.delay > 0 {
+            try await Task.sleep(nanoseconds: settings.capturing.delayNanoseconds)
+        }
+
+        var album: PHAssetCollection? = nil
+        if !capturing.album.isEmpty {
+            album = try await library.getOrCreateAlbum(name: capturing.album)
         }
         
         var lastOutput: TnCameraPhotoOutput!
-        for _ in 1...settings.capture.count {
+        for _ in 1...capturing.count {
             lastOutput = try await captureImageInternal()
+            try await library.addPhoto(imageData: lastOutput.photoData, album: album)
         }
         
         return lastOutput

@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import TnIosBase
 
-public struct TnCameraToolbarMiscView<TCameraManager: TnCameraProtocol>: View, TnCameraViewProtocol {
+public struct TnCameraToolbarMiscView<TCameraManager: TnCameraProxyProtocol>: View, TnCameraViewProtocol {
     @EnvironmentObject public var cameraModel: TnCameraViewModel
     let cameraManager: TCameraManager
 
@@ -107,15 +107,17 @@ extension TnCameraToolbarMiscView {
             }
             
             Section("Capturing") {
-                Stepper("Count: \(cameraModel.settings.capture.count)", value: $cameraModel.settings.capture.count, onEditingChanged: { _ in
-                    cameraManager.setCapturing(cameraModel.settings.capture)
+                Stepper("Count: \(cameraModel.settings.capturing.count)", value: $cameraModel.settings.capturing.count, onEditingChanged: { _ in
+                    cameraManager.setCapturing(cameraModel.settings.capturing)
                 })
-                Stepper("Delay: \(cameraModel.settings.capture.delay)s", value: $cameraModel.settings.capture.delay, in: 0...10, onEditingChanged: { _ in
-                    cameraManager.setCapturing(cameraModel.settings.capture)
+                Stepper("Delay: \(cameraModel.settings.capturing.delay)s", value: $cameraModel.settings.capturing.delay, in: 0...10, onEditingChanged: { _ in
+                    cameraManager.setCapturing(cameraModel.settings.capturing)
                 })
-                TextField("Library", text: $cameraModel.settings.capture.album, onEditingChanged: { _ in
-                    cameraManager.setCapturing(cameraModel.settings.capture)
-                })
+                
+                SelectAlbumView(
+                    album: $cameraModel.settings.capturing.album,
+                    albumNames: cameraManager.albums
+                )
             }
             
             Section("Light") {
@@ -213,13 +215,13 @@ extension TnCameraToolbarMiscView {
 
             Section("Image Mirroring") {
                 getSliderView(
-                    value: $cameraModel.settings.transport.scale,
+                    value: $cameraModel.settings.transporting.scale,
                     label: "Scale",
                     bounds: 0.02...0.40,
                     step: 0.01,
                     onChanged: { _ in},
                     onChanging: { [self] v in
-                        cameraManager.setTransport(cameraModel.settings.transport)
+                        cameraManager.setTransport(cameraModel.settings.transporting)
                     },
                     formatter: getNumberPercentFormatter(),
                     closeable: false,
@@ -227,24 +229,43 @@ extension TnCameraToolbarMiscView {
                 )
 
                 getSliderView(
-                    value: $cameraModel.settings.transport.compressQuality,
+                    value: $cameraModel.settings.transporting.compressQuality,
                     label: "Compress quality",
                     bounds: 0.25...1,
                     step: 0.05,
                     onChanged: { _ in},
                     onChanging: { [self] v in
-                        cameraManager.setTransport(cameraModel.settings.transport)
+                        cameraManager.setTransport(cameraModel.settings.transporting)
                     },
                     formatter: getNumberPercentFormatter(),
                     closeable: false,
                     adjustBounds: false
                 )
 
-                TnToggleField(label: "Continuous", value: $cameraModel.settings.transport.continuous) { v in
-                    cameraManager.setTransport(cameraModel.settings.transport)
+                TnToggleField(label: "Continuous", value: $cameraModel.settings.transporting.continuous) { v in
+                    cameraManager.setTransport(cameraModel.settings.transporting)
                 }
                 .toggleStyle(.switch)
             }
+        }
+    }
+}
+
+struct SelectAlbumView: View {
+    @Binding var album: String
+    var albumNames: [String]
+    
+    var body: some View {
+        Group {
+            TextField("Album", text: $album, onEditingChanged: { _ in
+    //            cameraManager.setCapturing(cameraModel.settings.capture)
+            })
+
+            tnPickerFieldStringMenu(
+                label: "Select album",
+                value: $album,
+                labels: albumNames
+            )
         }
     }
 }

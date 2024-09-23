@@ -17,7 +17,8 @@ public class TnCameraProxyClient: NSObject, ObservableObject, TnLoggable {
     @Published public private(set) var currentCiImage: CIImage?
     @Published public private(set) var settings: TnCameraSettings = .init()
     @Published public private(set) var status: TnCameraStatus = .none
-    
+    @Published public private(set) var albums: [String] = []
+
     private let ble: TnBluetoothClient
     private var network: TnNetworkConnection?
     private let networkInfo: TnNetworkServiceInfo
@@ -40,12 +41,50 @@ public class TnCameraProxyClient: NSObject, ObservableObject, TnLoggable {
     }
 }
 
-// MARK: CameraManagerProxyProtocol
-extension TnCameraProxyClient: TnCameraProxyProtocol {
-    public func setup() {
-        ble.setupBle()
+// MARK: solve messages
+extension TnCameraProxyClient {
+    func solveData(data: Data) {
+        let receivedMsg = TnMessage(data: data)
+        let messageType: TnCameraMessageType = .init(rawValue: receivedMsg.typeCode)!
+        logDebug("receive", messageType)
+
+        switch messageType {
+        case .getSettingsResponse:
+            solveMsgValue(receivedMsg) { (v: TnCameraSettingsValue) in
+                self.status = v.status
+                self.settings = v.settings
+                // connect to TCP
+                if network == nil {
+                    if let ipHost = v.ipHost, let ipPort = v.ipPort {
+                        network = .init(host: ipHost, port: ipPort, queue: nil, delegate: self, EOM: networkInfo.EOM, MTU: networkInfo.MTU)
+                        network?.start()
+                    }
+                }
+            }
+        case .getImageResponse:
+            solveMsgValue(receivedMsg) { (v: Data) in
+                let uiImage: UIImage = .init(data: v)!
+                logDebug("image", uiImage.size.width, uiImage.size.height, uiImage.scale)
+
+                let ciImage = CIImage(image: uiImage)!
+                self.currentCiImage = ciImage
+            }
+
+            if settings.transporting.continuous {
+                send(.getImage)
+            }
+        case .getAlbumsResponse:
+            solveMsgValue(receivedMsg) { (v: [String]) in
+                self.albums = v
+            }
+        default:
+            return
+        }
     }
-    
+}
+
+// MARK: CameraManagerProxyProtocol
+extension TnCameraProxyClient: TnCameraProtocol {
     public var currentCiImagePublisher: Published<CIImage?>.Publisher {
         $currentCiImage
     }
@@ -136,6 +175,22 @@ extension TnCameraProxyClient: TnCameraProxyProtocol {
     }
 }
 
+// MARK: TnCameraProxyProtocol
+extension TnCameraProxyClient: TnCameraProxyProtocol {
+    public func setup() {
+        ble.setupBle()
+    }
+
+    public func send(_ object: TnCameraMessageProtocol, useBle: Bool = false) {
+        if useBle {
+            try? ble.send(object: object)
+        } else {
+            try? network?.send(object: object)
+        }
+    }
+}
+
+// MARK: TnBluetoothClientDelegate
 extension TnCameraProxyClient: TnBluetoothClientDelegate {
     public func tnBluetoothClient(ble: TnBluetoothClient, statusChanged: TnBluetoothClient.Status) {
     }
@@ -159,51 +214,7 @@ extension TnCameraProxyClient: TnBluetoothClientDelegate {
     }
 }
 
-extension TnCameraProxyClient {
-    public func send(_ object: TnCameraMessageProtocol, useBle: Bool = false) {
-        if useBle {
-            try? ble.send(object: object)
-        } else {
-            try? network?.send(object: object)
-        }
-    }
-    
-    func solveData(data: Data) {
-        let receivedMsg = TnMessage(data: data)
-        let messageType: TnCameraMessageType = .init(rawValue: receivedMsg.typeCode)!
-        logDebug("receive", messageType)
-
-        switch messageType {
-        case .getSettingsResponse:
-            solveMsgValue(receivedMsg) { (v: TnCameraSettingsValue) in
-                self.status = v.status
-                self.settings = v.settings
-                // connect to TCP
-                if network == nil {
-                    if let ipHost = v.ipHost, let ipPort = v.ipPort {
-                        network = .init(host: ipHost, port: ipPort, queue: nil, delegate: self, EOM: networkInfo.EOM, MTU: networkInfo.MTU)
-                        network?.start()
-                    }
-                }
-            }
-        case .getImageResponse:
-            solveMsgValue(receivedMsg) { (v: Data) in
-                let uiImage: UIImage = .init(data: v)!
-                logDebug("image", uiImage.size.width, uiImage.size.height, uiImage.scale)
-
-                let ciImage = CIImage(image: uiImage)!
-                self.currentCiImage = ciImage
-            }
-
-            if settings.transport.continuous {
-                send(.getImage)
-            }
-        default:
-            return
-        }
-    }
-}
-
+// MARK: TnNetworkDelegate
 extension TnCameraProxyClient: TnNetworkDelegate {
     public func tnNetworkReady(_ connection: TnNetworkConnection) {
     }

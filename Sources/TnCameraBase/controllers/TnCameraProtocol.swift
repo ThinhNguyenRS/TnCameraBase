@@ -47,12 +47,14 @@ public protocol TnCameraProtocol {
     func setCapturing(_ v: TnCameraCapturingValue)
 }
 
-// MARK: TnCameraSendMessageProtocol
-public protocol TnCameraSendMessageProtocol {
+// MARK: CameraManagerProxyProtocol
+public protocol TnCameraProxyProtocol: TnCameraProtocol {
+    func setup()
     func send(_ object: TnCameraMessageProtocol, useBle: Bool)
+    var albums: [String] { get }
 }
 
-extension TnCameraSendMessageProtocol {
+extension TnCameraProxyProtocol {
     public func send(_ messageType: TnCameraMessageType, useBle: Bool = false) {
         self.send(TnCameraMessage(messageType), useBle: useBle)
     }
@@ -67,9 +69,3 @@ extension TnCameraSendMessageProtocol {
         }
     }
 }
-
-// MARK: CameraManagerProxyProtocol
-public protocol TnCameraProxyProtocol: TnCameraProtocol, TnCameraSendMessageProtocol {
-    func setup()
-}
-

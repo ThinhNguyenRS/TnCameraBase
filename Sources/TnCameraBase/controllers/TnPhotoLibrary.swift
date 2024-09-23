@@ -78,7 +78,7 @@ public actor TnPhotoLibrary: TnLoggable {
         return album!
     }
     
-    public func addPhoto(image: UIImage, album: PHAssetCollection? = nil) async throws {
+    public func addPhoto(image: UIImage, album: PHAssetCollection?) async throws {
         // Add the asset to the photo library.
         try await PHPhotoLibrary.shared().performChanges {
             let creationRequest = PHAssetChangeRequest.creationRequestForAsset(from: image)
@@ -92,14 +92,14 @@ public actor TnPhotoLibrary: TnLoggable {
 }
 
 extension TnPhotoLibrary {
-    public func addPhoto(imageData: Data, album: PHAssetCollection? = nil) async throws {
+    public func addPhoto(imageData: Data, album: PHAssetCollection?) async throws {
         guard let image = UIImage(data: imageData) else {
             throw TnAppError.from("Cannot create image")
         }
         try await addPhoto(image: image, album: album)
     }
     
-    public func addPhoto(imageData: Data, albumName: String? = nil) async throws {
+    public func addPhoto(imageData: Data, albumName: String?) async throws {
         guard let image = UIImage(data: imageData) else {
             throw TnAppError.from("Cannot create image")
         }

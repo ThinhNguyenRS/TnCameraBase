@@ -16,13 +16,19 @@ public class TnCameraProxyServerAsync: TnLoggable {
     private let cameraService: TnCameraService
     private var network: TnNetworkServer?
     private let ble: TnBluetoothServer
+    
+    @Published public private(set) var albums: [String] = []
 
     public init(_ cameraService: TnCameraService, networkInfo: TnNetworkServiceInfo) {
         self.cameraService = cameraService
-        ble = .init(info: networkInfo)
+        self.ble = .init(info: networkInfo)
         if let address = TnNetworkHelper.getAddressList(for: [.wifi, .cellularBridge, .cellular]).first {
-            network = .init(host: address.address, port: 1234, queue: .main, delegate: self, EOM: networkInfo.EOM, MTU: networkInfo.MTU)
-            network?.start()
+            self.network = .init(host: address.address, port: 1234, queue: .main, delegate: self, EOM: networkInfo.EOM, MTU: networkInfo.MTU)
+            self.network!.start()
+        }
+        
+        Task {
+            self.albums = await cameraService.library.getAlbums()
         }
         
         logDebug("inited")
@@ -38,29 +44,6 @@ public class TnCameraProxyServerAsync: TnLoggable {
     }
 
     public var captureCompletion: TnCameraPhotoOutputCompletion?
-}
-
-// MARK: TnBluetoothServerDelegate
-extension TnCameraProxyServerAsync: TnBluetoothServerDelegate {
-    public func tnBluetoothServer(ble: TnBluetoothServer, statusChanged: TnBluetoothServer.Status) {
-        switch statusChanged {
-        case .inited:
-            ble.start()
-        case .started:
-            Task {
-                try? await cameraService.startCapturing()
-            }
-        default:
-            return
-        }
-    }
-    
-    public func tnBluetoothServer(ble: TnBluetoothServer, sentIDs: [String], sentData: Data) {
-    }
-
-    public func tnBluetoothServer(ble: TnBluetoothServer, receivedID: String, receivedData: Data) {
-        solveData(data: receivedData)
-    }
 }
 
 // MARK: solve messages
@@ -84,7 +67,11 @@ extension TnCameraProxyServerAsync {
             // response settings
             Task {
                 let settings = await cameraService.settings, status = await cameraService.status
-                send(.getSettingsResponse, TnCameraSettingsValue(settings: settings, status: status, network: network), useBle: true)
+                send(
+                    .getSettingsResponse,
+                    TnCameraSettingsValue(settings: settings, status: status, network: network),
+                    useBle: true
+                )
             }
 
         case .getImage:
@@ -134,11 +121,38 @@ extension TnCameraProxyServerAsync {
             solveMsgValue(receivedMsg) { (v: TnCameraTransportingValue) in
                 setTransport(v)
             }
+            
+        case .getAlbums:
+            send(.getAlbumsResponse, albums)
         default:
             return
         }
     }
 }
+
+// MARK: TnBluetoothServerDelegate
+extension TnCameraProxyServerAsync: TnBluetoothServerDelegate {
+    public func tnBluetoothServer(ble: TnBluetoothServer, statusChanged: TnBluetoothServer.Status) {
+        switch statusChanged {
+        case .inited:
+            ble.start()
+        case .started:
+            Task {
+                try? await cameraService.startCapturing()
+            }
+        default:
+            return
+        }
+    }
+    
+    public func tnBluetoothServer(ble: TnBluetoothServer, sentIDs: [String], sentData: Data) {
+    }
+
+    public func tnBluetoothServer(ble: TnBluetoothServer, receivedID: String, receivedData: Data) {
+        solveData(data: receivedData)
+    }
+}
+
 
 // MARK: TnCameraProxyProtocol
 extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
@@ -165,8 +179,8 @@ extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
     public func sendImage() {
         Task {
             if let currentCiImage = await cameraService.currentCiImage {
-                let transportScale = await cameraService.settings.transport.scale,
-                    compressionQuality = await cameraService.settings.transport.compressQuality
+                let transportScale = await cameraService.settings.transporting.scale,
+                    compressionQuality = await cameraService.settings.transporting.compressQuality
                 send(.getImageResponse, currentCiImage.jpegData(scale: transportScale, compressionQuality: compressionQuality))
             }
         }

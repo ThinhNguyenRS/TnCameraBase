@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import Combine
 
-public struct TnCameraToolbarMainView<TBottom: View, TCameraManager: TnCameraProtocol>: View, TnCameraViewProtocol {
+public struct TnCameraToolbarMainView<TBottom: View, TCameraManager: TnCameraProxyProtocol>: View, TnCameraViewProtocol {
     @EnvironmentObject public var cameraModel: TnCameraViewModel
     let cameraManager: TCameraManager
 

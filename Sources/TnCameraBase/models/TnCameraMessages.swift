@@ -20,6 +20,9 @@ public enum TnCameraMessageType: UInt8, Codable {
     case getImage
     case getImageResponse
 
+    case getAlbums
+    case getAlbumsResponse
+
     case switchCamera
 
     case toggleCapturing
@@ -107,6 +110,7 @@ public struct TnCameraZoomFactorValue: Codable {
     }
 }
 
+// MARK: TnCameraTransportingValue
 public struct TnCameraTransportingValue: Codable {
     public var scale: CGFloat
     public var compressQuality: CGFloat
@@ -119,6 +123,7 @@ public struct TnCameraTransportingValue: Codable {
     }
 }
 
+// MARK: TnCameraExposureValue
 public struct TnCameraExposureValue: Codable {
     public let iso: Float?
     public let duration: Double?
@@ -129,6 +134,7 @@ public struct TnCameraExposureValue: Codable {
     }
 }
 
+// MARK: TnCameraCapturingValue
 public struct TnCameraCapturingValue: Codable {
     public var album: String
     public var delay: Int
@@ -137,6 +143,7 @@ public struct TnCameraCapturingValue: Codable {
     var delayNanoseconds: UInt64 {
         UInt64(delay*1000000000)
     }
+    
     public init(album: String = "", delay: Int = 0, count: Int = 1) {
         self.album = album
         self.delay = delay

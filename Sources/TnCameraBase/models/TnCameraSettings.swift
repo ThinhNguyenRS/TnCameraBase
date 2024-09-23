@@ -81,8 +81,8 @@ public struct TnCameraSettings: Codable {
     public var wideColor = true
     public var pixelFormat: Int = Int(kCVPixelFormatType_32BGRA)
     
-    public var transport: TnCameraTransportingValue = .init()
+    public var transporting: TnCameraTransportingValue = .init()
     
-    public var capture: TnCameraCapturingValue = .init()
+    public var capturing: TnCameraCapturingValue = .init()
 }
 

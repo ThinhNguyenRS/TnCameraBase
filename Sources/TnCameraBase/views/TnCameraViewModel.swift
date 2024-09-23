@@ -33,7 +33,7 @@ public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {
         logDebug("inited")
     }
     
-    public func listen(manager: TnCameraProtocol, withOrientation: Bool = true) {
+    public func listen(manager: TnCameraProxyProtocol, withOrientation: Bool = true) {
         Task {
             await manager.statusPublisher
                 .onReceive(debounceMs: 10, cancelables: &cancelables) { [self] v in
