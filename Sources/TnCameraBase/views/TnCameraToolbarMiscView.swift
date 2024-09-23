@@ -264,14 +264,14 @@ struct SelectAlbumView: View {
     }
     
     var body: some View {
-        HStack {
+        VStack(alignment: .leading) {
             tnPickerFieldStringMenu(
-                label: "Select album",
+                label: "Album",
                 value: $album,
                 labels: albumNames
             )
 
-            tnImageButton(name: "plus") {
+            tnButton("New ...") {
                 showSheet = true
             }
         }
@@ -281,8 +281,13 @@ struct SelectAlbumView: View {
                 TextField("New album name", text: $newAlbum)
                 
                 Spacer()
-                tnButton("Close") {
-                    showSheet = false
+                HStack {
+                    tnButton("Create") {
+                        showSheet = false
+                    }
+                    tnButton("Close") {
+                        showSheet = false
+                    }
                 }
             }
         }
