@@ -8,9 +8,7 @@
 import SwiftUI
 import TnIosBase
 
-public struct TnCameraSettingsViewSlider<TValue, TTopView: View, TBottomView: View>: View, TnCameraViewProtocol where TValue : BinaryFloatingPoint & CVarArg, TValue.Stride: BinaryFloatingPoint {
-    @EnvironmentObject public var cameraModel: TnCameraViewModel
-
+public struct TnCameraSettingsViewSlider<TValue, TTopView: View, TBottomView: View>: View where TValue : BinaryFloatingPoint & CVarArg, TValue.Stride: BinaryFloatingPoint {
     @Binding var value: TValue
     let label: String
 
@@ -25,24 +23,12 @@ public struct TnCameraSettingsViewSlider<TValue, TTopView: View, TBottomView: Vi
     @ViewBuilder let topView: () -> TTopView
     @ViewBuilder let bottomView: () -> TBottomView
 
-    var closeable = true
-    
     var adjustBounds: Bool = false
-
+    
     public var body: some View {
         HStack {
             VStack(alignment: .leading) {
-                HStack {
-                    tnText("\(label) \(formatter(value))")
-                    Spacer()
-                    if closeable {
-                        circleButton(imageName: "xmark", radius: 40) {
-                            withAnimation {
-                                cameraModel.toolbarType = .main
-                            }
-                        }
-                    }
-                }
+                tnText("\(label) \(formatter(value))")
 
                 topView()
 
@@ -56,5 +42,105 @@ public struct TnCameraSettingsViewSlider<TValue, TTopView: View, TBottomView: Vi
         .onAppear {
             TnLogger.debug("CameraSettingsSliderView", "init", label, value)
         }
+    }
+}
+
+extension View {
+    public func getSliderView<TValue, TTopView: View, TBottomView: View>(
+        value: Binding<TValue>,
+        label: String,
+        bounds: ClosedRange<TValue>,
+        step: TValue.Stride,
+        onChanged: @escaping (TValue) -> Void,
+        onChanging: @escaping (TValue) -> Void,
+        formatter: @escaping (TValue) -> String = defaultNumberFormatter,
+        @ViewBuilder topView: @escaping () -> TTopView,
+        @ViewBuilder bottomView: @escaping () -> TBottomView,
+        adjustBounds: Bool = false
+    ) -> some View where TValue : BinaryFloatingPoint & CVarArg, TValue.Stride : BinaryFloatingPoint {
+        TnCameraSettingsViewSlider(
+            value: value,
+            label: label,
+            bounds: bounds,
+            step: step,
+            formatter: formatter,
+            onChanged: onChanged,
+            onChanging: onChanging,
+            topView: topView,
+            bottomView: bottomView,
+            adjustBounds: adjustBounds
+        )
+    }
+    
+    public func getSliderView<TValue, TTopView: View>(
+        value: Binding<TValue>,
+        label: String,
+        bounds: ClosedRange<TValue>,
+        step: TValue.Stride,
+        onChanged: @escaping (TValue) -> Void,
+        onChanging: @escaping (TValue) -> Void,
+        formatter: @escaping (TValue) -> String = defaultNumberFormatter,
+        @ViewBuilder topView: @escaping () -> TTopView,
+        adjustBounds: Bool = false
+    ) -> some View where TValue : BinaryFloatingPoint & CVarArg, TValue.Stride : BinaryFloatingPoint {
+        getSliderView(
+            value: value,
+            label: label,
+            bounds: bounds,
+            step: step,
+            onChanged: onChanged,
+            onChanging: onChanging,
+            formatter: formatter,
+            topView: topView,
+            bottomView: { },
+            adjustBounds: adjustBounds
+        )
+    }
+    
+    public func getSliderView<TValue, TBottomView: View>(
+        value: Binding<TValue>,
+        label: String, bounds: ClosedRange<TValue>,
+        step: TValue.Stride,
+        onChanged: @escaping (TValue) -> Void,
+        onChanging: @escaping (TValue) -> Void,
+        formatter: @escaping (TValue) -> String = defaultNumberFormatter,
+        @ViewBuilder bottomView: @escaping () -> TBottomView,
+        adjustBounds: Bool = false
+    ) -> some View where TValue : BinaryFloatingPoint & CVarArg, TValue.Stride : BinaryFloatingPoint {
+        getSliderView(
+            value: value,
+            label: label,
+            bounds: bounds,
+            step: step,
+            onChanged: onChanged,
+            onChanging: onChanging,
+            formatter: formatter,
+            topView: { },
+            bottomView: bottomView,
+            adjustBounds: adjustBounds
+        )
+    }
+    
+    public func getSliderView<TValue>(
+        value: Binding<TValue>,
+        label: String, bounds: ClosedRange<TValue>,
+        step: TValue.Stride,
+        onChanged: @escaping (TValue) -> Void,
+        onChanging: @escaping (TValue) -> Void,
+        formatter: @escaping (TValue) -> String = defaultNumberFormatter,
+        adjustBounds: Bool = false
+    ) -> some View where TValue : BinaryFloatingPoint & CVarArg, TValue.Stride : BinaryFloatingPoint {
+        getSliderView(
+            value: value,
+            label: label,
+            bounds: bounds,
+            step: step,
+            onChanged: onChanged,
+            onChanging: onChanging,
+            formatter: formatter,
+            topView: { },
+            bottomView: { },
+            adjustBounds: adjustBounds
+        )
     }
 }

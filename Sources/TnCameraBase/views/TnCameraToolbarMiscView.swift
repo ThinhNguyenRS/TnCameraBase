@@ -17,7 +17,7 @@ public struct TnCameraToolbarMiscView<TCameraManager: TnCameraProxyProtocol>: Vi
         Group {
             switch cameraModel.toolbarType {
             case .zoom:
-                zoomView                
+                ZoomView(cameraManager: cameraManager, settings: $cameraModel.settings)
             case .misc:
                 miscView
             default:
@@ -31,43 +31,6 @@ public struct TnCameraToolbarMiscView<TCameraManager: TnCameraProxyProtocol>: Vi
 }
 
 extension TnCameraToolbarMiscView {
-    var zoomView: some View {
-        let step = 0.1/2
-        return getSliderView(
-            value: $cameraModel.settings.zoomFactor,
-            label: "Zoom",
-            bounds: cameraModel.settings.zoomRange,
-            step: step,
-            onChanged: { _ in},
-            onChanging: { [self] v in
-                cameraManager.setZoomFactor(.init(value: v))
-            },
-            formatter: getNumberFormatter("%.2f"),
-            bottomView: {
-                HStack {
-                    tnCircleButton(imageName: "chevron.backward", radius: 40) {
-                        cameraManager.setZoomFactor(.init(value: cameraModel.settings.zoomFactor - step))
-                    }
-                    
-                    Spacer()
-                    tnForEach(cameraModel.settings.zoomRelativeFactors) { idx, v in
-                        Group {
-                            tnCircleButton(text: v.toString("%0.1f"), radius: 36, backColor: cameraModel.settings.zoomFactor == v ? .orange : .gray) {
-                                cameraManager.setZoomFactor(.init(value: v))
-                            }
-                            Spacer()
-                        }
-                    }
-
-                    tnCircleButton(imageName: "chevron.forward", radius: 40) {
-                        cameraManager.setZoomFactor(.init(value: cameraModel.settings.zoomFactor + step))
-                    }
-                }
-            },
-            closeable: false
-        )
-    }
-            
     var miscView: some View {
         List {
             Section("Camera Type") {
@@ -177,8 +140,7 @@ extension TnCameraToolbarMiscView {
                             onChanging: { [self] v in
                                 cameraManager.setExposure(.init(iso: v))
                             },
-                            formatter: getNumberFormatter("%.0f"),
-                            closeable: false
+                            formatter: getNumberFormatter("%.0f")
                         )
                         
                         getSliderView(
@@ -190,8 +152,7 @@ extension TnCameraToolbarMiscView {
                             onChanging: { [self] v in
                                 cameraManager.setExposure(.init(duration: v))
                             },
-                            formatter: getNumberFormatter("%.3f"),
-                            closeable: false
+                            formatter: getNumberFormatter("%.3f")
                         )
                     }
                     .padding(.horizontal, 16)
@@ -225,7 +186,6 @@ extension TnCameraToolbarMiscView {
                         cameraManager.setTransport(cameraModel.settings.transporting)
                     },
                     formatter: getNumberPercentFormatter(),
-                    closeable: false,
                     adjustBounds: false
                 )
 
@@ -239,7 +199,6 @@ extension TnCameraToolbarMiscView {
                         cameraManager.setTransport(cameraModel.settings.transporting)
                     },
                     formatter: getNumberPercentFormatter(),
-                    closeable: false,
                     adjustBounds: false
                 )
 
@@ -252,10 +211,51 @@ extension TnCameraToolbarMiscView {
     }
 }
 
+struct ZoomView<TCameraManager: TnCameraProxyProtocol>: View {
+    let cameraManager: TCameraManager
+    @Binding var settings: TnCameraSettings
+    
+    var body: some View {
+        let step = 0.1/2
+        return getSliderView(
+            value: $settings.zoomFactor,
+            label: "Zoom",
+            bounds: settings.zoomRange,
+            step: step,
+            onChanged: { _ in},
+            onChanging: { [self] v in
+                cameraManager.setZoomFactor(.init(value: v))
+            },
+            formatter: getNumberFormatter("%.2f"),
+            bottomView: {
+                HStack {
+                    tnCircleButton(imageName: "chevron.backward", radius: 40) {
+                        cameraManager.setZoomFactor(.init(value: settings.zoomFactor - step))
+                    }
+                    
+                    Spacer()
+                    tnForEach(settings.zoomRelativeFactors) { idx, v in
+                        Group {
+                            tnCircleButton(text: v.toString("%0.1f"), radius: 36, backColor: settings.zoomFactor == v ? .orange : .gray) {
+                                cameraManager.setZoomFactor(.init(value: v))
+                            }
+                            Spacer()
+                        }
+                    }
+
+                    tnCircleButton(imageName: "chevron.forward", radius: 40) {
+                        cameraManager.setZoomFactor(.init(value: settings.zoomFactor + step))
+                    }
+                }
+            }
+        )
+    }
+}
+
 struct SelectAlbumView<TCameraManager: TnCameraProxyProtocol>: View {
+    let cameraManager: TCameraManager
     @Binding var album: String
     var albumNames: [String]
-    let cameraManager: TCameraManager
     
     @State private var showSheet = false
     @State private var newAlbum = ""
