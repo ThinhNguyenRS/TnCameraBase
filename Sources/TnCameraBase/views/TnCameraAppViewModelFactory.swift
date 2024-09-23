@@ -61,15 +61,15 @@ public struct TnCameraAppViewModelFactory {
         )
         appModel.cameraModel.delegate = delegate ?? ServerDelegate(cameraManager: appModel.cameraManager)
         appModel.cameraManager.bleDelegate = appModel.cameraManager
-//        appModel.cameraManager.captureCompletion = { output in
-//            let uiImage = UIImage(data: output.photoData)
-//            DispatchQueue.main.async {
-//                withAnimation {
-//                    appModel.cameraModel.capturedImage = uiImage
-//                }
-//                appModel.cameraManager.sendImage()
-//            }
-//        }
+        appModel.cameraManager.captureCompletion = { output in
+            let uiImage = UIImage(data: output.photoData)
+            DispatchQueue.main.async {
+                withAnimation {
+                    appModel.cameraModel.capturedImage = uiImage
+                }
+                appModel.cameraManager.sendImage()
+            }
+        }
         return appModel
     }
 
