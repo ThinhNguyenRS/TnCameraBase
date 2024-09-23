@@ -261,9 +261,16 @@ struct SelectAlbumView: View {
     //            cameraManager.setCapturing(cameraModel.settings.capture)
             })
 
-            tnPickerFieldStringMenu(
+//            tnPickerFieldStringMenu(
+//                label: "Select album",
+//                value: $album,
+//                labels: albumNames
+//            )
+
+            TnPickerFieldPopup(
                 label: "Select album",
                 value: $album,
+                values: albumNames,
                 labels: albumNames
             )
         }
