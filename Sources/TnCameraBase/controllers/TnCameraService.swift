@@ -31,6 +31,7 @@ public actor TnCameraService: NSObject, TnLoggable {
     var captureDelegate: TnCameraCaptureDelegate? = nil
 
     let library = TnPhotoLibrary()
+    private var cancellables: Set<AnyCancellable> = .init()
 
     private override init() {
     }
@@ -103,7 +104,7 @@ extension TnCameraService {
         settings.zoomMainFactor = mainZoomFactor
         settings.zoomRelativeFactors = relativeZoomFactors
         settings.zoomRange = relativeZoomFactors.first! ... relativeZoomFactors.last!
-        settings.zoomFactor = device.videoZoomFactor / mainZoomFactor
+        settings.zoomFactor = device.videoZoomFactor / settings.zoomMainFactor
         
         logDebug("zoomFactor", settings.zoomFactor)
     }
@@ -152,6 +153,14 @@ extension TnCameraService {
         session.addInput(deviceInput)
         videoDeviceInput = deviceInput
         
+        // listen videoZoomFactor
+        device.publisher(for: \.videoZoomFactor)
+            .sink { [self] v in
+                settings.zoomFactor = device.videoZoomFactor / settings.zoomMainFactor
+                logDebug("zoomFactor changed", settings.zoomFactor)
+            }
+            .store(in: &cancellables)
+
         self.logDebug("addSessionInputs !")
     }
     
