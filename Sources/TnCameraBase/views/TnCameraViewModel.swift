@@ -33,25 +33,8 @@ public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {
         logDebug("inited")
     }
     
-    public func listen(manager: TnCameraProxyProtocol, withOrientation: Bool = true) {
-        Task { @MainActor in
-            await manager.statusPublisher
-                .sink { [self] v in
-                    status = v
-                    logDebug("status changed", v)
-                    delegate?.onChanged(settings: settings, status: status)
-                }
-                .store(in: &cancelables)
-
-
-            await manager.settingsPublisher
-                .sink { [self] v in
-                    settings = v
-                    logDebug("settings changed")
-                    delegate?.onChanged(settings: settings, status: status)
-                }
-                .store(in: &cancelables)
-
+    public func listen(manager: TnCameraProxyProtocol, withOrientation: Bool = true) async {
+//        Task {
 //            await manager.statusPublisher
 //                .onReceive(cancelables: &cancelables) { [self] v in
 //                    withAnimation {
@@ -69,8 +52,27 @@ public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {
 //                    }
 //                    delegate?.onChanged(settings: settings, status: status)
 //                }
-        }
+//        }
 
+
+        await manager.statusPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [self] v in
+                status = v
+                logDebug("status changed", v)
+                delegate?.onChanged(settings: settings, status: status)
+            }
+            .store(in: &cancelables)
+
+
+        await manager.settingsPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [self] v in
+                settings = v
+                logDebug("settings changed")
+                delegate?.onChanged(settings: settings, status: status)
+            }
+            .store(in: &cancelables)
 
         if withOrientation {
             let motionOrientation: DeviceMotionOrientationListener = .shared
