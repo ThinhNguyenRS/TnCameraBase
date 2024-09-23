@@ -18,7 +18,6 @@ public struct TnCameraSettingsViewSlider<TValue, TTopView: View, TBottomView: Vi
     let formatter: (TValue) -> String
 
     let onChanged: ((TValue) -> Void)?
-    let onChanging: ((TValue) -> Void)?
     
     @ViewBuilder let topView: () -> TTopView
     @ViewBuilder let bottomView: () -> TBottomView
@@ -33,7 +32,7 @@ public struct TnCameraSettingsViewSlider<TValue, TTopView: View, TBottomView: Vi
                 topView()
 
                 TnSliderField(value: $value, bounds: bounds, step: step, formatter: formatter, onEdited:  { v in
-                    onChanging?(v)
+                    onChanged?(v)
                 }, adjustBounds: adjustBounds)
 
                 bottomView()
@@ -52,7 +51,6 @@ extension View {
         bounds: ClosedRange<TValue>,
         step: TValue.Stride,
         onChanged: @escaping (TValue) -> Void,
-        onChanging: @escaping (TValue) -> Void,
         formatter: @escaping (TValue) -> String = defaultNumberFormatter,
         @ViewBuilder topView: @escaping () -> TTopView,
         @ViewBuilder bottomView: @escaping () -> TBottomView,
@@ -65,7 +63,6 @@ extension View {
             step: step,
             formatter: formatter,
             onChanged: onChanged,
-            onChanging: onChanging,
             topView: topView,
             bottomView: bottomView,
             adjustBounds: adjustBounds
@@ -78,7 +75,6 @@ extension View {
         bounds: ClosedRange<TValue>,
         step: TValue.Stride,
         onChanged: @escaping (TValue) -> Void,
-        onChanging: @escaping (TValue) -> Void,
         formatter: @escaping (TValue) -> String = defaultNumberFormatter,
         @ViewBuilder topView: @escaping () -> TTopView,
         adjustBounds: Bool = false
@@ -89,7 +85,6 @@ extension View {
             bounds: bounds,
             step: step,
             onChanged: onChanged,
-            onChanging: onChanging,
             formatter: formatter,
             topView: topView,
             bottomView: { },
@@ -102,7 +97,6 @@ extension View {
         label: String, bounds: ClosedRange<TValue>,
         step: TValue.Stride,
         onChanged: @escaping (TValue) -> Void,
-        onChanging: @escaping (TValue) -> Void,
         formatter: @escaping (TValue) -> String = defaultNumberFormatter,
         @ViewBuilder bottomView: @escaping () -> TBottomView,
         adjustBounds: Bool = false
@@ -113,7 +107,6 @@ extension View {
             bounds: bounds,
             step: step,
             onChanged: onChanged,
-            onChanging: onChanging,
             formatter: formatter,
             topView: { },
             bottomView: bottomView,
@@ -126,7 +119,6 @@ extension View {
         label: String, bounds: ClosedRange<TValue>,
         step: TValue.Stride,
         onChanged: @escaping (TValue) -> Void,
-        onChanging: @escaping (TValue) -> Void,
         formatter: @escaping (TValue) -> String = defaultNumberFormatter,
         adjustBounds: Bool = false
     ) -> some View where TValue : BinaryFloatingPoint & CVarArg, TValue.Stride : BinaryFloatingPoint {
@@ -136,7 +128,6 @@ extension View {
             bounds: bounds,
             step: step,
             onChanged: onChanged,
-            onChanging: onChanging,
             formatter: formatter,
             topView: { },
             bottomView: { },

@@ -136,8 +136,7 @@ extension TnCameraToolbarMiscView {
                             label: "ISO",
                             bounds: cameraModel.settings.isoRange,
                             step: 50,
-                            onChanged: { _ in},
-                            onChanging: { [self] v in
+                            onChanged: { [self] v in
                                 cameraManager.setExposure(.init(iso: v))
                             },
                             formatter: getNumberFormatter("%.0f")
@@ -148,8 +147,7 @@ extension TnCameraToolbarMiscView {
                             label: "Shutter speed",
                             bounds: cameraModel.settings.exposureDurationRange,
                             step: 0.001,
-                            onChanged: { _ in},
-                            onChanging: { [self] v in
+                            onChanged: { [self] v in
                                 cameraManager.setExposure(.init(duration: v))
                             },
                             formatter: getNumberFormatter("%.3f")
@@ -181,8 +179,7 @@ extension TnCameraToolbarMiscView {
                     label: "Scale",
                     bounds: 0.02...0.40,
                     step: 0.01,
-                    onChanged: { _ in},
-                    onChanging: { [self] v in
+                    onChanged: { [self] v in
                         cameraManager.setTransport(cameraModel.settings.transporting)
                     },
                     formatter: getNumberPercentFormatter(),
@@ -194,8 +191,7 @@ extension TnCameraToolbarMiscView {
                     label: "Compress quality",
                     bounds: 0.25...1,
                     step: 0.05,
-                    onChanged: { _ in},
-                    onChanging: { [self] v in
+                    onChanged: { [self] v in
                         cameraManager.setTransport(cameraModel.settings.transporting)
                     },
                     formatter: getNumberPercentFormatter(),
@@ -224,8 +220,6 @@ struct ZoomView<TCameraManager: TnCameraProxyProtocol>: View {
             step: step,
             onChanged: { v in
                 cameraManager.setZoomFactor(.init(value: v))
-            },
-            onChanging: { [self] v in
             },
             formatter: getNumberFormatter("%.2f"),
             bottomView: {
