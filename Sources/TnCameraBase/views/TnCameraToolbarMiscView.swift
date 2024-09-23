@@ -255,33 +255,35 @@ struct SelectAlbumView: View {
     @Binding var album: String
     var albumNames: [String]
     
-    @State private var selectedAlbum: String = ""
+    @State private var showSheet = false
+    @State private var newAlbum = ""
+
+    init(album: Binding<String>, albumNames: [String]) {
+        _album = album
+        self.albumNames = [""] + albumNames
+    }
     
     var body: some View {
-        Group {
-            TextField("Album", text: $album, onEditingChanged: { _ in
-    //            cameraManager.setCapturing(cameraModel.settings.capture)
-            })
-
+        HStack {
             tnPickerFieldStringMenu(
                 label: "Select album",
-                value: $selectedAlbum,
-                labels: albumNames,
-                onChanged: { _ in
-                    album = selectedAlbum
-                }
+                value: $album,
+                labels: albumNames
             )
 
-//            TnPickerFieldPopup(
-//                label: "Select album",
-//                value: $album,
-//                values: albumNames,
-//                labels: albumNames
-//            )
+            tnImageButton(name: "plus") {
+                showSheet = true
+            }
         }
-        .onAppear {
-            if !album.isEmpty {
-                selectedAlbum = album
+        .sheet(isPresented: $showSheet) {
+            VStack {
+                Text("Create new album")
+                TextField("New album name", text: $newAlbum)
+                
+                Spacer()
+                tnButton("Close") {
+                    showSheet = false
+                }
             }
         }
     }
