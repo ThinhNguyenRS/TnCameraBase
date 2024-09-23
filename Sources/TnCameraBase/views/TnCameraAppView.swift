@@ -10,7 +10,6 @@ import SwiftUI
 import TnIosBase
 
 public struct TnCameraAppView<TCameraManager: TnCameraProxyProtocol, TBottom: View>: TnLoggable {
-    public let LOG_NAME = "TnCameraAppView.\(TCameraManager.Type.self)"
     @ViewBuilder var bottom: () -> TBottom
     @EnvironmentObject var appModel: TnCameraAppViewModel<TCameraManager>
     @EnvironmentObject var cameraModel: TnCameraViewModel

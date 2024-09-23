@@ -14,8 +14,6 @@ import CoreImage
 import TnIosBase
 
 public class TnCameraProxyClient: NSObject, ObservableObject, TnLoggable {
-    public let LOG_NAME = "TnCameraProxyClient"
-
     @Published public private(set) var currentCiImage: CIImage?
     @Published public private(set) var settings: TnCameraSettings = .init()
     @Published public private(set) var status: TnCameraStatus = .none

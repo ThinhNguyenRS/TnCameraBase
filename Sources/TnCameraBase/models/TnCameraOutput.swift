@@ -17,11 +17,6 @@ public struct TnCameraPhotoOutput {
     }
 }
 
-public enum TnCameraPhotoOutputError: Error {
-    case general(error: String)
-    case noData
-}
-
 public typealias TnCameraPhotoOutputContinuation = CheckedContinuation<TnCameraPhotoOutput, Error>
 
 public typealias TnCameraPhotoOutputCompletion = (TnCameraPhotoOutput) -> Void

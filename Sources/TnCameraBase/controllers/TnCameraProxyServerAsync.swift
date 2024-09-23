@@ -13,8 +13,6 @@ import CoreImage
 import TnIosBase
 
 public class TnCameraProxyServerAsync: TnLoggable {
-    public let LOG_NAME = "TnCameraProxyServerNew"
-
     private let cameraService: TnCameraService
     private var network: TnNetworkServer?
     private let ble: TnBluetoothServer

@@ -9,9 +9,7 @@ import Foundation
 import SwiftUI
 import TnIosBase
 
-public class TnCameraAppViewModel<TCameraManager: TnCameraProxyProtocol>: NSObject, ObservableObject, TnLoggable {
-    public let LOG_NAME = "TnCameraAppViewModel.\(TCameraManager.Type.self)"
-    
+public class TnCameraAppViewModel<TCameraManager: TnCameraProxyProtocol>: NSObject, ObservableObject, TnLoggable {    
     public let cameraManager: TCameraManager
     public let cameraModel: TnCameraViewModel
     @Published public var showToolbar: Bool = true

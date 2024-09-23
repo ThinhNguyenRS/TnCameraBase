@@ -16,9 +16,7 @@ public protocol TnCameraViewModelDelegate {
     func onVolumeButton()
 }
 
-public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {
-    public let LOG_NAME = "CameraViewModel"
-    
+public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {    
     @Published public var status: TnCameraStatus = .none
     @Published public var settings: TnCameraSettings = .init()
     @Published public var toolbarType: TnCameraToolbarViewType = .none

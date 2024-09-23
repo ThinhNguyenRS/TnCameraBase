@@ -113,7 +113,7 @@ extension TnCameraToolbarMiscView {
                 Stepper("Delay: \(cameraModel.settings.capture.delay)s", value: $cameraModel.settings.capture.delay, in: 0...10, onEditingChanged: { _ in
                     cameraManager.setCapturing(cameraModel.settings.capture)
                 })
-                TextField("Library", text: $cameraModel.settings.capture.library, onEditingChanged: { _ in
+                TextField("Library", text: $cameraModel.settings.capture.album, onEditingChanged: { _ in
                     cameraManager.setCapturing(cameraModel.settings.capture)
                 })
             }

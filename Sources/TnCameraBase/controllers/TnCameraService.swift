@@ -16,8 +16,6 @@ public actor TnCameraService: NSObject, TnLoggable {
     public static let shared: TnCameraService = .init()
 
     typealias DoDeviceHandler = (AVCaptureDeviceInput, AVCaptureDevice) throws -> Void
-
-    nonisolated public let LOG_NAME = "TnCameraService"
     
     @Published public var settings: TnCameraSettings = .init()
     @Published public var status: TnCameraStatus = .none

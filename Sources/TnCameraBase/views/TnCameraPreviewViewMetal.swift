@@ -12,10 +12,7 @@ import Combine
 import TnIosBase
 
 public struct TnCameraPreviewViewMetal: TnLoggable {
-    public let LOG_NAME = "TnCameraPreviewViewMetal"
-    
     public class InternalView: MTKView, TnLoggable {
-        public let LOG_NAME = "TnCameraPreviewViewMetal.InternalView"
         /// The image that should be displayed next.
         private var ciImage: CIImage?
         private var cancelables = Set<AnyCancellable>()

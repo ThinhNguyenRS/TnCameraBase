@@ -12,8 +12,6 @@ import Photos
 import TnIosBase
 
 public class TnCameraCaptureDelegate: NSObject, AVCapturePhotoCaptureDelegate, TnLoggable {
-    public let LOG_NAME = "TnCameraCaptureDelegate"
-
     private var photoData: Data? = nil
     private var photoLiveURL: URL?
     
@@ -43,7 +41,7 @@ public class TnCameraCaptureDelegate: NSObject, AVCapturePhotoCaptureDelegate, T
     public func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingLivePhotoToMovieFileAt outputFileURL: URL, duration: CMTime, photoDisplayTime: CMTime, resolvedSettings: AVCaptureResolvedPhotoSettings, error: (any Error)?) {
         logDebug("didFinishProcessingLivePhotoToMovieFileAt", "...")
         if let error {
-            logError("didFinishProcessingLivePhotoToMovieFileAt", error.localizedDescription)
+            logError("didFinishProcessingLivePhotoToMovieFileAt", error)
         } else {
             photoLiveURL = outputFileURL
             logDebug("didFinishProcessingLivePhotoToMovieFileAt", "!")
@@ -55,15 +53,13 @@ public class TnCameraCaptureDelegate: NSObject, AVCapturePhotoCaptureDelegate, T
 
         // If an error occurs, resume the continuation by throwing an error, and return.
         if let error {
-            logError("didFinishCaptureFor", error.localizedDescription)
-            continuation.resume(throwing: TnCameraPhotoOutputError.general(error: error.localizedDescription))
+            continuation.resume(throwing: error)
             return
         }
         
         // If the app captures no photo data, resume the continuation by throwing an error, and return.
         guard let photoData else {
-            logError("didFinishCaptureFor", "noData")
-            continuation.resume(throwing: TnCameraPhotoOutputError.noData)
+            continuation.resume(throwing: TnAppError.from("No photo data"))
             return
         }
         
