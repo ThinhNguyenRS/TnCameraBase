@@ -105,8 +105,6 @@ extension TnCameraService {
         settings.zoomRelativeFactors = relativeZoomFactors
         settings.zoomRange = relativeZoomFactors.first! ... relativeZoomFactors.last!
         settings.zoomFactor = device.videoZoomFactor / settings.zoomMainFactor
-        
-        logDebug("zoomFactor", settings.zoomFactor)
     }
 }
 
@@ -157,7 +155,6 @@ extension TnCameraService {
         device.publisher(for: \.videoZoomFactor)
             .sink { [self] v in
                 settings.zoomFactor = device.videoZoomFactor / settings.zoomMainFactor
-                logDebug("zoomFactor changed", settings.zoomFactor)
             }
             .store(in: &cancellables)
 

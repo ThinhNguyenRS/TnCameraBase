@@ -29,9 +29,7 @@ public class TnCameraAppViewModel<TCameraManager: TnCameraProxyProtocol>: NSObje
     }
     
     public func setup() {
-        Task {
-            await cameraModel.listen(manager: cameraManager, withOrientation: listenOrientation)
-        }
+        cameraModel.listen(manager: cameraManager, withOrientation: listenOrientation)
         cameraManager.setup()
     }
 }
