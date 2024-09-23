@@ -69,7 +69,7 @@ public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {
             .receive(on: DispatchQueue.main)
             .sink { [self] v in
                 settings = v
-                logDebug("settings changed")
+                logDebug("settings changed", settings.zoomFactor)
                 delegate?.onChanged(settings: settings, status: status)
             }
             .store(in: &cancelables)
