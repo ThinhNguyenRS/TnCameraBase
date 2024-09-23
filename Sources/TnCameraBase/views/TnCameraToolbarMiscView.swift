@@ -255,24 +255,32 @@ struct SelectAlbumView: View {
     @Binding var album: String
     var albumNames: [String]
     
+    @State private var selectedAlbum: String = ""
+    
     var body: some View {
         Group {
             TextField("Album", text: $album, onEditingChanged: { _ in
     //            cameraManager.setCapturing(cameraModel.settings.capture)
             })
 
-//            tnPickerFieldStringMenu(
+            tnPickerFieldStringMenu(
+                label: "Select album",
+                value: $selectedAlbum,
+                labels: albumNames,
+                onChanged: { _ in
+                    album = selectedAlbum
+                }
+            )
+
+//            TnPickerFieldPopup(
 //                label: "Select album",
 //                value: $album,
+//                values: albumNames,
 //                labels: albumNames
 //            )
-
-            TnPickerFieldPopup(
-                label: "Select album",
-                value: $album,
-                values: albumNames,
-                labels: albumNames
-            )
+        }
+        .onAppear {
+            selectedAlbum = album
         }
     }
 }
