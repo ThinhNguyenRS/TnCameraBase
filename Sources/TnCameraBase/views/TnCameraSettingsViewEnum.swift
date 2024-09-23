@@ -68,7 +68,6 @@ extension View {
             topView: topView,
             bottomView: bottomView
         )
-        .transition(.moveAndFade)
     }
     
     public func getEnumView<TValue: TnEnum, TTopView: View, TBottomView: View>(
