@@ -45,6 +45,7 @@ public protocol TnCameraProtocol {
     
     func setTransport(_ v: TnCameraTransportingValue)
     func setCapturing(_ v: TnCameraCapturingValue)
+    func createAlbum(_ v: String)
 }
 
 // MARK: CameraManagerProxyProtocol

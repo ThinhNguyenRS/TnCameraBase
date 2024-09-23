@@ -116,7 +116,8 @@ extension TnCameraToolbarMiscView {
                 
                 SelectAlbumView(
                     album: $cameraModel.settings.capturing.album,
-                    albumNames: cameraManager.albums
+                    albumNames: cameraManager.albums,
+                    cameraManager: cameraManager
                 )
             }
             
@@ -251,16 +252,18 @@ extension TnCameraToolbarMiscView {
     }
 }
 
-struct SelectAlbumView: View {
+struct SelectAlbumView<TCameraManager: TnCameraProxyProtocol>: View {
     @Binding var album: String
     var albumNames: [String]
+    let cameraManager: TCameraManager
     
     @State private var showSheet = false
     @State private var newAlbum = ""
 
-    init(album: Binding<String>, albumNames: [String]) {
+    init(album: Binding<String>, albumNames: [String], cameraManager: TCameraManager) {
         _album = album
         self.albumNames = [""] + albumNames
+        self.cameraManager = cameraManager
     }
     
     var body: some View {
@@ -282,12 +285,19 @@ struct SelectAlbumView: View {
                 
                 Spacer()
                 HStack {
+                    Spacer()
                     tnButton("Create") {
+                        cameraManager.createAlbum(newAlbum)
                         showSheet = false
                     }
+                    .disabled(newAlbum.isEmpty)
+
+                    Spacer()
                     tnButton("Close") {
                         showSheet = false
                     }
+
+                    Spacer()
                 }
             }
         }

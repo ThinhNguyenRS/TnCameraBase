@@ -175,7 +175,7 @@ extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
             try? network?.send(object: object)
         }
     }
-
+    
     public func sendImage() {
         Task {
             if let currentCiImage = await cameraService.currentCiImage {
@@ -185,7 +185,7 @@ extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
             }
         }
     }
-
+    
     public func setup() {
         ble.setupBle()
     }
@@ -219,7 +219,7 @@ extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
             await cameraService.stopCapturing()
         }
     }
-
+    
     public func toggleCapturing() {
         Task {
             try? await cameraService.toggleCapturing()
@@ -231,7 +231,7 @@ extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
             try? await cameraService.switchCamera()
         }
     }
-
+    
     // MARK: captureImage
     public func captureImage() {
         Task {
@@ -277,7 +277,7 @@ extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
             try? await cameraService.setWideColor(v)
         }
     }
-
+    
     public func setExposureMode(_ v: AVCaptureDevice.ExposureMode) {
         Task {
             try? await cameraService.setExposureMode(v)
@@ -325,12 +325,21 @@ extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
             await cameraService.setTransport(v)
         }
     }
-
+    
     public func setCapturing(_ v: TnCameraCapturingValue) {
         Task {
             await cameraService.setCapturing(v)
         }
     }
+
+    public func createAlbum(_ v: String) {
+        Task {
+            try await cameraService.library.getOrCreateAlbum(name: v)
+            albums = await cameraService.library.getAlbums()
+            send(.getAlbumsResponse, albums)
+        }
+    }
+
 }
 
 // MARK: TnNetworkDelegateServer

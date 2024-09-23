@@ -173,6 +173,10 @@ extension TnCameraProxyClient: TnCameraProtocol {
     public func setCapturing(_ v: TnCameraCapturingValue) {
         send(.setCapturing, v)
     }
+    
+    public func createAlbum(_ v: String) {
+        send(.createAlbum, v)
+    }
 }
 
 // MARK: TnCameraProxyProtocol

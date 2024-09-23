@@ -70,6 +70,7 @@ public actor TnPhotoLibrary: TnLoggable {
         return createdAlbum
     }
     
+    @discardableResult
     public func getOrCreateAlbum(name: String) async throws -> PHAssetCollection {
         var album = getAlbum(name: name)
         if album == nil {
