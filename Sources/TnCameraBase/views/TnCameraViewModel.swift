@@ -34,31 +34,48 @@ public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {
     }
     
     public func listen(manager: TnCameraProxyProtocol, withOrientation: Bool = true) {
-        Task {
+        Task { @MainActor in
             await manager.statusPublisher
-                .onReceive(debounceMs: 10, cancelables: &cancelables) { [self] v in
-                    withAnimation {
-                        status = v
-                        logDebug("status changed", v)
-                    }
+                .sink { [self] v in
+                    status = v
+                    logDebug("status changed", v)
                     delegate?.onChanged(settings: settings, status: status)
                 }
+                .store(in: &cancelables)
+
 
             await manager.settingsPublisher
-                .onReceive(debounceMs: 10, cancelables: &cancelables) { [self] v in
-                    withAnimation {
-                        settings = v
-                        logDebug("settings changed")
-                    }
+                .sink { [self] v in
+                    settings = v
+                    logDebug("settings changed")
                     delegate?.onChanged(settings: settings, status: status)
                 }
+                .store(in: &cancelables)
+
+//            await manager.statusPublisher
+//                .onReceive(cancelables: &cancelables) { [self] v in
+//                    withAnimation {
+//                        status = v
+//                        logDebug("status changed", v)
+//                    }
+//                    delegate?.onChanged(settings: settings, status: status)
+//                }
+//
+//            await manager.settingsPublisher
+//                .onReceive(cancelables: &cancelables) { [self] v in
+//                    withAnimation {
+//                        settings = v
+//                        logDebug("settings changed")
+//                    }
+//                    delegate?.onChanged(settings: settings, status: status)
+//                }
         }
 
 
         if withOrientation {
             let motionOrientation: DeviceMotionOrientationListener = .shared
             motionOrientation.$orientation
-                .onReceive(debounceMs: 10, cancelables: &cancelables) { [self] _ in
+                .onReceive(cancelables: &cancelables) { [self] _ in
                     withAnimation {
                         orientation = motionOrientation.orientation
                         orientationAngle = motionOrientation.angle
