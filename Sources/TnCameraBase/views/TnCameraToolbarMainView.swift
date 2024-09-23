@@ -46,9 +46,6 @@ public struct TnCameraToolbarMainView<TBottom: View, TCameraManager: TnCameraPro
                 // settings
                 Spacer()
                 getSettingsButton(type: .misc, imageName: "ellipsis")
-//                circleButtonRotation(imageName: "gear", radius: 50) {
-//                    cameraModel.toolbarType = cameraModel.toolbarType == .misc ? .none : .misc
-//                }
 
                 Spacer()
             }

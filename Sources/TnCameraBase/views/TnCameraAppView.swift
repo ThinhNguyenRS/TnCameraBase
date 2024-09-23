@@ -40,6 +40,7 @@ extension TnCameraAppView: View {
                         TnCameraToolbarMiscView(cameraManager: appModel.cameraManager)
                         TnCameraToolbarMainView(cameraManager: appModel.cameraManager, bottom: bottom())
                     }
+                    .transition(.move(edge: .bottom))
                 }
             }
         }

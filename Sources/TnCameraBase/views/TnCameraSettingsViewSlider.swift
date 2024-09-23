@@ -40,7 +40,7 @@ public struct TnCameraSettingsViewSlider<TValue, TTopView: View, TBottomView: Vi
             }
         }
         .onAppear {
-            TnLogger.debug("CameraSettingsSliderView", "init", label, value)
+            TnLogger.debug("CameraSettingsSliderView", "appear", label, value)
         }
     }
 }

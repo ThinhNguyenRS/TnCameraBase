@@ -92,7 +92,7 @@ public actor TnPhotoLibrary: TnLoggable {
             }
         }
     }
-
+    
     private func addPhoto(imageData: Data, album: PHAssetCollection?) async throws {
         guard let image = UIImage(data: imageData) else {
             throw TnAppError.from("Cannot create image")
@@ -104,7 +104,7 @@ public actor TnPhotoLibrary: TnLoggable {
         guard let image = UIImage(data: imageData) else {
             throw TnAppError.from("Cannot create image")
         }
-
+        
         var album: PHAssetCollection? = nil
         if let albumName, !albumName.isEmpty {
             album = try await getOrCreateAlbum(name: albumName)
@@ -112,10 +112,10 @@ public actor TnPhotoLibrary: TnLoggable {
         
         try await addPhoto(image: image, album: album)
     }
-
+    
     private func addPhoto(imageData: Data, liveURL: URL, album: PHAssetCollection?) async throws {
         try await PHPhotoLibrary.shared().performChanges {
-//            PHAssetChangeRequest.creationRequestForAsset(from: image)
+            //            PHAssetChangeRequest.creationRequestForAsset(from: image)
             
             // Add the captured photo's file data as the main resource for the Photos asset.
             let creationRequest = PHAssetCreationRequest.forAsset()
@@ -125,7 +125,7 @@ public actor TnPhotoLibrary: TnLoggable {
             let options = PHAssetResourceCreationOptions()
             options.shouldMoveFile = true
             creationRequest.addResource(with: .pairedVideo, fileURL: liveURL, options: options)
-
+            
             // add to album
             if let album {
                 if let addAssetRequest = PHAssetCollectionChangeRequest(for: album) {
@@ -142,4 +142,5 @@ public actor TnPhotoLibrary: TnLoggable {
             try await addPhoto(imageData: imageData, album: album)
         }
     }
+    
 }
