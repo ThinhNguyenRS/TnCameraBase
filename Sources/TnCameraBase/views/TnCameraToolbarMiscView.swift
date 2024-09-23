@@ -222,9 +222,10 @@ struct ZoomView<TCameraManager: TnCameraProxyProtocol>: View {
             label: "Zoom",
             bounds: settings.zoomRange,
             step: step,
-            onChanged: { _ in},
-            onChanging: { [self] v in
+            onChanged: { v in
                 cameraManager.setZoomFactor(.init(value: v))
+            },
+            onChanging: { [self] v in
             },
             formatter: getNumberFormatter("%.2f"),
             bottomView: {
