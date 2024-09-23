@@ -280,7 +280,9 @@ struct SelectAlbumView: View {
 //            )
         }
         .onAppear {
-            selectedAlbum = album
+            if !album.isEmpty {
+                selectedAlbum = album
+            }
         }
     }
 }
