@@ -79,10 +79,12 @@ public actor TnPhotoLibrary: TnLoggable {
         return album!
     }
     
-    public func addPhoto(image: UIImage, album: PHAssetCollection?) async throws {
+    private func addPhoto(image: UIImage, album: PHAssetCollection?) async throws {
         // Add the asset to the photo library.
         try await PHPhotoLibrary.shared().performChanges {
+            // add photo
             let creationRequest = PHAssetChangeRequest.creationRequestForAsset(from: image)
+            // add to album
             if let album {
                 if let addAssetRequest = PHAssetCollectionChangeRequest(for: album) {
                     addAssetRequest.addAssets([creationRequest.placeholderForCreatedAsset!] as NSArray)
@@ -90,26 +92,54 @@ public actor TnPhotoLibrary: TnLoggable {
             }
         }
     }
-}
 
-extension TnPhotoLibrary {
-    public func addPhoto(imageData: Data, album: PHAssetCollection?) async throws {
+    private func addPhoto(imageData: Data, album: PHAssetCollection?) async throws {
         guard let image = UIImage(data: imageData) else {
             throw TnAppError.from("Cannot create image")
         }
         try await addPhoto(image: image, album: album)
     }
     
-    public func addPhoto(imageData: Data, albumName: String?) async throws {
+    private func addPhoto(imageData: Data, albumName: String?) async throws {
         guard let image = UIImage(data: imageData) else {
             throw TnAppError.from("Cannot create image")
         }
 
         var album: PHAssetCollection? = nil
-        if let albumName {
+        if let albumName, !albumName.isEmpty {
             album = try await getOrCreateAlbum(name: albumName)
         }
         
         try await addPhoto(image: image, album: album)
+    }
+
+    private func addPhoto(imageData: Data, liveURL: URL, album: PHAssetCollection?) async throws {
+        try await PHPhotoLibrary.shared().performChanges {
+//            PHAssetChangeRequest.creationRequestForAsset(from: image)
+            
+            // Add the captured photo's file data as the main resource for the Photos asset.
+            let creationRequest = PHAssetCreationRequest.forAsset()
+            creationRequest.addResource(with: .photo, data: imageData, options: nil)
+            
+            // Add the movie file URL as the Live Photo's paired video resource.
+            let options = PHAssetResourceCreationOptions()
+            options.shouldMoveFile = true
+            creationRequest.addResource(with: .pairedVideo, fileURL: liveURL, options: options)
+
+            // add to album
+            if let album {
+                if let addAssetRequest = PHAssetCollectionChangeRequest(for: album) {
+                    addAssetRequest.addAssets([creationRequest.placeholderForCreatedAsset!] as NSArray)
+                }
+            }
+        }
+    }
+    
+    public func addPhoto(imageData: Data, liveURL: URL?, album: PHAssetCollection?) async throws {
+        if let liveURL {
+            try await addPhoto(imageData: imageData, liveURL: liveURL, album: album)
+        } else {
+            try await addPhoto(imageData: imageData, album: album)
+        }
     }
 }

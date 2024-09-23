@@ -530,7 +530,7 @@ extension TnCameraService {
         var lastOutput: TnCameraPhotoOutput!
         for _ in 1...capturing.count {
             lastOutput = try await captureImageInternal()
-            try await library.addPhoto(imageData: lastOutput.photoData, album: album)
+            try await library.addPhoto(imageData: lastOutput.photoData, liveURL: lastOutput.photoLiveURL, album: album)
         }
         
         return lastOutput
