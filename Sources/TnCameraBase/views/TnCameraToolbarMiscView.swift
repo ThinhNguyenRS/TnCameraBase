@@ -288,6 +288,7 @@ struct SelectAlbumView<TCameraManager: TnCameraProxyProtocol>: View {
                     Spacer()
                     tnButton("Create") {
                         cameraManager.createAlbum(newAlbum)
+                        album = newAlbum
                         showSheet = false
                     }
                     .disabled(newAlbum.isEmpty)
@@ -300,6 +301,7 @@ struct SelectAlbumView<TCameraManager: TnCameraProxyProtocol>: View {
                     Spacer()
                 }
             }
+            .padding(.all, 16)
         }
     }
 }
