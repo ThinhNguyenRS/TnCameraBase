@@ -104,6 +104,8 @@ extension TnCameraService {
         settings.zoomRelativeFactors = relativeZoomFactors
         settings.zoomRange = relativeZoomFactors.first! ... relativeZoomFactors.last!
         settings.zoomFactor = device.videoZoomFactor / mainZoomFactor
+        
+        logDebug("zoomFactor", settings.zoomFactor)
     }
 }
 
