@@ -47,9 +47,10 @@ extension TnCameraAppView: View {
                     VStack(alignment: .leading) {
                         Spacer()
                         toolbarMiscView
+                            .animation(.bouncy, value: appModel.cameraModel.toolbarType)
                         toolbarMainView
                     }
-                    .transition(.moveAndFade)
+//                    .transition(.moveAndFade)
                     .animation(.bouncy, value: appModel.showToolbar)
                 }
             }
