@@ -274,18 +274,18 @@ struct SelectAlbumView<TCameraProxy: TnCameraProxyProtocol>: View, TnLoggable {
     }
     
     var body: some View {
-        VStack(alignment: .leading) {
-            tnPickerViewHorz(
-                label: "Album",
+        HStack() {
+            tnPickerView(
                 value: $album,
                 values: albumNames,
                 labels: albumNames,
                 style: .wheel
             )
 
-//            tnCircleButton(imageName: "plus") {
-//                showSheet = true
-//            }
+            Spacer()
+            tnCircleButton(imageName: "ellipsis") {
+                showSheet = true
+            }
         }
         .sheet(isPresented: $showSheet) {
             VStack {
