@@ -280,11 +280,11 @@ struct SelectAlbumView<TCameraProxy: TnCameraProxyProtocol>: View, TnLoggable {
 //                values: albumNames,
 //                labels: albumNames,
 //                style: .wheel
-//            )            
+//            )
             TextField("Album", text: $album)
 
             Spacer()
-            tnCircleButton(imageName: "ellipsis") {
+            tnCircleButton(imageName: "ellipsis", radius: 24) {
                 showSheet = true
             }
         }
