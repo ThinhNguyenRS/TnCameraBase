@@ -14,14 +14,22 @@ public struct TnCameraAppViewModelFactory {
     struct ServerDelegate: TnCameraViewModelDelegate {
         let cameraProxy: TnCameraProxyServerAsync
         
-        func onChanged(settings: TnCameraBase.TnCameraSettings, status: TnCameraBase.TnCameraStatus) {
-            cameraProxy.send(
-                .getSettingsResponse,
-                TnCameraSettingsValue(settings: settings, status: status)
-            )
+        func onChanged(status: TnCameraBase.TnCameraStatus) {
+//            cameraProxy.send(
+//                .getSettingsResponse,
+//                TnCameraSettingsValue(settings: settings, status: status)
+//            )
 //            cameraProxy.sendImage()
         }
         
+        func onChanged(settings: TnCameraBase.TnCameraSettings) {
+//            cameraProxy.send(
+//                .getSettingsResponse,
+//                TnCameraSettingsValue(settings: settings, status: status)
+//            )
+//            cameraProxy.sendImage()
+        }
+
         func onVolumeButton() {
         }
     }
@@ -29,9 +37,12 @@ public struct TnCameraAppViewModelFactory {
     struct ClientDelegate: TnCameraViewModelDelegate {
         let cameraManager: TnCameraProxyClient
         
-        func onChanged(settings: TnCameraBase.TnCameraSettings, status: TnCameraBase.TnCameraStatus) {
+        func onChanged(status: TnCameraBase.TnCameraStatus) {
         }
         
+        func onChanged(settings: TnCameraBase.TnCameraSettings) {
+        }
+
         func onVolumeButton() {
         }
     }

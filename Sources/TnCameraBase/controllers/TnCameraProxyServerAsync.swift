@@ -17,6 +17,7 @@ public class TnCameraProxyServerAsync: TnLoggable {
     private var network: TnNetworkServer?
     private let ble: TnBluetoothServer
     
+    @Published public private(set) var settings: TnCameraSettings = .init()
     @Published public private(set) var albums: [String] = []
 
     public init(_ cameraService: TnCameraService, networkInfo: TnNetworkServiceInfo) {
@@ -28,7 +29,16 @@ public class TnCameraProxyServerAsync: TnLoggable {
         }
         
         Task {
+            self.settings = await cameraService.settings
             self.albums = await cameraService.library.getAlbums()
+            
+            await cameraService.$isSettingsChanging.sink { v in
+                if !v {
+                    Task {
+                        self.settings = await cameraService.settings
+                    }
+                }
+            }.store(in: &cameraCancellables)
         }
         
         logDebug("inited")
@@ -156,18 +166,6 @@ extension TnCameraProxyServerAsync: TnBluetoothServerDelegate {
 
 // MARK: TnCameraProxyProtocol
 extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
-    public var settings: TnCameraSettings {
-        get async {
-            await cameraService.settings
-        }
-    }
-    
-    public var status: TnCameraStatus {
-        get async {
-            await cameraService.status
-        }
-    }
-    
     public func send(_ object: TnCameraMessageProtocol, useBle: Bool = false) {
         if useBle {
             try? ble.send(object: object)
@@ -179,8 +177,8 @@ extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
     public func sendImage() {
         Task {
             if let currentCiImage = await cameraService.currentCiImage {
-                let transportScale = await cameraService.settings.transporting.scale,
-                    compressionQuality = await cameraService.settings.transporting.compressQuality
+                let transportScale = settings.transporting.scale,
+                    compressionQuality = settings.transporting.compressQuality
                 send(.getImageResponse, currentCiImage.jpegData(scale: transportScale, compressionQuality: compressionQuality))
             }
         }
@@ -198,7 +196,7 @@ extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
     
     public var settingsPublisher: Published<TnCameraSettings>.Publisher {
         get async {
-            await cameraService.$settings
+            $settings
         }
     }
     

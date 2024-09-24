@@ -21,6 +21,7 @@ public actor TnCameraService: NSObject, TnLoggable {
     @Published public var settings: TnCameraSettings = .init()
     @Published public var status: TnCameraStatus = .none
     @Published public var currentCiImage: CIImage?
+    @Published private(set) var isSettingsChanging = false
     
     private let session = AVCaptureSession()
     
@@ -31,7 +32,6 @@ public actor TnCameraService: NSObject, TnLoggable {
     var captureDelegate: TnCameraCaptureDelegate? = nil
 
     let library = TnPhotoLibrary()
-    private var cancellables: Set<AnyCancellable> = .init()
 
     private override init() {
     }
@@ -41,6 +41,8 @@ public actor TnCameraService: NSObject, TnLoggable {
 // MARK: config misc
 extension TnCameraService {
     private func fetchSettings() {
+        isSettingsChanging = true
+        
         let deviceInput = videoDeviceInput!, device = deviceInput.device
 
         settings.cameraPosition = device.position
@@ -86,6 +88,8 @@ extension TnCameraService {
 
         // zoom
         calcZoomFactors()
+
+        isSettingsChanging = false
     }
 
     private func calcZoomFactors() {
@@ -159,7 +163,7 @@ extension TnCameraService {
                     settings.zoomFactor = device.videoZoomFactor / settings.zoomMainFactor
                 }
             }
-            .store(in: &cancellables)
+            .store(in: &cameraCancellables)
 
         self.logDebug("addSessionInputs !")
     }

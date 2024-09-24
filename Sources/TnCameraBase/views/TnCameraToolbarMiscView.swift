@@ -237,7 +237,7 @@ struct MiscView<TCameraProxy: TnCameraProxyProtocol>: View, TnLoggable {
 struct ZoomView<TCameraProxy: TnCameraProxyProtocol>: View {
     let cameraProxy: TCameraProxy
     @ObservedObject var cameraModel: TnCameraViewModel
-
+    
     init(cameraProxy: TCameraProxy, cameraModel: TnCameraViewModel) {
         self.cameraProxy = cameraProxy
         self.cameraModel = cameraModel

@@ -29,7 +29,7 @@ public class TnCameraAppViewModel<TCameraProxy: TnCameraProxyProtocol>: NSObject
     }
     
     public func setup() {
-        cameraModel.listen(manager: cameraProxy, withOrientation: listenOrientation)
+        cameraModel.listen(proxy: cameraProxy, withOrientation: listenOrientation)
         cameraProxy.setup()
     }
 }

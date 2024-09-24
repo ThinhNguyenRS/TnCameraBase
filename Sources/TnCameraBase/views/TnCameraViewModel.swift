@@ -12,7 +12,8 @@ import AVFAudio
 import TnIosBase
 
 public protocol TnCameraViewModelDelegate {
-    func onChanged(settings: TnCameraSettings, status: TnCameraStatus)
+    func onChanged(settings: TnCameraSettings)
+    func onChanged(status: TnCameraStatus)
     func onVolumeButton()
 }
 
@@ -25,7 +26,6 @@ public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {
     @Published public var orientation: UIDeviceOrientation = .unknown
     @Published public var orientationAngle: Angle = .zero
     
-    private var cancelables: Set<AnyCancellable> = []
     public var delegate: TnCameraViewModelDelegate? = nil
     
     public override init() {
@@ -33,31 +33,31 @@ public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {
         logDebug("inited")
     }
     
-    public func listen(manager: TnCameraProxyProtocol, withOrientation: Bool = true) {
+    public func listen(proxy: TnCameraProxyProtocol, withOrientation: Bool = true) {
         Task {
-            await manager.statusPublisher
-                .onReceive(cancelables: &cancelables) { [self] v in
+            await proxy.statusPublisher
+                .onReceive(cancellables: &cameraCancellables) { [self] v in
                     withAnimation {
                         status = v
                         logDebug("status changed", v)
                     }
-                    delegate?.onChanged(settings: settings, status: status)
+                    delegate?.onChanged(status: status)
                 }
 
-            await manager.settingsPublisher
-                .onReceive(debounceMs: 500, cancelables: &cancelables) { [self] v in
+            await proxy.settingsPublisher
+                .onReceive(debounceMs: 500, cancellables: &cameraCancellables) { [self] v in
                     withAnimation {
                         settings = v
                         logDebug("settings changed")
                     }
-                    delegate?.onChanged(settings: settings, status: status)
+                    delegate?.onChanged(settings: settings)
                 }
         }
 
         if withOrientation {
             let motionOrientation: DeviceMotionOrientationListener = .shared
             motionOrientation.$orientation
-                .onReceive(cancelables: &cancelables) { [self] _ in
+                .onReceive(cancellables: &cameraCancellables) { [self] _ in
                     withAnimation {
                         orientation = motionOrientation.orientation
                         orientationAngle = motionOrientation.angle
