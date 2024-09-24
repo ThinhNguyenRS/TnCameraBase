@@ -260,14 +260,16 @@ struct ZoomView<TCameraProxy: TnCameraProxyProtocol>: View {
 struct SelectAlbumView<TCameraProxy: TnCameraProxyProtocol>: View, TnLoggable {
     let cameraProxy: TCameraProxy
     @Binding var album: String
-    var albumNames: [String]
-    
+    let albumNames: [String]
+    let albumLabels: [String]
+
     @State private var showSheet = false
     @State private var newAlbum = ""
 
     init(album: Binding<String>, albumNames: [String], cameraProxy: TCameraProxy) {
         _album = album
         self.albumNames = [""] + albumNames
+        self.albumLabels = ["Default album"] + albumNames
         self.cameraProxy = cameraProxy
         
         logDebug("inited")
@@ -275,16 +277,9 @@ struct SelectAlbumView<TCameraProxy: TnCameraProxyProtocol>: View, TnLoggable {
     
     var body: some View {
         HStack() {
-//            tnPickerView(
-//                value: $album,
-//                values: albumNames,
-//                labels: albumNames,
-//                style: .wheel
-//            )
-            TextField("Album", text: $album)
-
+            tnPickerView(value: $album, values: albumNames, labels: albumLabels)
             Spacer()
-            tnCircleButton(imageName: "ellipsis", radius: 24) {
+            tnCircleButton(imageName: "plus", radius: 32) {
                 showSheet = true
             }
         }
