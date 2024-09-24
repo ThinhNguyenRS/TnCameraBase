@@ -15,6 +15,7 @@ public struct TnCameraAppView<TCameraManager: TnCameraProxyProtocol, TBottom: Vi
     @EnvironmentObject var cameraModel: TnCameraViewModel
     
     let preview = TnCameraPreviewViewMetal()
+    
     public init(_ type: TCameraManager.Type, @ViewBuilder bottom: @escaping () -> TBottom) {
         self.bottom = bottom
         logDebug("inited")

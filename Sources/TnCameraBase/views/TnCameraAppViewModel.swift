@@ -11,7 +11,7 @@ import TnIosBase
 
 public class TnCameraAppViewModel<TCameraManager: TnCameraProxyProtocol>: NSObject, ObservableObject, TnLoggable {    
     public let cameraManager: TCameraManager
-    public let cameraModel: TnCameraViewModel
+    @Published public var cameraModel: TnCameraViewModel
     @Published public var showToolbar: Bool = true
     let listenOrientation: Bool
     

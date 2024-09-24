@@ -10,6 +10,7 @@ import SwiftUI
 import TnIosBase
 
 public struct TnCameraToolbarMiscView<TCameraManager: TnCameraProxyProtocol>: View, TnCameraViewProtocol, TnLoggable {
+    @EnvironmentObject var appModel: TnCameraAppViewModel<TCameraManager>
     @EnvironmentObject public var cameraModel: TnCameraViewModel
     let cameraManager: TCameraManager
 
