@@ -153,9 +153,11 @@ extension TnCameraService {
         videoDeviceInput = deviceInput
         
         // listen videoZoomFactor
-        device.publisher(for: \.videoZoomFactor)
+        device.publisher(for: \.isRampingVideoZoom)
             .sink { [self] v in
-                settings.zoomFactor = device.videoZoomFactor / settings.zoomMainFactor
+                if !v {
+                    settings.zoomFactor = device.videoZoomFactor / settings.zoomMainFactor
+                }
             }
             .store(in: &cancellables)
 
