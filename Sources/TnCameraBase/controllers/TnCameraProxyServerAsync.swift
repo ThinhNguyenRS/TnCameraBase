@@ -352,12 +352,11 @@ extension TnCameraProxyServerAsync: TnNetworkDelegateServer {
     }
     
     public func tnNetwork(_ server: TnNetworkServer, accepted: TnNetworkConnectionServer) {
-        Task {
-            send(
-                .getAlbumsResponse,
-                albums
-            )
-        }
+        send(
+            .getAlbumsResponse,
+            albums
+        )
+        sendImage()
     }
     
     public func tnNetwork(_ server: TnNetworkServer, stopped: TnNetworkConnectionServer, error: (any Error)?) {
