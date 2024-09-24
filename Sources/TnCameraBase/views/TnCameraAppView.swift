@@ -46,8 +46,8 @@ extension TnCameraAppView: View {
                 if appModel.showToolbar {
                     VStack(alignment: .leading) {
                         Spacer()
-                        TnCameraToolbarMiscView(cameraModel: cameraModel, cameraManager: appModel.cameraManager)
-                        TnCameraToolbarMainView(cameraModel: cameraModel, cameraManager: appModel.cameraManager, bottom: bottom())
+                        toolbarMiscView
+                        toolbarMainView
                     }
                     .transition(.move(edge: .bottom))
                 }
