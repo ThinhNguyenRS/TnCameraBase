@@ -9,10 +9,15 @@ import Foundation
 import SwiftUI
 import TnIosBase
 
-public struct TnCameraToolbarMiscView<TCameraManager: TnCameraProxyProtocol>: View, TnCameraViewProtocol {
+public struct TnCameraToolbarMiscView<TCameraManager: TnCameraProxyProtocol>: View, TnCameraViewProtocol, TnLoggable {
     @EnvironmentObject public var cameraModel: TnCameraViewModel
     let cameraManager: TCameraManager
 
+    init(cameraManager: TCameraManager) {
+        self.cameraManager = cameraManager
+        logDebug("inited")
+    }
+    
     public var body: some View {
         Group {
             switch cameraModel.toolbarType {
@@ -251,7 +256,7 @@ struct ZoomView<TCameraManager: TnCameraProxyProtocol>: View {
     }
 }
 
-struct SelectAlbumView<TCameraManager: TnCameraProxyProtocol>: View {
+struct SelectAlbumView<TCameraManager: TnCameraProxyProtocol>: View, TnLoggable {
     let cameraManager: TCameraManager
     @Binding var album: String
     var albumNames: [String]
@@ -263,6 +268,8 @@ struct SelectAlbumView<TCameraManager: TnCameraProxyProtocol>: View {
         _album = album
         self.albumNames = [""] + albumNames
         self.cameraManager = cameraManager
+        
+        logDebug("inited")
     }
     
     var body: some View {
