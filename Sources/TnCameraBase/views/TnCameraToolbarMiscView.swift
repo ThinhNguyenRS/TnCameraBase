@@ -9,17 +9,16 @@ import Foundation
 import SwiftUI
 import TnIosBase
 
-public struct TnCameraToolbarMiscView<TCameraManager: TnCameraProxyProtocol>: View, TnCameraViewProtocol, TnLoggable {
-    @EnvironmentObject var appModel: TnCameraAppViewModel<TCameraManager>
-//    @EnvironmentObject public var cameraModel: TnCameraViewModel
+public struct TnCameraToolbarMiscView<TCameraProxy: TnCameraProxyProtocol>: View, TnCameraViewProtocol, TnLoggable {
+//    @EnvironmentObject var appModel: TnCameraAppViewModel<TCameraProxy>
     
     @ObservedObject public var cameraModel: TnCameraViewModel
         
-    let cameraManager: TCameraManager
+    let cameraProxy: TCameraProxy
 
-    init(cameraModel: TnCameraViewModel, cameraManager: TCameraManager) {
+    init(cameraModel: TnCameraViewModel, cameraProxy: TCameraProxy) {
         self.cameraModel = cameraModel
-        self.cameraManager = cameraManager
+        self.cameraProxy = cameraProxy
         logDebug("inited")
     }
     
@@ -27,7 +26,7 @@ public struct TnCameraToolbarMiscView<TCameraManager: TnCameraProxyProtocol>: Vi
         Group {
             switch cameraModel.toolbarType {
             case .zoom:
-                ZoomView(cameraManager: cameraManager, settings: $cameraModel.settings)
+                ZoomView(cameraProxy: cameraProxy, settings: $cameraModel.settings)
             case .misc:
                 miscView
             default:
@@ -49,7 +48,7 @@ extension TnCameraToolbarMiscView {
                     value: $cameraModel.settings.preset,
                     values: cameraModel.settings.presets,
                     onChanged: { v in
-                        cameraManager.setPreset(v)
+                        cameraProxy.setPreset(v)
                     }
                 )
                 
@@ -58,7 +57,7 @@ extension TnCameraToolbarMiscView {
                     value: $cameraModel.settings.cameraType,
                     values: cameraModel.settings.cameraTypes,
                     onChanged: { v in
-                        cameraManager.setCameraType(v)
+                        cameraProxy.setCameraType(v)
                     }
                 )
                 
@@ -66,18 +65,18 @@ extension TnCameraToolbarMiscView {
                     label: "Priority",
                     value: $cameraModel.settings.priority,
                     onChanged: { v in
-                        cameraManager.setPriority(v)
+                        cameraProxy.setPriority(v)
                     }
                 )
                 
                 TnToggleField(label: "Wide color", value: $cameraModel.settings.wideColor) { v in
-                    cameraManager.setWideColor(v)
+                    cameraProxy.setWideColor(v)
                 }
                 .toggleStyle(.switch)
 
                 if cameraModel.settings.livephotoSupported {
                     TnToggleField(label: "Live photo", value: $cameraModel.settings.livephoto) { v in
-                        cameraManager.setLivephoto(v)
+                        cameraProxy.setLivephoto(v)
                     }
                     .toggleStyle(.switch)
                 }
@@ -85,16 +84,16 @@ extension TnCameraToolbarMiscView {
             
             Section("Capturing") {
                 Stepper("Count: \(cameraModel.settings.capturing.count)", value: $cameraModel.settings.capturing.count, onEditingChanged: { _ in
-                    cameraManager.setCapturing(cameraModel.settings.capturing)
+                    cameraProxy.setCapturing(cameraModel.settings.capturing)
                 })
                 Stepper("Delay: \(cameraModel.settings.capturing.delay)s", value: $cameraModel.settings.capturing.delay, in: 0...10, onEditingChanged: { _ in
-                    cameraManager.setCapturing(cameraModel.settings.capturing)
+                    cameraProxy.setCapturing(cameraModel.settings.capturing)
                 })
                 
                 SelectAlbumView(
                     album: $cameraModel.settings.capturing.album,
-                    albumNames: cameraManager.albums,
-                    cameraManager: cameraManager
+                    albumNames: cameraProxy.albums,
+                    cameraProxy: cameraProxy
                 )
             }
             
@@ -105,7 +104,7 @@ extension TnCameraToolbarMiscView {
                         value: $cameraModel.settings.flashMode,
                         values: cameraModel.settings.flashModes,
                         onChanged: { v in
-                            cameraManager.setFlash(v)
+                            cameraProxy.setFlash(v)
                         }
                     )
                 }
@@ -115,7 +114,7 @@ extension TnCameraToolbarMiscView {
                         label: "HDR",
                         value: $cameraModel.settings.hdr,
                         onChanged: { v in
-                            cameraManager.setHDR(v)
+                            cameraProxy.setHDR(v)
                         }
                     )
 
@@ -129,7 +128,7 @@ extension TnCameraToolbarMiscView {
                         value: $cameraModel.settings.focusMode,
                         values: cameraModel.settings.focusModes,
                         onChanged: { v in
-                            cameraManager.setFocusMode(v)
+                            cameraProxy.setFocusMode(v)
                         }
                     )
                 }
@@ -139,7 +138,7 @@ extension TnCameraToolbarMiscView {
                     value: $cameraModel.settings.exposureMode,
                     values: cameraModel.settings.exposureModes,
                     onChanged: { v in
-                        cameraManager.setExposureMode(v)
+                        cameraProxy.setExposureMode(v)
                     }
                 )
                 
@@ -151,7 +150,7 @@ extension TnCameraToolbarMiscView {
                             bounds: cameraModel.settings.isoRange,
                             step: 50,
                             onChanged: { [self] v in
-                                cameraManager.setExposure(.init(iso: v))
+                                cameraProxy.setExposure(.init(iso: v))
                             },
                             formatter: getNumberFormatter("%.0f")
                         )
@@ -162,7 +161,7 @@ extension TnCameraToolbarMiscView {
                             bounds: cameraModel.settings.exposureDurationRange,
                             step: 0.001,
                             onChanged: { [self] v in
-                                cameraManager.setExposure(.init(duration: v))
+                                cameraProxy.setExposure(.init(duration: v))
                             },
                             formatter: getNumberFormatter("%.3f")
                         )
@@ -174,13 +173,13 @@ extension TnCameraToolbarMiscView {
             if cameraModel.settings.depthSupported {
                 Section("Virtual apecture") {
                     TnToggleField(label: "Embed depth data", value: $cameraModel.settings.depth) { v in
-                        cameraManager.setDepth(v)
+                        cameraProxy.setDepth(v)
                     }
                     .toggleStyle(.switch)
                     
                     if cameraModel.settings.portraitSupported {
                         TnToggleField(label: "Embed portrait data", value: $cameraModel.settings.portrait) { v in
-                            cameraManager.setPortrait(v)
+                            cameraProxy.setPortrait(v)
                         }
                         .toggleStyle(.switch)
                     }
@@ -194,7 +193,7 @@ extension TnCameraToolbarMiscView {
                     bounds: 0.02...0.40,
                     step: 0.01,
                     onChanged: { [self] v in
-                        cameraManager.setTransport(cameraModel.settings.transporting)
+                        cameraProxy.setTransport(cameraModel.settings.transporting)
                     },
                     formatter: getNumberPercentFormatter(),
                     adjustBounds: false
@@ -206,14 +205,14 @@ extension TnCameraToolbarMiscView {
                     bounds: 0.25...1,
                     step: 0.05,
                     onChanged: { [self] v in
-                        cameraManager.setTransport(cameraModel.settings.transporting)
+                        cameraProxy.setTransport(cameraModel.settings.transporting)
                     },
                     formatter: getNumberPercentFormatter(),
                     adjustBounds: false
                 )
 
                 TnToggleField(label: "Continuous", value: $cameraModel.settings.transporting.continuous) { v in
-                    cameraManager.setTransport(cameraModel.settings.transporting)
+                    cameraProxy.setTransport(cameraModel.settings.transporting)
                 }
                 .toggleStyle(.switch)
             }
@@ -221,8 +220,8 @@ extension TnCameraToolbarMiscView {
     }
 }
 
-struct ZoomView<TCameraManager: TnCameraProxyProtocol>: View {
-    let cameraManager: TCameraManager
+struct ZoomView<TCameraProxy: TnCameraProxyProtocol>: View {
+    let cameraProxy: TCameraProxy
     @Binding var settings: TnCameraSettings
     
     var body: some View {
@@ -233,27 +232,27 @@ struct ZoomView<TCameraManager: TnCameraProxyProtocol>: View {
             bounds: settings.zoomRange,
             step: step,
             onChanged: { v in
-                cameraManager.setZoomFactor(.init(value: v))
+                cameraProxy.setZoomFactor(.init(value: v))
             },
             formatter: getNumberFormatter("%.2f"),
             bottomView: {
                 HStack {
                     tnCircleButton(imageName: "chevron.backward", radius: 40) {
-                        cameraManager.setZoomFactor(.init(value: settings.zoomFactor - step))
+                        cameraProxy.setZoomFactor(.init(value: settings.zoomFactor - step))
                     }
                     
                     Spacer()
                     tnForEach(settings.zoomRelativeFactors) { idx, v in
                         Group {
                             tnCircleButton(text: v.toString("%0.1f"), radius: 36, backColor: settings.zoomFactor == v ? .orange : .gray) {
-                                cameraManager.setZoomFactor(.init(value: v))
+                                cameraProxy.setZoomFactor(.init(value: v))
                             }
                             Spacer()
                         }
                     }
 
                     tnCircleButton(imageName: "chevron.forward", radius: 40) {
-                        cameraManager.setZoomFactor(.init(value: settings.zoomFactor + step))
+                        cameraProxy.setZoomFactor(.init(value: settings.zoomFactor + step))
                     }
                 }
             }
@@ -261,18 +260,18 @@ struct ZoomView<TCameraManager: TnCameraProxyProtocol>: View {
     }
 }
 
-struct SelectAlbumView<TCameraManager: TnCameraProxyProtocol>: View, TnLoggable {
-    let cameraManager: TCameraManager
+struct SelectAlbumView<TCameraProxy: TnCameraProxyProtocol>: View, TnLoggable {
+    let cameraProxy: TCameraProxy
     @Binding var album: String
     var albumNames: [String]
     
     @State private var showSheet = false
     @State private var newAlbum = ""
 
-    init(album: Binding<String>, albumNames: [String], cameraManager: TCameraManager) {
+    init(album: Binding<String>, albumNames: [String], cameraProxy: TCameraProxy) {
         _album = album
         self.albumNames = [""] + albumNames
-        self.cameraManager = cameraManager
+        self.cameraProxy = cameraProxy
         
         logDebug("inited")
     }
@@ -300,7 +299,7 @@ struct SelectAlbumView<TCameraManager: TnCameraProxyProtocol>: View, TnLoggable 
                 HStack {
                     Spacer()
                     tnButton("Create") {
-                        cameraManager.createAlbum(newAlbum)
+                        cameraProxy.createAlbum(newAlbum)
                         album = newAlbum
                         showSheet = false
                     }

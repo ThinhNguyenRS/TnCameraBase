@@ -9,18 +9,18 @@ import Foundation
 import SwiftUI
 import TnIosBase
 
-public class TnCameraAppViewModel<TCameraManager: TnCameraProxyProtocol>: NSObject, ObservableObject, TnLoggable {    
-    public let cameraManager: TCameraManager
+public class TnCameraAppViewModel<TCameraProxy: TnCameraProxyProtocol>: NSObject, ObservableObject, TnLoggable {    
+    public let cameraProxy: TCameraProxy
     @Published public var cameraModel: TnCameraViewModel
     @Published public var showToolbar: Bool = true
     let listenOrientation: Bool
     
     public init(
-        cameraManager: TCameraManager,
+        cameraProxy: TCameraProxy,
         cameraModel: TnCameraViewModel,
         listenOrientation: Bool = true
     ) {
-        self.cameraManager = cameraManager
+        self.cameraProxy = cameraProxy
         self.cameraModel = cameraModel
         self.listenOrientation = listenOrientation
         super.init()
@@ -29,7 +29,7 @@ public class TnCameraAppViewModel<TCameraManager: TnCameraProxyProtocol>: NSObje
     }
     
     public func setup() {
-        cameraModel.listen(manager: cameraManager, withOrientation: listenOrientation)
-        cameraManager.setup()
+        cameraModel.listen(manager: cameraProxy, withOrientation: listenOrientation)
+        cameraProxy.setup()
     }
 }

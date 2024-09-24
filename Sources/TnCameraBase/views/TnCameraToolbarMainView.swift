@@ -10,14 +10,14 @@ import SwiftUI
 import Combine
 import TnIosBase
 
-public struct TnCameraToolbarMainView<TBottom: View, TCameraManager: TnCameraProxyProtocol>: View, TnCameraViewProtocol, TnLoggable {
+public struct TnCameraToolbarMainView<TBottom: View, TCameraProxy: TnCameraProxyProtocol>: View, TnCameraViewProtocol, TnLoggable {
     @ObservedObject public var cameraModel: TnCameraViewModel
-    let cameraManager: TCameraManager
+    let cameraProxy: TCameraProxy
     let bottom: TBottom?
     
-    init(cameraModel: TnCameraViewModel, cameraManager: TCameraManager, bottom: TBottom?) {
+    init(cameraModel: TnCameraViewModel, cameraProxy: TCameraProxy, bottom: TBottom?) {
         self.cameraModel = cameraModel
-        self.cameraManager = cameraManager
+        self.cameraProxy = cameraProxy
         self.bottom = bottom
         logDebug("inited")
     }
@@ -33,7 +33,7 @@ public struct TnCameraToolbarMainView<TBottom: View, TCameraManager: TnCameraPro
 
                 Spacer()
                 circleButtonRotation(imageName: cameraModel.settings.cameraPosition.imageName) {
-                    cameraManager.switchCamera()
+                    cameraProxy.switchCamera()
                 }
 
                 Spacer()
@@ -47,7 +47,7 @@ public struct TnCameraToolbarMainView<TBottom: View, TCameraManager: TnCameraPro
                 // capture
                 Spacer()
                 circleButtonRotation(imageName: "camera", radius: 90, backColor: .white, imageColor: .black) {
-                    cameraManager.captureImage()
+                    cameraProxy.captureImage()
                 }
 
                 // settings
