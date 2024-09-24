@@ -283,9 +283,9 @@ struct SelectAlbumView<TCameraProxy: TnCameraProxyProtocol>: View, TnLoggable {
                 style: .menu
             )
 
-            tnCircleButton(imageName: "plus") {
-                showSheet = true
-            }
+//            tnCircleButton(imageName: "plus") {
+//                showSheet = true
+//            }
         }
         .sheet(isPresented: $showSheet) {
             VStack {
