@@ -43,6 +43,7 @@ struct MiscView<TCameraProxy: TnCameraProxyProtocol>: View, TnLoggable {
     init(cameraProxy: TCameraProxy, settings: Binding<TnCameraSettings>) {
         self.cameraProxy = cameraProxy
         self._settings = settings
+        logDebug("inited")
     }
     
     var body: some View {
