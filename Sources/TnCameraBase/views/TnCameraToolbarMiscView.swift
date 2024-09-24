@@ -190,7 +190,7 @@ extension TnCameraToolbarMiscView {
                     bounds: 0.02...0.40,
                     step: 0.01,
                     onChanged: { [self] v in
-                        cameraProxy.setTransport(cameraModel.settings.transporting)
+                        cameraProxy.setTransporting(cameraModel.settings.transporting)
                     },
                     formatter: getNumberPercentFormatter(),
                     adjustBounds: false
@@ -202,14 +202,14 @@ extension TnCameraToolbarMiscView {
                     bounds: 0.25...1,
                     step: 0.05,
                     onChanged: { [self] v in
-                        cameraProxy.setTransport(cameraModel.settings.transporting)
+                        cameraProxy.setTransporting(cameraModel.settings.transporting)
                     },
                     formatter: getNumberPercentFormatter(),
                     adjustBounds: false
                 )
 
                 TnToggleField(label: "Continuous", value: $cameraModel.settings.transporting.continuous) { v in
-                    cameraProxy.setTransport(cameraModel.settings.transporting)
+                    cameraProxy.setTransporting(cameraModel.settings.transporting)
                 }
                 .toggleStyle(.switch)
             }

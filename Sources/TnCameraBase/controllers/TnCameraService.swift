@@ -99,7 +99,8 @@ extension TnCameraService {
             mainZoomFactor = virtualZoomFactors[wideIndex]
             relativeZoomFactors = virtualZoomFactors.map { $0/mainZoomFactor }
         }
-        relativeZoomFactors = relativeZoomFactors + [relativeZoomFactors.last!*2, relativeZoomFactors.last!*4]
+//        relativeZoomFactors = relativeZoomFactors + [relativeZoomFactors.last!*2, relativeZoomFactors.last!*4]
+        relativeZoomFactors = relativeZoomFactors + [relativeZoomFactors.last!*2]
 
         settings.zoomMainFactor = mainZoomFactor
         settings.zoomRelativeFactors = relativeZoomFactors

@@ -43,7 +43,7 @@ public protocol TnCameraProtocol {
     func setFocusMode(_ v: AVCaptureDevice.FocusMode)
     func setWideColor(_ v: Bool)
     
-    func setTransport(_ v: TnCameraTransportingValue)
+    func setTransporting(_ v: TnCameraTransportingValue)
     func setCapturing(_ v: TnCameraCapturingValue)
     func createAlbum(_ v: String)
 }

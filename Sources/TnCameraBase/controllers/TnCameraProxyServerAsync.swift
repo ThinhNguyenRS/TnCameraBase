@@ -119,7 +119,7 @@ extension TnCameraProxyServerAsync {
 
         case .setTransporting:
             solveMsgValue(receivedMsg) { (v: TnCameraTransportingValue) in
-                setTransport(v)
+                setTransporting(v)
             }
             
         case .getAlbums:
@@ -320,7 +320,7 @@ extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
         }
     }
     
-    public func setTransport(_ v: TnCameraTransportingValue) {
+    public func setTransporting(_ v: TnCameraTransportingValue) {
         Task {
             await cameraService.setTransport(v)
         }
