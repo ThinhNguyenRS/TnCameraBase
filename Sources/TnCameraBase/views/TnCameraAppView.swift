@@ -12,7 +12,7 @@ import TnIosBase
 public struct TnCameraAppView<TCameraManager: TnCameraProxyProtocol, TBottom: View>: TnLoggable {
     @ViewBuilder var bottom: () -> TBottom
     @EnvironmentObject var appModel: TnCameraAppViewModel<TCameraManager>
-    @EnvironmentObject var cameraModel: TnCameraViewModel
+//    @EnvironmentObject var cameraModel: TnCameraViewModel
     
     let preview = TnCameraPreviewViewMetal()
     
@@ -25,7 +25,7 @@ public struct TnCameraAppView<TCameraManager: TnCameraProxyProtocol, TBottom: Vi
 extension TnCameraAppView: View {
     public var body: some View {
         ZStack {
-            if cameraModel.status == .started {
+            if appModel.cameraModel.status == .started {
                 // preview
                 preview
                     .onTapGesture {
@@ -38,7 +38,7 @@ extension TnCameraAppView: View {
                 if appModel.showToolbar {
                     VStack(alignment: .leading) {
                         Spacer()
-                        TnCameraToolbarMiscView(cameraManager: appModel.cameraManager)
+                        TnCameraToolbarMiscView(cameraModel: appModel.cameraModel, cameraManager: appModel.cameraManager)
                         TnCameraToolbarMainView(cameraManager: appModel.cameraManager, bottom: bottom())
                     }
                     .transition(.move(edge: .bottom))

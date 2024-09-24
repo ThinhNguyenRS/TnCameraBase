@@ -11,10 +11,14 @@ import TnIosBase
 
 public struct TnCameraToolbarMiscView<TCameraManager: TnCameraProxyProtocol>: View, TnCameraViewProtocol, TnLoggable {
     @EnvironmentObject var appModel: TnCameraAppViewModel<TCameraManager>
-    @EnvironmentObject public var cameraModel: TnCameraViewModel
+//    @EnvironmentObject public var cameraModel: TnCameraViewModel
+    
+    @ObservedObject public var cameraModel: TnCameraViewModel
+        
     let cameraManager: TCameraManager
 
-    init(cameraManager: TCameraManager) {
+    init(cameraModel: TnCameraViewModel, cameraManager: TCameraManager) {
+        self.cameraModel = cameraModel
         self.cameraManager = cameraManager
         logDebug("inited")
     }
