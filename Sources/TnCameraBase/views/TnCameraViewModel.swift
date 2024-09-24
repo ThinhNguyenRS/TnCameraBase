@@ -45,7 +45,7 @@ public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {
                 }
 
             await manager.settingsPublisher
-                .onReceive(cancelables: &cancelables) { [self] v in
+                .onReceive(debounceMs: 500, cancelables: &cancelables) { [self] v in
                     withAnimation {
                         settings = v
                         logDebug("settings changed")
