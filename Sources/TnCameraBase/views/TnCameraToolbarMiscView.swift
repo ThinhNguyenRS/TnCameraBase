@@ -10,10 +10,7 @@ import SwiftUI
 import TnIosBase
 
 public struct TnCameraToolbarMiscView<TCameraProxy: TnCameraProxyProtocol>: View, TnCameraViewProtocol, TnLoggable {
-//    @EnvironmentObject var appModel: TnCameraAppViewModel<TCameraProxy>
-    
     @ObservedObject public var cameraModel: TnCameraViewModel
-        
     let cameraProxy: TCameraProxy
 
     init(cameraModel: TnCameraViewModel, cameraProxy: TCameraProxy) {
@@ -144,7 +141,7 @@ extension TnCameraToolbarMiscView {
                 
                 if cameraModel.settings.exposureMode == .custom {
                     VStack {
-                        getSliderView(
+                        tnSliderViewVert(
                             value: $cameraModel.settings.iso,
                             label: "ISO",
                             bounds: cameraModel.settings.isoRange,
@@ -155,7 +152,7 @@ extension TnCameraToolbarMiscView {
                             formatter: getNumberFormatter("%.0f")
                         )
                         
-                        getSliderView(
+                        tnSliderViewVert(
                             value: $cameraModel.settings.exposureDuration,
                             label: "Shutter speed",
                             bounds: cameraModel.settings.exposureDurationRange,
@@ -187,7 +184,7 @@ extension TnCameraToolbarMiscView {
             }
 
             Section("Image Mirroring") {
-                getSliderView(
+                tnSliderViewVert(
                     value: $cameraModel.settings.transporting.scale,
                     label: "Scale",
                     bounds: 0.02...0.40,
@@ -199,7 +196,7 @@ extension TnCameraToolbarMiscView {
                     adjustBounds: false
                 )
 
-                getSliderView(
+                tnSliderViewVert(
                     value: $cameraModel.settings.transporting.compressQuality,
                     label: "Compress quality",
                     bounds: 0.25...1,
@@ -226,7 +223,7 @@ struct ZoomView<TCameraProxy: TnCameraProxyProtocol>: View {
     
     var body: some View {
         let step = 0.1/2
-        return getSliderView(
+        return tnSliderViewVert(
             value: $settings.zoomFactor,
             label: "Zoom",
             bounds: settings.zoomRange,
