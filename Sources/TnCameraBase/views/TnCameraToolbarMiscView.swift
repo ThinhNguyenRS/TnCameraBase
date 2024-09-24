@@ -14,14 +14,14 @@ public struct TnCameraToolbarMiscView<TCameraProxy: TnCameraProxyProtocol>: View
     let cameraProxy: TCameraProxy
     
     
-    private let zoomView: ZoomView<TCameraProxy>
-    private let miscView: MiscView<TCameraProxy>
+//    private let zoomView: ZoomView<TCameraProxy>
+//    private let miscView: MiscView<TCameraProxy>
 
     init(cameraModel: TnCameraViewModel, cameraProxy: TCameraProxy) {
         self.cameraModel = cameraModel
         self.cameraProxy = cameraProxy
-        self.zoomView = ZoomView(cameraProxy: cameraProxy, cameraModel: cameraModel)
-        self.miscView = MiscView(cameraProxy: cameraProxy, cameraModel: cameraModel)
+//        self.zoomView = ZoomView(cameraProxy: cameraProxy, cameraModel: cameraModel)
+//        self.miscView = MiscView(cameraProxy: cameraProxy, cameraModel: cameraModel)
         logDebug("inited")
     }
     
@@ -29,9 +29,11 @@ public struct TnCameraToolbarMiscView<TCameraProxy: TnCameraProxyProtocol>: View
         Group {
             switch cameraModel.toolbarType {
             case .zoom:
-                zoomView
+//                zoomView
+                ZoomView(cameraProxy: cameraProxy, cameraModel: cameraModel)
             case .misc:
-                miscView
+//                miscView
+                MiscView(cameraProxy: cameraProxy, cameraModel: cameraModel)
             default:
                 EmptyView()
             }
