@@ -43,7 +43,7 @@ extension TnCameraAppView: View {
                 VStack(alignment: .leading) {
                     Spacer()
                     TnCameraToolbarMiscView(cameraModel: appModel.cameraModel, cameraManager: appModel.cameraManager)
-                    TnCameraToolbarMainView(cameraManager: appModel.cameraManager, bottom: bottom())
+                    TnCameraToolbarMainView(cameraModel: appModel.cameraModel, cameraManager: appModel.cameraManager, bottom: bottom())
                 }
                 .transition(.move(edge: .bottom))
             }

@@ -10,10 +10,15 @@ import SwiftUI
 import Combine
 
 public struct TnCameraToolbarMainView<TBottom: View, TCameraManager: TnCameraProxyProtocol>: View, TnCameraViewProtocol {
-    @EnvironmentObject public var cameraModel: TnCameraViewModel
+    @ObservedObject public var cameraModel: TnCameraViewModel
     let cameraManager: TCameraManager
-
     let bottom: TBottom?
+    
+    init(cameraModel: TnCameraViewModel, cameraManager: TCameraManager, bottom: TBottom?) {
+        self.cameraModel = cameraModel
+        self.cameraManager = cameraManager
+        self.bottom = bottom
+    }
 
     public var body: some View {
         HStack {
