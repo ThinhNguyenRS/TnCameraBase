@@ -275,12 +275,13 @@ struct SelectAlbumView<TCameraProxy: TnCameraProxyProtocol>: View, TnLoggable {
     
     var body: some View {
         HStack() {
-            tnPickerView(
-                value: $album,
-                values: albumNames,
-                labels: albumNames,
-                style: .wheel
-            )
+//            tnPickerView(
+//                value: $album,
+//                values: albumNames,
+//                labels: albumNames,
+//                style: .wheel
+//            )            
+            TextField("Album", text: $album)
 
             Spacer()
             tnCircleButton(imageName: "ellipsis") {
