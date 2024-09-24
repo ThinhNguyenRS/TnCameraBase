@@ -12,14 +12,14 @@ public struct TnCameraAppViewModelFactory {
     private init() {}
     
     struct ServerDelegate: TnCameraViewModelDelegate {
-        let cameraManager: TnCameraProxyProtocol
+        let cameraProxy: TnCameraProxyServerAsync
         
         func onChanged(settings: TnCameraBase.TnCameraSettings, status: TnCameraBase.TnCameraStatus) {
-            cameraManager.send(
+            cameraProxy.send(
                 .getSettingsResponse,
                 TnCameraSettingsValue(settings: settings, status: status)
             )
-//            cameraManager.sendImage()
+            cameraProxy.sendImage()
         }
         
         func onVolumeButton() {
@@ -36,30 +36,12 @@ public struct TnCameraAppViewModelFactory {
         }
     }
     
-//    public static func createServerModel(delegate: TnCameraViewModelDelegate? = nil, EOM: String? = nil, MTU: Int? = nil) -> TnCameraAppViewModel<TnCameraProxyServer> {
-//        let appModel: TnCameraAppViewModel = .init(
-//            cameraManager: TnCameraProxyServer(TnCameraLocal.shared, networkInfo: TnCameraProxyServiceInfo.getInstance(EOM: EOM, MTU: MTU)),
-//            cameraModel: TnCameraViewModel()
-//        )
-//        appModel.cameraModel.delegate = delegate ?? ServerDelegate(cameraManager: appModel.cameraManager)
-//        appModel.cameraManager.bleDelegate = appModel.cameraManager
-//        appModel.cameraManager.captureCompletion = { capturedImage in
-//            DispatchQueue.main.async {
-//                withAnimation {
-//                    appModel.cameraModel.capturedImage = capturedImage
-//                }
-//                appModel.cameraManager.sendImage()
-//            }
-//        }
-//        return appModel
-//    }
-    
     public static func createServerAsyncModel(delegate: TnCameraViewModelDelegate? = nil, EOM: String? = nil, MTU: Int? = nil) -> TnCameraAppViewModel<TnCameraProxyServerAsync> {
         let appModel: TnCameraAppViewModel = .init(
             cameraProxy: TnCameraProxyServerAsync(TnCameraService.shared, networkInfo: TnCameraProxyServiceInfo.getInstance(EOM: EOM, MTU: MTU)),
             cameraModel: TnCameraViewModel()
         )
-        appModel.cameraModel.delegate = delegate ?? ServerDelegate(cameraManager: appModel.cameraProxy)
+        appModel.cameraModel.delegate = delegate ?? ServerDelegate(cameraProxy: appModel.cameraProxy)
         appModel.cameraProxy.bleDelegate = appModel.cameraProxy
         appModel.cameraProxy.captureCompletion = { output in
             let uiImage = UIImage(data: output.photoData)

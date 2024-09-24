@@ -73,6 +73,12 @@ extension TnCameraProxyServerAsync {
                     useBle: true
                 )
             }
+            Task {
+                send(
+                    .getAlbumsResponse,
+                    albums
+                )
+            }
 
         case .getImage:
             sendImage()

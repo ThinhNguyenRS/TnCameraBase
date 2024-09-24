@@ -283,7 +283,7 @@ struct SelectAlbumView<TCameraProxy: TnCameraProxyProtocol>: View, TnLoggable {
                 style: .menu
             )
 
-            tnButton("New ...") {
+            tnCircleButton(imageName: "plus") {
                 showSheet = true
             }
         }
