@@ -280,7 +280,7 @@ struct SelectAlbumView<TCameraProxy: TnCameraProxyProtocol>: View, TnLoggable {
                 value: $album,
                 values: albumNames,
                 labels: albumNames,
-                style: .menu
+                style: .wheel
             )
 
 //            tnCircleButton(imageName: "plus") {
