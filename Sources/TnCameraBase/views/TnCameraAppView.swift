@@ -11,12 +11,17 @@ import TnIosBase
 
 public struct TnCameraAppView<TCameraManager: TnCameraProxyProtocol, TBottom: View>: TnLoggable {
     @ViewBuilder var bottom: () -> TBottom
-    @EnvironmentObject var appModel: TnCameraAppViewModel<TCameraManager>
+//    @EnvironmentObject var appModel: TnCameraAppViewModel<TCameraManager>
+    
+    @ObservedObject var appModel: TnCameraAppViewModel<TCameraManager>
+
 //    @EnvironmentObject var cameraModel: TnCameraViewModel
+//    @ObservedObject var cameraModel: TnCameraViewModel
     
     let preview = TnCameraPreviewViewMetal()
     
-    public init(_ type: TCameraManager.Type, @ViewBuilder bottom: @escaping () -> TBottom) {
+    public init(appModel: TnCameraAppViewModel<TCameraManager>, @ViewBuilder bottom: @escaping () -> TBottom) {
+        self.appModel = appModel
         self.bottom = bottom
         logDebug("inited")
     }
