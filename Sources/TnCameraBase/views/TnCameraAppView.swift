@@ -30,25 +30,42 @@ public struct TnCameraAppView<TCameraManager: TnCameraProxyProtocol, TBottom: Vi
 extension TnCameraAppView: View {
     public var body: some View {
         ZStack {
-            if appModel.cameraModel.status == .started {
-                // preview
-                preview
-                    .onTapGesture {
-                        withAnimation {
-                            appModel.showToolbar.toggle()
-                        }
+            // preview
+            preview
+                .onTapGesture {
+                    withAnimation {
+                        appModel.showToolbar.toggle()
                     }
-
-                // bottom toolbar
-                if appModel.showToolbar {
-                    VStack(alignment: .leading) {
-                        Spacer()
-                        TnCameraToolbarMiscView(cameraModel: appModel.cameraModel, cameraManager: appModel.cameraManager)
-                        TnCameraToolbarMainView(cameraManager: appModel.cameraManager, bottom: bottom())
-                    }
-                    .transition(.move(edge: .bottom))
                 }
+
+            // bottom toolbar
+            if appModel.showToolbar {
+                VStack(alignment: .leading) {
+                    Spacer()
+                    TnCameraToolbarMiscView(cameraModel: appModel.cameraModel, cameraManager: appModel.cameraManager)
+                    TnCameraToolbarMainView(cameraManager: appModel.cameraManager, bottom: bottom())
+                }
+                .transition(.move(edge: .bottom))
             }
+//            if appModel.cameraModel.status == .started {
+//                // preview
+//                preview
+//                    .onTapGesture {
+//                        withAnimation {
+//                            appModel.showToolbar.toggle()
+//                        }
+//                    }
+//
+//                // bottom toolbar
+//                if appModel.showToolbar {
+//                    VStack(alignment: .leading) {
+//                        Spacer()
+//                        TnCameraToolbarMiscView(cameraModel: appModel.cameraModel, cameraManager: appModel.cameraManager)
+//                        TnCameraToolbarMainView(cameraManager: appModel.cameraManager, bottom: bottom())
+//                    }
+//                    .transition(.move(edge: .bottom))
+//                }
+//            }
         }
         .onAppear {
             preview.setImagePublisher(imagePublisher: { await appModel.cameraManager.currentCiImagePublisher })
