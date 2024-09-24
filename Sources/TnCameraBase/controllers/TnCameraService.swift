@@ -18,11 +18,16 @@ public actor TnCameraService: NSObject, TnLoggable {
 
     typealias DoDeviceHandler = (AVCaptureDeviceInput, AVCaptureDevice) throws -> Void
     
-    @Published public var settings: TnCameraSettings = .init()
-    @Published public var status: TnCameraStatus = .none
+//    @Published public var settings: TnCameraSettings = .init()
+//    @Published public var status: TnCameraStatus = .none
+
+    public var settings: TnCameraSettings = .init()
+    public var status: TnCameraStatus = .none
     @Published public var currentCiImage: CIImage?
-    @Published private(set) var isSettingsChanging = false
     
+    @Published private(set) var isSettingsChanging = false
+    @Published private(set) var isStatusChanging = false
+
     private let session = AVCaptureSession()
     
     private var videoDeviceInput: AVCaptureDeviceInput?
@@ -227,6 +232,8 @@ extension TnCameraService {
         
         self.logDebug("setup session", name, "...")
         
+        isStatusChanging = true
+        
         // stop capturing if reset
         if reset {
             session.stopRunning()
@@ -242,6 +249,7 @@ extension TnCameraService {
                 status = .started
             }
             fetchSettings()
+            isStatusChanging = false
             self.logDebug("setup session", name, "!")
         }
         
@@ -324,15 +332,19 @@ extension TnCameraService {
         guard await isAuthorized, !session.isRunning else { return }
         try setupSession(name: "startCapturing", reset: false)
         
+        isStatusChanging = true
         session.startRunning()
         status = .started
+        isStatusChanging = false
     }
     
     public func stopCapturing() {
         guard session.isRunning else { return }
         
+        isStatusChanging = true
         session.stopRunning()
         status = .inited
+        isStatusChanging = false
     }
     
     public func toggleCapturing() async throws {

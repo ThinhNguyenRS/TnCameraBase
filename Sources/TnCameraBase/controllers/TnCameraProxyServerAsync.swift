@@ -18,6 +18,7 @@ public class TnCameraProxyServerAsync: TnLoggable {
     private let ble: TnBluetoothServer
     
     @Published public private(set) var settings: TnCameraSettings = .init()
+    @Published public private(set) var status: TnCameraStatus = .none
     @Published public private(set) var albums: [String] = []
 
     public init(_ cameraService: TnCameraService, networkInfo: TnNetworkServiceInfo) {
@@ -36,6 +37,16 @@ public class TnCameraProxyServerAsync: TnLoggable {
                 if !v {
                     Task {
                         self.settings = await cameraService.settings
+                    }
+                }
+            }.store(in: &cameraCancellables)
+
+            await cameraService.$isStatusChanging.sink { v in
+                if !v {
+                    Task {
+                        if await self.status != cameraService.status {
+                            self.status = await cameraService.status
+                        }
                     }
                 }
             }.store(in: &cameraCancellables)
@@ -201,9 +212,7 @@ extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
     }
     
     public var statusPublisher: Published<TnCameraStatus>.Publisher {
-        get async {
-            await cameraService.$status
-        }
+        $status
     }
     
     public func startCapturing() {
