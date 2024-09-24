@@ -15,11 +15,17 @@ public struct TnCameraAppView<TCameraManager: TnCameraProxyProtocol, TBottom: Vi
     @ObservedObject var cameraModel: TnCameraViewModel
 
     let preview = TnCameraPreviewViewMetal()
-    
+
+    let toolbarMainView: TnCameraToolbarMainView<TBottom, TCameraManager>
+    let toolbarMiscView: TnCameraToolbarMiscView<TCameraManager>
+
     public init(appModel: TnCameraAppViewModel<TCameraManager>, @ViewBuilder bottom: @escaping () -> TBottom) {
         self.appModel = appModel
         self.cameraModel = appModel.cameraModel
         self.bottom = bottom
+
+        self.toolbarMiscView = TnCameraToolbarMiscView(cameraModel: appModel.cameraModel, cameraManager: appModel.cameraManager)
+        self.toolbarMainView = TnCameraToolbarMainView(cameraModel: appModel.cameraModel, cameraManager: appModel.cameraManager, bottom: bottom())
         logDebug("inited")
     }
 }
@@ -27,24 +33,6 @@ public struct TnCameraAppView<TCameraManager: TnCameraProxyProtocol, TBottom: Vi
 extension TnCameraAppView: View {
     public var body: some View {
         ZStack {
-//            // preview
-//            preview
-//                .onTapGesture {
-//                    withAnimation {
-//                        appModel.showToolbar.toggle()
-//                    }
-//                }
-//
-//            // bottom toolbar
-//            if appModel.showToolbar {
-//                VStack(alignment: .leading) {
-//                    Spacer()
-//                    TnCameraToolbarMiscView(cameraModel: appModel.cameraModel, cameraManager: appModel.cameraManager)
-//                    TnCameraToolbarMainView(cameraModel: appModel.cameraModel, cameraManager: appModel.cameraManager, bottom: bottom())
-//                }
-//                .transition(.move(edge: .bottom))
-//            }
-            
             if cameraModel.status == .started {
                 // preview
                 preview

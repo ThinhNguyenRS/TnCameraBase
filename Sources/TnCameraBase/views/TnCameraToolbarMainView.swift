@@ -8,8 +8,9 @@
 import Foundation
 import SwiftUI
 import Combine
+import TnIosBase
 
-public struct TnCameraToolbarMainView<TBottom: View, TCameraManager: TnCameraProxyProtocol>: View, TnCameraViewProtocol {
+public struct TnCameraToolbarMainView<TBottom: View, TCameraManager: TnCameraProxyProtocol>: View, TnCameraViewProtocol, TnLoggable {
     @ObservedObject public var cameraModel: TnCameraViewModel
     let cameraManager: TCameraManager
     let bottom: TBottom?
@@ -18,6 +19,7 @@ public struct TnCameraToolbarMainView<TBottom: View, TCameraManager: TnCameraPro
         self.cameraModel = cameraModel
         self.cameraManager = cameraManager
         self.bottom = bottom
+        logDebug("inited")
     }
 
     public var body: some View {
