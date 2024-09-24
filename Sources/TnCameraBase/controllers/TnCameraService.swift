@@ -353,9 +353,10 @@ extension TnCameraService {
     public func setLivephoto(_ v: Bool) throws {
         guard settings.livephotoSupported && settings.livephoto != v else { return }
         
-        try configSession(name: "setLivephoto", sessionLock: true) { [self] _, _ in
-            photoOutput.isLivePhotoCaptureEnabled = photoOutput.isLivePhotoCaptureSupported && v
-        }
+        settings.livephoto = v
+//        try configSession(name: "setLivephoto", sessionLock: true) { [self] _, _ in
+//            photoOutput.isLivePhotoCaptureEnabled = photoOutput.isLivePhotoCaptureSupported && v
+//        }
     }
     
     public func setPreset(_ v: AVCaptureSession.Preset) throws {
