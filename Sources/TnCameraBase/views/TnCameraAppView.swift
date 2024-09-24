@@ -49,7 +49,8 @@ extension TnCameraAppView: View {
                         toolbarMiscView
                         toolbarMainView
                     }
-                    .transition(.move(edge: .bottom))
+                    .transition(.moveAndFade)
+                    .animation(.bouncy, value: appModel.showToolbar)
                 }
             }
             
