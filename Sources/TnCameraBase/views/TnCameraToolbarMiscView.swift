@@ -271,8 +271,9 @@ struct SelectAlbumView<TCameraManager: TnCameraProxyProtocol>: View {
                 label: "Album",
                 value: $album,
                 values: albumNames,
-                labels: albumNames
-            ).pickerStyle(MenuPickerStyle())
+                labels: albumNames,
+                style: .menu
+            )
 
             tnButton("New ...") {
                 showSheet = true
