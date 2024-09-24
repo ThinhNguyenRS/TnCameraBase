@@ -277,7 +277,14 @@ struct SelectAlbumView<TCameraProxy: TnCameraProxyProtocol>: View, TnLoggable {
     
     var body: some View {
         HStack() {
-            tnPickerView(value: $album, values: albumNames, labels: albumLabels)
+            tnPickerView(
+                value: $album,
+                values: albumNames,
+                labels: albumLabels,
+                onChanged: { _ in                
+                },
+                style: .menu
+            )
             Spacer()
             tnCircleButton(imageName: "plus", radius: 32) {
                 showSheet = true
