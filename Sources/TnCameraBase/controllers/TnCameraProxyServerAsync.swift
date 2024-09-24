@@ -73,12 +73,6 @@ extension TnCameraProxyServerAsync {
                     useBle: true
                 )
             }
-            Task {
-                send(
-                    .getAlbumsResponse,
-                    albums
-                )
-            }
 
         case .getImage:
             sendImage()
@@ -358,6 +352,12 @@ extension TnCameraProxyServerAsync: TnNetworkDelegateServer {
     }
     
     public func tnNetwork(_ server: TnNetworkServer, accepted: TnNetworkConnectionServer) {
+        Task {
+            send(
+                .getAlbumsResponse,
+                albums
+            )
+        }
     }
     
     public func tnNetwork(_ server: TnNetworkServer, stopped: TnNetworkConnectionServer, error: (any Error)?) {
