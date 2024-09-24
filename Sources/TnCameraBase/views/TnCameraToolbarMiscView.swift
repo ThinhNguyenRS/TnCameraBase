@@ -34,7 +34,7 @@ extension TnCameraToolbarMiscView {
     var miscView: some View {
         List {
             Section("Camera Type") {
-                TnPickerField.forEnum(
+                tnPickerViewVert(
                     label: "Preset",
                     value: $cameraModel.settings.preset,
                     values: cameraModel.settings.presets,
@@ -43,7 +43,7 @@ extension TnCameraToolbarMiscView {
                     }
                 )
                 
-                TnPickerField.forEnum(
+                tnPickerViewVert(
                     label: "Type",
                     value: $cameraModel.settings.cameraType,
                     values: cameraModel.settings.cameraTypes,
@@ -52,9 +52,13 @@ extension TnCameraToolbarMiscView {
                     }
                 )
                 
-                TnPickerField.forEnum(label: "Priority", value: $cameraModel.settings.priority, onChanged: { v in
-                    cameraManager.setPriority(v)
-                })
+                tnPickerViewVert(
+                    label: "Priority",
+                    value: $cameraModel.settings.priority,
+                    onChanged: { v in
+                        cameraManager.setPriority(v)
+                    }
+                )
                 
                 TnToggleField(label: "Wide color", value: $cameraModel.settings.wideColor) { v in
                     cameraManager.setWideColor(v)
@@ -86,7 +90,7 @@ extension TnCameraToolbarMiscView {
             
             Section("Light") {
                 if cameraModel.settings.flashSupported {
-                    TnPickerField.forEnum(
+                    tnPickerViewVert(
                         label: "Flash",
                         value: $cameraModel.settings.flashMode,
                         values: cameraModel.settings.flashModes,
@@ -97,7 +101,7 @@ extension TnCameraToolbarMiscView {
                 }
                 
                 if cameraModel.settings.hdrSupported {
-                    TnPickerField.forEnum(
+                    tnPickerViewVert(
                         label: "HDR",
                         value: $cameraModel.settings.hdr,
                         onChanged: { v in
@@ -110,7 +114,7 @@ extension TnCameraToolbarMiscView {
             
             Section("Exposure & Focus") {
                 if !cameraModel.settings.focusModes.isEmpty {
-                    TnPickerField.forEnum(
+                    tnPickerViewVert(
                         label: "Focus mode",
                         value: $cameraModel.settings.focusMode,
                         values: cameraModel.settings.focusModes,
@@ -120,7 +124,7 @@ extension TnCameraToolbarMiscView {
                     )
                 }
 
-                TnPickerField.forEnum(
+                tnPickerViewVert(
                     label: "Exposure mode",
                     value: $cameraModel.settings.exposureMode,
                     values: cameraModel.settings.exposureModes,
@@ -263,11 +267,12 @@ struct SelectAlbumView<TCameraManager: TnCameraProxyProtocol>: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            tnPickerFieldStringMenu(
+            tnPickerViewHorz(
                 label: "Album",
                 value: $album,
+                values: albumNames,
                 labels: albumNames
-            )
+            ).pickerStyle(MenuPickerStyle())
 
             tnButton("New ...") {
                 showSheet = true
