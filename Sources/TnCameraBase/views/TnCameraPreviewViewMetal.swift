@@ -105,6 +105,7 @@ public struct TnCameraPreviewViewMetal: TnLoggable {
     let internalView: InternalView = InternalView(device: MTLCreateSystemDefaultDevice()!)
     
     public init() {
+        logDebug("inited")
     }
     
     public init(imagePublisher: Published<CIImage?>.Publisher) {
@@ -116,7 +117,7 @@ public struct TnCameraPreviewViewMetal: TnLoggable {
     public func setImagePublisher(imagePublisher: @escaping () async -> Published<CIImage?>.Publisher) -> Self {
         Task { /*@MainActor in*/
             await internalView.setImagePublisher(imagePublisher: await imagePublisher().eraseToAnyPublisher())
-            logDebug("inited")
+            logDebug("listen image ...")
         }
         return self
     }
