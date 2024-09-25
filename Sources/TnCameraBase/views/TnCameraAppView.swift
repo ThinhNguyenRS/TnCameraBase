@@ -11,12 +11,18 @@ import TnIosBase
 
 public struct TnCameraAppView<TBottom: View>: TnLoggable {
     @ViewBuilder var bottom: () -> TBottom
-    @ObservedObject var cameraModel: TnCameraViewModel
-
+    //    @ObservedObject var cameraModel: TnCameraViewModel
+    @EnvironmentObject var cameraModel: TnCameraViewModel
+    
     let preview = TnCameraPreviewViewMetal()
-
-    public init(cameraModel: TnCameraViewModel, @ViewBuilder bottom: @escaping () -> TBottom) {
-        self.cameraModel = cameraModel
+    
+//    public init(cameraModel: TnCameraViewModel, @ViewBuilder bottom: @escaping () -> TBottom) {
+//        self.cameraModel = cameraModel
+//        self.bottom = bottom
+//        logDebug("inited")
+//    }
+    
+    public init(@ViewBuilder bottom: @escaping () -> TBottom) {
         self.bottom = bottom
         logDebug("inited")
     }
@@ -37,7 +43,7 @@ extension TnCameraAppView: View {
                 }
 
             // bottom toolbar
-            TnCameraToolbarView(cameraModel: cameraModel, bottom: bottom)
+            TnCameraToolbarView(bottom: bottom)
         }
         .onAppear {
             cameraModel.setup()
@@ -46,11 +52,10 @@ extension TnCameraAppView: View {
 }
 
 struct TnCameraToolbarView<TBottom: View>: View, TnLoggable {
-    @ObservedObject var cameraModel: TnCameraViewModel
+    @EnvironmentObject var cameraModel: TnCameraViewModel
     @ViewBuilder var bottom: () -> TBottom
 
-    init(cameraModel: TnCameraViewModel, bottom: @escaping () -> TBottom) {
-        self.cameraModel = cameraModel
+    init(bottom: @escaping () -> TBottom) {
         self.bottom = bottom
         logDebug("inited")
     }
@@ -60,8 +65,8 @@ struct TnCameraToolbarView<TBottom: View>: View, TnLoggable {
         if cameraModel.showToolbar {
             VStack(alignment: .leading) {
                 Spacer()
-                TnCameraToolbarMiscView(cameraModel: cameraModel, cameraProxy: cameraModel.cameraProxy)
-                TnCameraToolbarMainView(cameraModel: cameraModel, cameraProxy: cameraModel.cameraProxy, bottom: bottom())
+                TnCameraToolbarMiscView(cameraProxy: cameraModel.cameraProxy)
+                TnCameraToolbarMainView(cameraProxy: cameraModel.cameraProxy, bottom: bottom())
             }
         }
     }

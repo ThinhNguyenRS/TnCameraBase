@@ -9,19 +9,12 @@ import Foundation
 import SwiftUI
 import TnIosBase
 
-public struct TnCameraToolbarMiscView: View, TnCameraViewProtocol, TnLoggable {
-    @ObservedObject public var cameraModel: TnCameraViewModel
+public struct TnCameraToolbarMiscView: View, TnLoggable {
+    @EnvironmentObject var cameraModel: TnCameraViewModel
     let cameraProxy: TnCameraProxyProtocol
     
-    
-//    private let zoomView: ZoomView<TCameraProxy>
-//    private let miscView: MiscView<TCameraProxy>
-
-    init(cameraModel: TnCameraViewModel, cameraProxy: TnCameraProxyProtocol) {
-        self.cameraModel = cameraModel
+    init(cameraProxy: TnCameraProxyProtocol) {
         self.cameraProxy = cameraProxy
-//        self.zoomView = ZoomView(cameraProxy: cameraProxy, cameraModel: cameraModel)
-//        self.miscView = MiscView(cameraProxy: cameraProxy, cameraModel: cameraModel)
         logDebug("inited")
     }
     
@@ -30,10 +23,10 @@ public struct TnCameraToolbarMiscView: View, TnCameraViewProtocol, TnLoggable {
             switch cameraModel.toolbarType {
             case .zoom:
 //                zoomView
-                ZoomView(cameraProxy: cameraProxy, cameraModel: cameraModel)
+                ZoomView(cameraProxy: cameraProxy)
             case .misc:
 //                miscView
-                MiscView(cameraProxy: cameraProxy, cameraModel: cameraModel)
+                MiscView(cameraProxy: cameraProxy)
             default:
                 EmptyView()
             }
@@ -45,12 +38,11 @@ public struct TnCameraToolbarMiscView: View, TnCameraViewProtocol, TnLoggable {
 }
 
 struct MiscView: View, TnLoggable {
+    @EnvironmentObject var cameraModel: TnCameraViewModel
     let cameraProxy: TnCameraProxyProtocol
-    @ObservedObject var cameraModel: TnCameraViewModel
 
-    init(cameraProxy: TnCameraProxyProtocol, cameraModel: TnCameraViewModel) {
+    init(cameraProxy: TnCameraProxyProtocol) {
         self.cameraProxy = cameraProxy
-        self.cameraModel = cameraModel
         logDebug("inited")
     }
     
@@ -235,12 +227,11 @@ struct MiscView: View, TnLoggable {
 }
 
 struct ZoomView: View {
+    @EnvironmentObject var cameraModel: TnCameraViewModel
     let cameraProxy: TnCameraProxyProtocol
-    @ObservedObject var cameraModel: TnCameraViewModel
-    
-    init(cameraProxy: TnCameraProxyProtocol, cameraModel: TnCameraViewModel) {
+
+    init(cameraProxy: TnCameraProxyProtocol) {
         self.cameraProxy = cameraProxy
-        self.cameraModel = cameraModel
     }
     
     var body: some View {
