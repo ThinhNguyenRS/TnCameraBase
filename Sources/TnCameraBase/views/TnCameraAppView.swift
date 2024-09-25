@@ -45,10 +45,16 @@ extension TnCameraAppView: View {
     }
 }
 
-struct TnCameraToolbarView<TBottom: View>: View {
+struct TnCameraToolbarView<TBottom: View>: View, TnLoggable {
     @ObservedObject var cameraModel: TnCameraViewModel
     @ViewBuilder var bottom: () -> TBottom
 
+    init(cameraModel: TnCameraViewModel, bottom: @escaping () -> TBottom) {
+        self.cameraModel = cameraModel
+        self.bottom = bottom
+        logDebug("inited")
+    }
+    
     var body: some View {
         // bottom toolbar
         if cameraModel.showToolbar {
