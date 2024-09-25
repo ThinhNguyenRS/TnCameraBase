@@ -15,15 +15,9 @@ public struct TnCameraAppView<TBottom: View>: TnLoggable {
 
     let preview = TnCameraPreviewViewMetal()
 
-    let toolbarMainView: TnCameraToolbarMainView<TBottom>
-    let toolbarMiscView: TnCameraToolbarMiscView
-
     public init(cameraModel: TnCameraViewModel, @ViewBuilder bottom: @escaping () -> TBottom) {
         self.cameraModel = cameraModel
         self.bottom = bottom
-
-        self.toolbarMiscView = TnCameraToolbarMiscView(cameraModel: cameraModel, cameraProxy: cameraModel.cameraProxy)
-        self.toolbarMainView = TnCameraToolbarMainView(cameraModel: cameraModel, cameraProxy: cameraModel.cameraProxy, bottom: bottom())
         logDebug("inited")
     }
 }
@@ -31,32 +25,38 @@ public struct TnCameraAppView<TBottom: View>: TnLoggable {
 extension TnCameraAppView: View {
     public var body: some View {
         ZStack {
-            if cameraModel.status == .started {
-                // preview
-                preview
-                    .onAppear {
-                        preview.setImagePublisher(imagePublisher: { await cameraModel.cameraProxy.currentCiImagePublisher })
-//                        cameraModel.setup()
-                    }
-                    .onTapGesture {
-                        withAnimation {
-                            cameraModel.showToolbar.toggle()
-                        }
-                    }
-
-                // bottom toolbar
-                if cameraModel.showToolbar {
-                    VStack(alignment: .leading) {
-                        Spacer()
-                        toolbarMiscView
-                        toolbarMainView
+            // preview
+            preview
+                .onAppear {
+                    preview.setImagePublisher(imagePublisher: { await cameraModel.cameraProxy.currentCiImagePublisher })
+                }
+                .onTapGesture {
+                    withAnimation {
+                        cameraModel.showToolbar.toggle()
                     }
                 }
-            }
+
+            // bottom toolbar
+            TnCameraToolbarView(cameraModel: cameraModel, bottom: bottom)
         }
         .onAppear {
-//            preview.setImagePublisher(imagePublisher: { await cameraModel.cameraProxy.currentCiImagePublisher })
             cameraModel.setup()
+        }
+    }
+}
+
+struct TnCameraToolbarView<TBottom: View>: View {
+    @ObservedObject var cameraModel: TnCameraViewModel
+    @ViewBuilder var bottom: () -> TBottom
+
+    var body: some View {
+        // bottom toolbar
+        if cameraModel.showToolbar {
+            VStack(alignment: .leading) {
+                Spacer()
+                TnCameraToolbarMiscView(cameraModel: cameraModel, cameraProxy: cameraModel.cameraProxy)
+                TnCameraToolbarMainView(cameraModel: cameraModel, cameraProxy: cameraModel.cameraProxy, bottom: bottom())
+            }
         }
     }
 }
