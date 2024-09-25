@@ -36,7 +36,7 @@ extension TnCameraAppView: View {
                 preview
                     .onAppear {
                         preview.setImagePublisher(imagePublisher: { await cameraModel.cameraProxy.currentCiImagePublisher })
-                        cameraModel.setup()
+//                        cameraModel.setup()
                     }
                     .onTapGesture {
                         withAnimation {
@@ -53,6 +53,10 @@ extension TnCameraAppView: View {
                     }
                 }
             }
+        }
+        .onAppear {
+//            preview.setImagePublisher(imagePublisher: { await cameraModel.cameraProxy.currentCiImagePublisher })
+            cameraModel.setup()
         }
     }
 }
