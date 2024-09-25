@@ -34,6 +34,10 @@ extension TnCameraAppView: View {
             if cameraModel.status == .started {
                 // preview
                 preview
+                    .onAppear {
+                        preview.setImagePublisher(imagePublisher: { await cameraModel.cameraProxy.currentCiImagePublisher })
+                        cameraModel.setup()
+                    }
                     .onTapGesture {
                         withAnimation {
                             cameraModel.showToolbar.toggle()
@@ -49,11 +53,6 @@ extension TnCameraAppView: View {
                     }
                 }
             }
-            
-        }
-        .onAppear {
-            preview.setImagePublisher(imagePublisher: { await cameraModel.cameraProxy.currentCiImagePublisher })
-            cameraModel.setup()
         }
     }
 }
