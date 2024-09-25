@@ -59,7 +59,7 @@ public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {
 //                        status = v
                         logDebug("status changed", v)
                     }
-                    delegate?.onChanged(status: status)
+                    delegate?.onChanged(status: v)
                 }
             
             await cameraProxy.settingsPublisher
@@ -68,7 +68,7 @@ public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {
 //                        settings = v
                         logDebug("settings changed")
                     }
-                    delegate?.onChanged(settings: settings)
+                    delegate?.onChanged(settings: v)
                 }
         }
         
