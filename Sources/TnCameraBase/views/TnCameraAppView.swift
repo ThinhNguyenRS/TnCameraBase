@@ -31,7 +31,7 @@ public struct TnCameraAppView<TBottom: View>: TnLoggable {
 extension TnCameraAppView: View {
     public var body: some View {
         ZStack {
-            if cameraModel.status == .started {
+//            if cameraModel.status == .started {
                 // preview
                 preview
                     .onTapGesture {
@@ -48,7 +48,7 @@ extension TnCameraAppView: View {
                         toolbarMainView
                     }
                 }
-            }
+//            }
             
         }
         .onAppear {
