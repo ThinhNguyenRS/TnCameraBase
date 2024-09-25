@@ -18,7 +18,7 @@ public protocol TnCameraViewModelDelegate {
 }
 
 public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {
-//    @Published public var status: TnCameraStatus = .none
+    @Published public var status: TnCameraStatus = .none
 //    @Published public var settings: TnCameraSettings = .init()
     
     @Published public var showToolbar: Bool = true
@@ -31,9 +31,9 @@ public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {
     public var delegate: TnCameraViewModelDelegate? = nil
     public private(set) var cameraProxy: TnCameraProxyProtocol
 
-    public var status: TnCameraStatus {
-        cameraProxy.status
-    }
+//    public var status: TnCameraStatus {
+//        cameraProxy.status
+//    }
 
     public var settings: TnCameraSettings {
         get {
@@ -56,7 +56,7 @@ public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {
             await cameraProxy.statusPublisher
                 .onReceive(cancellables: &cameraCancellables) { [self] v in
                     withAnimation {
-//                        status = v
+                        status = v
                         logDebug("status changed", v)
                     }
                     delegate?.onChanged(status: v)
