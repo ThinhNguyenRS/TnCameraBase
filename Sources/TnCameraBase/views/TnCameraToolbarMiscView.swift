@@ -9,15 +9,15 @@ import Foundation
 import SwiftUI
 import TnIosBase
 
-public struct TnCameraToolbarMiscView<TCameraProxy: TnCameraProxyProtocol>: View, TnCameraViewProtocol, TnLoggable {
+public struct TnCameraToolbarMiscView: View, TnCameraViewProtocol, TnLoggable {
     @ObservedObject public var cameraModel: TnCameraViewModel
-    let cameraProxy: TCameraProxy
+    let cameraProxy: TnCameraProxyProtocol
     
     
 //    private let zoomView: ZoomView<TCameraProxy>
 //    private let miscView: MiscView<TCameraProxy>
 
-    init(cameraModel: TnCameraViewModel, cameraProxy: TCameraProxy) {
+    init(cameraModel: TnCameraViewModel, cameraProxy: TnCameraProxyProtocol) {
         self.cameraModel = cameraModel
         self.cameraProxy = cameraProxy
 //        self.zoomView = ZoomView(cameraProxy: cameraProxy, cameraModel: cameraModel)
@@ -44,11 +44,11 @@ public struct TnCameraToolbarMiscView<TCameraProxy: TnCameraProxyProtocol>: View
     }
 }
 
-struct MiscView<TCameraProxy: TnCameraProxyProtocol>: View, TnLoggable {
-    let cameraProxy: TCameraProxy
+struct MiscView: View, TnLoggable {
+    let cameraProxy: TnCameraProxyProtocol
     @ObservedObject var cameraModel: TnCameraViewModel
 
-    init(cameraProxy: TCameraProxy, cameraModel: TnCameraViewModel) {
+    init(cameraProxy: TnCameraProxyProtocol, cameraModel: TnCameraViewModel) {
         self.cameraProxy = cameraProxy
         self.cameraModel = cameraModel
         logDebug("inited")
@@ -234,11 +234,11 @@ struct MiscView<TCameraProxy: TnCameraProxyProtocol>: View, TnLoggable {
     }
 }
 
-struct ZoomView<TCameraProxy: TnCameraProxyProtocol>: View {
-    let cameraProxy: TCameraProxy
+struct ZoomView: View {
+    let cameraProxy: TnCameraProxyProtocol
     @ObservedObject var cameraModel: TnCameraViewModel
     
-    init(cameraProxy: TCameraProxy, cameraModel: TnCameraViewModel) {
+    init(cameraProxy: TnCameraProxyProtocol, cameraModel: TnCameraViewModel) {
         self.cameraProxy = cameraProxy
         self.cameraModel = cameraModel
     }
@@ -279,8 +279,8 @@ struct ZoomView<TCameraProxy: TnCameraProxyProtocol>: View {
     }
 }
 
-struct SelectAlbumView<TCameraProxy: TnCameraProxyProtocol>: View, TnLoggable {
-    let cameraProxy: TCameraProxy
+struct SelectAlbumView: View, TnLoggable {
+    let cameraProxy: TnCameraProxyProtocol
     @Binding var album: String
     let albumNames: [String]
     let albumLabels: [String]
@@ -288,7 +288,7 @@ struct SelectAlbumView<TCameraProxy: TnCameraProxyProtocol>: View, TnLoggable {
     @State private var showSheet = false
     @State private var newAlbum = ""
 
-    init(album: Binding<String>, albumNames: [String], cameraProxy: TCameraProxy) {
+    init(album: Binding<String>, albumNames: [String], cameraProxy: TnCameraProxyProtocol) {
         _album = album
         self.albumNames = [""] + albumNames
         self.albumLabels = ["Default album"] + albumNames

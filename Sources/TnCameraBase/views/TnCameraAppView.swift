@@ -9,23 +9,21 @@ import Foundation
 import SwiftUI
 import TnIosBase
 
-public struct TnCameraAppView<TCameraProxy: TnCameraProxyProtocol, TBottom: View>: TnLoggable {
+public struct TnCameraAppView<TBottom: View>: TnLoggable {
     @ViewBuilder var bottom: () -> TBottom
-    @ObservedObject var appModel: TnCameraAppViewModel<TCameraProxy>
     @ObservedObject var cameraModel: TnCameraViewModel
 
     let preview = TnCameraPreviewViewMetal()
 
-    let toolbarMainView: TnCameraToolbarMainView<TBottom, TCameraProxy>
-    let toolbarMiscView: TnCameraToolbarMiscView<TCameraProxy>
+    let toolbarMainView: TnCameraToolbarMainView<TBottom>
+    let toolbarMiscView: TnCameraToolbarMiscView
 
-    public init(appModel: TnCameraAppViewModel<TCameraProxy>, @ViewBuilder bottom: @escaping () -> TBottom) {
-        self.appModel = appModel
-        self.cameraModel = appModel.cameraModel
+    public init(cameraModel: TnCameraViewModel, @ViewBuilder bottom: @escaping () -> TBottom) {
+        self.cameraModel = cameraModel
         self.bottom = bottom
 
-        self.toolbarMiscView = TnCameraToolbarMiscView(cameraModel: appModel.cameraModel, cameraProxy: appModel.cameraProxy)
-        self.toolbarMainView = TnCameraToolbarMainView(cameraModel: appModel.cameraModel, cameraProxy: appModel.cameraProxy, bottom: bottom())
+        self.toolbarMiscView = TnCameraToolbarMiscView(cameraModel: cameraModel, cameraProxy: cameraModel.cameraProxy)
+        self.toolbarMainView = TnCameraToolbarMainView(cameraModel: cameraModel, cameraProxy: cameraModel.cameraProxy, bottom: bottom())
         logDebug("inited")
     }
 }
@@ -38,12 +36,12 @@ extension TnCameraAppView: View {
                 preview
                     .onTapGesture {
                         withAnimation {
-                            appModel.showToolbar.toggle()
+                            cameraModel.showToolbar.toggle()
                         }
                     }
 
                 // bottom toolbar
-                if appModel.showToolbar {
+                if cameraModel.showToolbar {
                     VStack(alignment: .leading) {
                         Spacer()
                         toolbarMiscView
@@ -54,8 +52,8 @@ extension TnCameraAppView: View {
             
         }
         .onAppear {
-            preview.setImagePublisher(imagePublisher: { await appModel.cameraProxy.currentCiImagePublisher })
-            appModel.setup()
+            preview.setImagePublisher(imagePublisher: { await cameraModel.cameraProxy.currentCiImagePublisher })
+            cameraModel.setup()
         }
     }
 }

@@ -17,43 +17,61 @@ public protocol TnCameraViewModelDelegate {
     func onVolumeButton()
 }
 
-public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {    
-    @Published public var status: TnCameraStatus = .none
-    @Published public var settings: TnCameraSettings = .init()
+public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {
+//    @Published public var status: TnCameraStatus = .none
+//    @Published public var settings: TnCameraSettings = .init()
+    
+    @Published public var showToolbar: Bool = true
     @Published public var toolbarType: TnCameraToolbarViewType = .none
     @Published public var capturedImage: UIImage? = nil
-
+    
     @Published public var orientation: UIDeviceOrientation = .unknown
     @Published public var orientationAngle: Angle = .zero
     
     public var delegate: TnCameraViewModelDelegate? = nil
-    
-    public override init() {
+    public private(set) var cameraProxy: TnCameraProxyProtocol
+
+    public var status: TnCameraStatus {
+        cameraProxy.status
+    }
+
+    public var settings: TnCameraSettings {
+        get {
+            cameraProxy.settings
+        }
+        set {
+            cameraProxy.settings = newValue
+        }
+    }
+
+    public init(cameraProxy: TnCameraProxyProtocol) {
+        self.cameraProxy = cameraProxy
         super.init()
+        
         logDebug("inited")
     }
     
-    public func listen(proxy: TnCameraProxyProtocol, withOrientation: Bool = true) {
-        Task {
-            await proxy.statusPublisher
-                .onReceive(cancellables: &cameraCancellables) { [self] v in
-                    withAnimation {
-                        status = v
-                        logDebug("status changed", v)
-                    }
-                    delegate?.onChanged(status: status)
-                }
-
-            await proxy.settingsPublisher
-                .onReceive(debounceMs: 500, cancellables: &cameraCancellables) { [self] v in
-                    withAnimation {
-                        settings = v
-                        logDebug("settings changed")
-                    }
-                    delegate?.onChanged(settings: settings)
-                }
-        }
-
+    public func listen(withOrientation: Bool = true) {
+//        Task {
+//            await cameraProxy.statusPublisher
+//                .onReceive(cancellables: &cameraCancellables) { [self] v in
+//                    withAnimation {
+//                        status = v
+//                        logDebug("status changed", v)
+//                    }
+//                    delegate?.onChanged(status: status)
+//                }
+//            
+//            await cameraProxy.settingsPublisher
+//                .onReceive(debounceMs: 500, cancellables: &cameraCancellables) { [self] v in
+//                    withAnimation {
+//                        settings = v
+//                        logDebug("settings changed")
+//                    }
+//                    delegate?.onChanged(settings: settings)
+//                }
+//        }
+        
         if withOrientation {
             let motionOrientation: DeviceMotionOrientationListener = .shared
             motionOrientation.$orientation
@@ -66,18 +84,23 @@ public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {
                 }
         }
         
-//        do {
-//            let audio = AVAudioSession.sharedInstance()
-//            try audio.setActive(true)
-//            audio.publisher(for: \.outputVolume)
-//                .sink(receiveValue: { [self] v in
-//                    if audio.outputVolume != v {
-//                        delegate?.onVolumeButton()
-//                    }
-//                })
-//                .store(in: &cancelables)
-//        } catch {
-//            logError("Cannot listen volume button", error.localizedDescription)
-//        }
+        //        do {
+        //            let audio = AVAudioSession.sharedInstance()
+        //            try audio.setActive(true)
+        //            audio.publisher(for: \.outputVolume)
+        //                .sink(receiveValue: { [self] v in
+        //                    if audio.outputVolume != v {
+        //                        delegate?.onVolumeButton()
+        //                    }
+        //                })
+        //                .store(in: &cancelables)
+        //        } catch {
+        //            logError("Cannot listen volume button", error.localizedDescription)
+        //        }
+    }
+
+    public func setup(withOrientation: Bool = true) {
+        listen(withOrientation: true)
+        cameraProxy.setup()
     }
 }

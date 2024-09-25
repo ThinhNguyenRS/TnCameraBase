@@ -47,32 +47,30 @@ public struct TnCameraAppViewModelFactory {
         }
     }
     
-    public static func createServerAsyncModel(delegate: TnCameraViewModelDelegate? = nil, EOM: String? = nil, MTU: Int? = nil) -> TnCameraAppViewModel<TnCameraProxyServerAsync> {
-        let appModel: TnCameraAppViewModel = .init(
-            cameraProxy: TnCameraProxyServerAsync(TnCameraService.shared, networkInfo: TnCameraProxyServiceInfo.getInstance(EOM: EOM, MTU: MTU)),
-            cameraModel: TnCameraViewModel()
-        )
-        appModel.cameraModel.delegate = delegate ?? ServerDelegate(cameraProxy: appModel.cameraProxy)
-        appModel.cameraProxy.bleDelegate = appModel.cameraProxy
-        appModel.cameraProxy.captureCompletion = { output in
+    public static func createServerAsyncModel(delegate: TnCameraViewModelDelegate? = nil, EOM: String? = nil, MTU: Int? = nil) -> TnCameraViewModel {
+        let cameraProxy = TnCameraProxyServerAsync(TnCameraService.shared, networkInfo: TnCameraProxyServiceInfo.getInstance(EOM: EOM, MTU: MTU))
+        let cameraModel = TnCameraViewModel(cameraProxy: cameraProxy)
+
+        cameraModel.delegate = delegate ?? ServerDelegate(cameraProxy: cameraProxy)
+        cameraProxy.bleDelegate = cameraProxy
+        cameraProxy.captureCompletion = { output in
             let uiImage = UIImage(data: output.photoData)
             DispatchQueue.main.async {
                 withAnimation {
-                    appModel.cameraModel.capturedImage = uiImage
+                    cameraModel.capturedImage = uiImage
                 }
-                appModel.cameraProxy.sendImage()
+                cameraProxy.sendImage()
             }
         }
-        return appModel
+        return cameraModel
     }
 
-    public static func createClientModel(delegate: TnCameraViewModelDelegate? = nil, EOM: String? = nil, MTU: Int? = nil) -> TnCameraAppViewModel<TnCameraProxyClient> {
-        let appModel: TnCameraAppViewModel = .init(
-            cameraProxy: TnCameraProxyClient(networkInfo: TnCameraProxyServiceInfo.getInstance(EOM: EOM, MTU: MTU)),
-            cameraModel: TnCameraViewModel()
-        )
-        appModel.cameraModel.delegate = delegate ?? ClientDelegate(cameraManager: appModel.cameraProxy)
-        appModel.cameraProxy.bleDelegate = appModel.cameraProxy
-        return appModel
+    public static func createClientModel(delegate: TnCameraViewModelDelegate? = nil, EOM: String? = nil, MTU: Int? = nil) -> TnCameraViewModel {
+        let cameraProxy = TnCameraProxyClient(networkInfo: TnCameraProxyServiceInfo.getInstance(EOM: EOM, MTU: MTU))
+        let cameraModel = TnCameraViewModel(cameraProxy: cameraProxy)
+        
+        cameraModel.delegate = delegate ?? ClientDelegate(cameraManager: cameraProxy)
+        cameraProxy.bleDelegate = cameraProxy
+        return cameraModel
     }
 }

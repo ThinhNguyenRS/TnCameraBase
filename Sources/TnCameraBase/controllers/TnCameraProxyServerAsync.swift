@@ -17,7 +17,7 @@ public class TnCameraProxyServerAsync: TnLoggable {
     private var network: TnNetworkServer?
     private let ble: TnBluetoothServer
     
-    @Published public private(set) var settings: TnCameraSettings = .init()
+    @Published public var settings: TnCameraSettings = .init()
     @Published public private(set) var status: TnCameraStatus = .none
     @Published public private(set) var albums: [String] = []
 

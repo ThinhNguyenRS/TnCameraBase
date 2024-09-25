@@ -18,8 +18,8 @@ public protocol TnCameraProtocol {
     var settingsPublisher: Published<TnCameraSettings>.Publisher { get async }
     var statusPublisher: Published<TnCameraStatus>.Publisher { get async }
 
-//    var settings: TnCameraSettings { get async }
-//    var status: TnCameraStatus { get async }
+    var settings: TnCameraSettings { get set }
+    var status: TnCameraStatus { get }
 
     func toggleCapturing()
     func startCapturing()

@@ -10,12 +10,12 @@ import SwiftUI
 import Combine
 import TnIosBase
 
-public struct TnCameraToolbarMainView<TBottom: View, TCameraProxy: TnCameraProxyProtocol>: View, TnCameraViewProtocol, TnLoggable {
+public struct TnCameraToolbarMainView<TBottom: View>: View, TnCameraViewProtocol, TnLoggable {
     @ObservedObject public var cameraModel: TnCameraViewModel
-    let cameraProxy: TCameraProxy
+    let cameraProxy: TnCameraProxyProtocol
     let bottom: TBottom?
     
-    init(cameraModel: TnCameraViewModel, cameraProxy: TCameraProxy, bottom: TBottom?) {
+    init(cameraModel: TnCameraViewModel, cameraProxy: TnCameraProxyProtocol, bottom: TBottom?) {
         self.cameraModel = cameraModel
         self.cameraProxy = cameraProxy
         self.bottom = bottom

@@ -15,7 +15,7 @@ import TnIosBase
 
 public class TnCameraProxyClient: NSObject, ObservableObject, TnLoggable {
     @Published public private(set) var currentCiImage: CIImage?
-    @Published public private(set) var settings: TnCameraSettings = .init()
+    @Published public var settings: TnCameraSettings = .init()
     @Published public private(set) var status: TnCameraStatus = .none
     @Published public private(set) var albums: [String] = []
 
