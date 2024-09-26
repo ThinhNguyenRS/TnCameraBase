@@ -13,9 +13,9 @@ import TnIosBase
 public struct TnCameraToolbarMainView<TBottom: View>: View, TnCameraViewProtocol, TnLoggable {
     @EnvironmentObject public var cameraModel: TnCameraViewModel
     let cameraProxy: TnCameraProxyProtocol
-    let bottom: TBottom?
-    
-    init(cameraProxy: TnCameraProxyProtocol, bottom: TBottom?) {
+    @ViewBuilder var bottom: () -> TBottom?
+
+    init(cameraProxy: TnCameraProxyProtocol, bottom: @escaping () -> TBottom?) {
         self.cameraProxy = cameraProxy
         self.bottom = bottom
         logDebug("inited")
@@ -37,9 +37,9 @@ public struct TnCameraToolbarMainView<TBottom: View>: View, TnCameraViewProtocol
             Spacer()
             getSettingsButton(type: .zoom, text: cameraModel.settings.zoomFactor.toString("%0.2f"))
 
-            if let bottom {
+            if let bottomView = bottom() {
                 Spacer()
-                bottom
+                bottomView
             }
 
             // capture

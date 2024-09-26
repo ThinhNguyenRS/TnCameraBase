@@ -10,37 +10,30 @@ import SwiftUI
 import TnIosBase
 
 public struct TnCameraAppView<TBottom: View>: TnLoggable {
-    @ViewBuilder var bottom: () -> TBottom
-    //    @ObservedObject var cameraModel: TnCameraViewModel
     @EnvironmentObject var cameraModel: TnCameraViewModel
     
+    @ViewBuilder var bottom: () -> TBottom?
     let preview = TnCameraPreviewViewMetal()
     
-//    public init(cameraModel: TnCameraViewModel, @ViewBuilder bottom: @escaping () -> TBottom) {
-//        self.cameraModel = cameraModel
-//        self.bottom = bottom
-//        logDebug("inited")
-//    }
-    
-    public init(@ViewBuilder bottom: @escaping () -> TBottom) {
+    public init(bottom: @escaping () -> TBottom?) {
         self.bottom = bottom
         logDebug("inited")
     }
-}
-
-extension TnCameraAppView: View {
+    
     public var body: some View {
         ZStack {
             // preview
-            preview
-                .onAppear {
-                    preview.setImagePublisher(imagePublisher: { await cameraModel.cameraProxy.currentCiImagePublisher })
-                }
-                .onTapGesture {
-                    withAnimation {
-                        cameraModel.showToolbar.toggle()
-                    }
-                }
+            TnCameraPreviewViewMetal(imagePublisher: { await cameraModel.cameraProxy.currentCiImagePublisher })
+            
+//            preview
+//                .onAppear {
+//                    preview.setImagePublisher(imagePublisher: { await cameraModel.cameraProxy.currentCiImagePublisher })
+//                }
+//                .onTapGesture {
+//                    withAnimation {
+//                        cameraModel.showToolbar.toggle()
+//                    }
+//                }
 
             // bottom toolbar
             TnCameraToolbarView(bottom: bottom)
@@ -51,11 +44,17 @@ extension TnCameraAppView: View {
     }
 }
 
+extension TnCameraAppView where TBottom == EmptyView {
+    init() {
+        self.init(bottom: { nil })
+    }
+}
+
 struct TnCameraToolbarView<TBottom: View>: View, TnLoggable {
     @EnvironmentObject var cameraModel: TnCameraViewModel
-    @ViewBuilder var bottom: () -> TBottom
+    @ViewBuilder var bottom: () -> TBottom?
 
-    init(bottom: @escaping () -> TBottom) {
+    init(bottom: @escaping () -> TBottom?) {
         self.bottom = bottom
         logDebug("inited")
     }
@@ -66,7 +65,7 @@ struct TnCameraToolbarView<TBottom: View>: View, TnLoggable {
             VStack(alignment: .leading) {
                 Spacer()
                 TnCameraToolbarMiscView(cameraProxy: cameraModel.cameraProxy)
-                TnCameraToolbarMainView(cameraProxy: cameraModel.cameraProxy, bottom: bottom())
+                TnCameraToolbarMainView(cameraProxy: cameraModel.cameraProxy, bottom: bottom)
             }
         }
     }

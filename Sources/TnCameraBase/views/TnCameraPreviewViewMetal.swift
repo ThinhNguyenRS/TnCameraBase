@@ -108,9 +108,9 @@ public struct TnCameraPreviewViewMetal: TnLoggable {
         logDebug("inited")
     }
     
-    public init(imagePublisher: Published<CIImage?>.Publisher) {
-        internalView.setImagePublisher(imagePublisher: imagePublisher.eraseToAnyPublisher())
-        logDebug("inited")
+    public init(imagePublisher: @escaping () async -> Published<CIImage?>.Publisher) {
+        self.init()
+        self.setImagePublisher(imagePublisher: imagePublisher)
     }
     
     @discardableResult
