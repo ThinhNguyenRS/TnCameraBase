@@ -72,17 +72,17 @@ public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {
                 }
         }
         
-        if withOrientation {
-            let motionOrientation: DeviceMotionOrientationListener = .shared
-            motionOrientation.$orientation
-                .onReceive(cancellables: &cameraCancellables) { [self] _ in
-                    logDebug("orientation changed")
-                    withAnimation {
-                        orientation = motionOrientation.orientation
-                        orientationAngle = motionOrientation.angle
-                    }
-                }
-        }
+//        if withOrientation {
+//            let motionOrientation: DeviceMotionOrientationListener = .shared
+//            motionOrientation.$orientation
+//                .onReceive(cancellables: &cameraCancellables) { [self] _ in
+//                    logDebug("orientation changed")
+//                    withAnimation {
+//                        orientation = motionOrientation.orientation
+//                        orientationAngle = motionOrientation.angle
+//                    }
+//                }
+//        }
         
         //        do {
         //            let audio = AVAudioSession.sharedInstance()
