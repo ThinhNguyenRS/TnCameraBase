@@ -41,11 +41,11 @@ public class TnCameraProxyServerAsync: TnLoggable {
                 }
             }.store(in: &cameraCancellables)
 
-            await cameraService.$status.sink { v in
+            await cameraService.$status.onReceive(cancellables: &cameraCancellables) { v in
                 if self.status != v {
                     self.status = v
                 }
-            }.store(in: &cameraCancellables)
+            }
         }
         
         logDebug("inited")
