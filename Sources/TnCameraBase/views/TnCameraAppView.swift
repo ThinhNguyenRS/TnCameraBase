@@ -20,17 +20,24 @@ public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
     }
     
     public var body: some View {
-        ZStack {
-            // preview
-            TnCameraPreviewViewMetal(imagePublisher: { await cameraModel.cameraProxy.currentCiImagePublisher })
-                .onTapGesture {
-                    withAnimation {
-                        cameraModel.showToolbar.toggle()
-                    }
-                }
+        Group {
+            if cameraModel.cameraProxy.status == .started {
+                ZStack {
+                    // preview
+                    TnCameraPreviewViewMetal(imagePublisher: { await cameraModel.cameraProxy.currentCiImagePublisher })
+                        .onTapGesture {
+                            withAnimation {
+                                cameraModel.showToolbar.toggle()
+                            }
+                        }
 
-            // bottom toolbar
-            TnCameraToolbarView(bottom: bottom)
+                    // bottom toolbar
+                    TnCameraToolbarView(bottom: bottom)
+                }
+                .onAppear {
+                    logDebug("appear")
+                }
+            }
         }
         .onAppear {
             cameraModel.setup()
