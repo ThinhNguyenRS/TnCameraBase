@@ -18,7 +18,7 @@ public protocol TnCameraViewModelDelegate {
 }
 
 public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {
-//    @Published public var status: TnCameraStatus = .none
+    @Published public var status: TnCameraStatus = .none
 //    @Published public var settings: TnCameraSettings = .init()
     
     @Published public var showToolbar: Bool = true
@@ -30,10 +30,6 @@ public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {
     
     public var delegate: TnCameraViewModelDelegate? = nil
     public private(set) var cameraProxy: TnCameraProxyProtocol
-
-//    public var status: TnCameraStatus {
-//        cameraProxy.status
-//    }
 
     public var settings: TnCameraSettings {
         get {
@@ -55,11 +51,13 @@ public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {
         Task {
             await cameraProxy.statusPublisher
                 .onReceive(cancellables: &cameraCancellables) { [self] v in
-                    logDebug("status changed", v)
-                    withAnimation {
-//                        status = v
+                    if status != v {
+                        logDebug("status changed", v)
+                        withAnimation {
+                            status = v
+                        }
+                        delegate?.onChanged(status: v)
                     }
-                    delegate?.onChanged(status: v)
                 }
             
             await cameraProxy.settingsPublisher
@@ -72,17 +70,17 @@ public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {
                 }
         }
         
-//        if withOrientation {
-//            let motionOrientation: DeviceMotionOrientationListener = .shared
-//            motionOrientation.$orientation
-//                .onReceive(cancellables: &cameraCancellables) { [self] _ in
-//                    logDebug("orientation changed")
-//                    withAnimation {
-//                        orientation = motionOrientation.orientation
-//                        orientationAngle = motionOrientation.angle
-//                    }
-//                }
-//        }
+        if withOrientation {
+            let motionOrientation: DeviceMotionOrientationListener = .shared
+            motionOrientation.$orientation
+                .onReceive(cancellables: &cameraCancellables) { [self] _ in
+                    logDebug("orientation changed")
+                    withAnimation {
+                        orientation = motionOrientation.orientation
+                        orientationAngle = motionOrientation.angle
+                    }
+                }
+        }
         
         //        do {
         //            let audio = AVAudioSession.sharedInstance()

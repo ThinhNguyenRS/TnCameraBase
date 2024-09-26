@@ -11,7 +11,6 @@ import TnIosBase
 
 public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
     @EnvironmentObject var cameraModel: TnCameraViewModel
-    
     @ViewBuilder private let bottom: () -> TBottom?
     
     public init(bottom: @escaping () -> TBottom?) {
@@ -21,7 +20,7 @@ public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
     
     public var body: some View {
         Group {
-            if cameraModel.cameraProxy.status == .started {
+            if cameraModel.status == .started {
                 ZStack {
                     // preview
                     TnCameraPreviewViewMetal(imagePublisher: { await cameraModel.cameraProxy.currentCiImagePublisher })
