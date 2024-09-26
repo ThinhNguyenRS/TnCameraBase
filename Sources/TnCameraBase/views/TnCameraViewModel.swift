@@ -18,10 +18,7 @@ public protocol TnCameraViewModelDelegate {
 }
 
 public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {
-    @Published public var status: TnCameraStatus = .none
-//    @Published public var settings: TnCameraSettings = .init()
-    
-//    @Published public var toolbarType: TnCameraToolbarViewType = .none
+//    @Published public var status: TnCameraStatus = .none
     @Published public var capturedImage: UIImage? = nil
     
     @Published public var orientation: UIDeviceOrientation = .unknown
@@ -47,39 +44,39 @@ public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {
     }
     
     public func listen(withOrientation: Bool = true) {
-        Task {
-            await cameraProxy.statusPublisher
-                .onReceive(cancellables: &cameraCancellables) { [self] v in
-                    if status != v {
-                        logDebug("status changed", v)
-                        withAnimation {
-                            status = v
-                        }
-                        delegate?.onChanged(status: v)
-                    }
-                }
-            
-            await cameraProxy.settingsPublisher
-                .onReceive(cancellables: &cameraCancellables) { [self] v in
-                    logDebug("settings changed")
-                    withAnimation {
-//                        settings = v
-                    }
-                    delegate?.onChanged(settings: v)
-                }
-        }
-        
-        if withOrientation {
-            let motionOrientation: DeviceMotionOrientationListener = .shared
-            motionOrientation.$orientation
-                .onReceive(cancellables: &cameraCancellables) { [self] _ in
-                    logDebug("orientation changed")
-                    withAnimation {
-                        orientation = motionOrientation.orientation
-                        orientationAngle = motionOrientation.angle
-                    }
-                }
-        }
+//        Task {
+//            await cameraProxy.statusPublisher
+//                .onReceive(cancellables: &cameraCancellables) { [self] v in
+//                    if status != v {
+//                        logDebug("status changed", v)
+//                        withAnimation {
+//                            status = v
+//                        }
+//                        delegate?.onChanged(status: v)
+//                    }
+//                }
+//            
+//            await cameraProxy.settingsPublisher
+//                .onReceive(cancellables: &cameraCancellables) { [self] v in
+//                    logDebug("settings changed")
+//                    withAnimation {
+////                        settings = v
+//                    }
+//                    delegate?.onChanged(settings: v)
+//                }
+//        }
+//        
+//        if withOrientation {
+//            let motionOrientation: DeviceMotionOrientationListener = .shared
+//            motionOrientation.$orientation
+//                .onReceive(cancellables: &cameraCancellables) { [self] _ in
+//                    logDebug("orientation changed")
+//                    withAnimation {
+//                        orientation = motionOrientation.orientation
+//                        orientationAngle = motionOrientation.angle
+//                    }
+//                }
+//        }
         
         //        do {
         //            let audio = AVAudioSession.sharedInstance()

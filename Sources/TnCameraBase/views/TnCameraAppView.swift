@@ -14,7 +14,8 @@ public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
     @ViewBuilder private let bottom: () -> TBottom?
     
     @State private var showToolbar = false
-    
+    @State private var status: TnCameraStatus = .none
+
     public init(bottom: @escaping () -> TBottom?) {
         self.bottom = bottom
         logDebug("inited")
@@ -22,7 +23,7 @@ public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
     
     public var body: some View {
         Group {
-            if cameraModel.status == .started {
+            if status == .started {
                 ZStack {
                     // preview
                     TnCameraPreviewViewMetal(imagePublisher: { await cameraModel.cameraProxy.currentCiImagePublisher })
@@ -40,8 +41,29 @@ public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
                 }
             }
         }
-        .onAppear {
-            cameraModel.setup()
+        .task {
+            let cameraProxy = cameraModel.cameraProxy
+            cameraProxy.setup()
+            // listen changes here
+            await cameraProxy.statusPublisher
+                .onReceive(cancellables: &cameraCancellables) { [self] v in
+                    if status != v {
+                        logDebug("status changed", v)
+                        withAnimation {
+                            status = v
+                        }
+//                        delegate?.onChanged(status: v)
+                    }
+                }
+            
+            await cameraProxy.settingsPublisher
+                .onReceive(cancellables: &cameraCancellables) { [self] v in
+                    logDebug("settings changed")
+                    withAnimation {
+//                        settings = v
+                    }
+//                    delegate?.onChanged(settings: v)
+                }
         }
     }
 }
