@@ -41,13 +41,9 @@ public class TnCameraProxyServerAsync: TnLoggable {
                 }
             }.store(in: &cameraCancellables)
 
-            await cameraService.$isStatusChanging.sink { v in
-                if !v {
-                    Task {
-                        if await self.status != cameraService.status {
-                            self.status = await cameraService.status
-                        }
-                    }
+            await cameraService.$status.sink { v in
+                if self.status != v {
+                    self.status = v
                 }
             }.store(in: &cameraCancellables)
         }
