@@ -11,10 +11,11 @@ import TnIosBase
 
 public struct TnCameraToolbarMiscView: View, TnLoggable {
     @EnvironmentObject var cameraModel: TnCameraViewModel
-    let cameraProxy: TnCameraProxyProtocol
+    var cameraProxy: TnCameraProxyProtocol {
+        cameraModel.cameraProxy
+    }
     
-    init(cameraProxy: TnCameraProxyProtocol) {
-        self.cameraProxy = cameraProxy
+    init() {
         logDebug("inited")
     }
     
@@ -23,10 +24,10 @@ public struct TnCameraToolbarMiscView: View, TnLoggable {
             switch cameraModel.toolbarType {
             case .zoom:
 //                zoomView
-                ZoomView(cameraProxy: cameraProxy)
+                ZoomView()
             case .misc:
 //                miscView
-                MiscView(cameraProxy: cameraProxy)
+                MiscView()
             default:
                 EmptyView()
             }
@@ -39,10 +40,11 @@ public struct TnCameraToolbarMiscView: View, TnLoggable {
 
 struct MiscView: View, TnLoggable {
     @EnvironmentObject var cameraModel: TnCameraViewModel
-    let cameraProxy: TnCameraProxyProtocol
+    var cameraProxy: TnCameraProxyProtocol {
+        cameraModel.cameraProxy
+    }
 
-    init(cameraProxy: TnCameraProxyProtocol) {
-        self.cameraProxy = cameraProxy
+    init() {
         logDebug("inited")
     }
     
@@ -96,11 +98,10 @@ struct MiscView: View, TnLoggable {
                     cameraProxy.setCapturing(cameraModel.settings.capturing)
                 })
                 
-                SelectAlbumView(
-                    album: $cameraModel.settings.capturing.album,
-                    albumNames: cameraProxy.albums,
-                    cameraProxy: cameraProxy
-                )
+//                SelectAlbumView(
+//                    album: $cameraModel.settings.capturing.album,
+//                    albumNames: cameraProxy.albums
+//                )
             }
             
             Section("Light") {
@@ -228,10 +229,11 @@ struct MiscView: View, TnLoggable {
 
 struct ZoomView: View {
     @EnvironmentObject var cameraModel: TnCameraViewModel
-    let cameraProxy: TnCameraProxyProtocol
+    var cameraProxy: TnCameraProxyProtocol {
+        cameraModel.cameraProxy
+    }
 
-    init(cameraProxy: TnCameraProxyProtocol) {
-        self.cameraProxy = cameraProxy
+    init() {
     }
     
     var body: some View {
@@ -271,7 +273,11 @@ struct ZoomView: View {
 }
 
 struct SelectAlbumView: View, TnLoggable {
-    let cameraProxy: TnCameraProxyProtocol
+    @EnvironmentObject var cameraModel: TnCameraViewModel
+    var cameraProxy: TnCameraProxyProtocol {
+        cameraModel.cameraProxy
+    }
+
     @Binding var album: String
     let albumNames: [String]
     let albumLabels: [String]
@@ -279,11 +285,10 @@ struct SelectAlbumView: View, TnLoggable {
     @State private var showSheet = false
     @State private var newAlbum = ""
 
-    init(album: Binding<String>, albumNames: [String], cameraProxy: TnCameraProxyProtocol) {
+    init(album: Binding<String>, albumNames: [String]) {
         _album = album
         self.albumNames = [""] + albumNames
         self.albumLabels = ["Default album"] + albumNames
-        self.cameraProxy = cameraProxy
         
         logDebug("inited")
     }

@@ -12,8 +12,7 @@ import TnIosBase
 public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
     @EnvironmentObject var cameraModel: TnCameraViewModel
     
-    @ViewBuilder var bottom: () -> TBottom?
-    let preview = TnCameraPreviewViewMetal()
+    @ViewBuilder private let bottom: () -> TBottom?
     
     public init(bottom: @escaping () -> TBottom?) {
         self.bottom = bottom
@@ -24,16 +23,11 @@ public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
         ZStack {
             // preview
             TnCameraPreviewViewMetal(imagePublisher: { await cameraModel.cameraProxy.currentCiImagePublisher })
-            
-//            preview
-//                .onAppear {
-//                    preview.setImagePublisher(imagePublisher: { await cameraModel.cameraProxy.currentCiImagePublisher })
-//                }
-//                .onTapGesture {
-//                    withAnimation {
-//                        cameraModel.showToolbar.toggle()
-//                    }
-//                }
+                .onTapGesture {
+                    withAnimation {
+                        cameraModel.showToolbar.toggle()
+                    }
+                }
 
             // bottom toolbar
             TnCameraToolbarView(bottom: bottom)
@@ -52,7 +46,7 @@ extension TnCameraAppView where TBottom == EmptyView {
 
 struct TnCameraToolbarView<TBottom: View>: View, TnLoggable {
     @EnvironmentObject var cameraModel: TnCameraViewModel
-    @ViewBuilder var bottom: () -> TBottom?
+    @ViewBuilder private let bottom: () -> TBottom?
 
     init(bottom: @escaping () -> TBottom?) {
         self.bottom = bottom
@@ -64,8 +58,8 @@ struct TnCameraToolbarView<TBottom: View>: View, TnLoggable {
         if cameraModel.showToolbar {
             VStack(alignment: .leading) {
                 Spacer()
-                TnCameraToolbarMiscView(cameraProxy: cameraModel.cameraProxy)
-                TnCameraToolbarMainView(cameraProxy: cameraModel.cameraProxy, bottom: bottom)
+                TnCameraToolbarMiscView()
+                TnCameraToolbarMainView(bottom: bottom)
             }
         }
     }

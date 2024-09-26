@@ -12,11 +12,13 @@ import TnIosBase
 
 public struct TnCameraToolbarMainView<TBottom: View>: View, TnCameraViewProtocol, TnLoggable {
     @EnvironmentObject public var cameraModel: TnCameraViewModel
-    let cameraProxy: TnCameraProxyProtocol
-    @ViewBuilder var bottom: () -> TBottom?
+    @ViewBuilder private let bottom: () -> TBottom?
 
-    init(cameraProxy: TnCameraProxyProtocol, bottom: @escaping () -> TBottom?) {
-        self.cameraProxy = cameraProxy
+    var cameraProxy: TnCameraProxyProtocol {
+        cameraModel.cameraProxy
+    }
+
+    init(bottom: @escaping () -> TBottom?) {
         self.bottom = bottom
         logDebug("inited")
     }
