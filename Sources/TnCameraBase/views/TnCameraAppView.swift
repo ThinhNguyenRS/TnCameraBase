@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import TnIosBase
 
-public struct TnCameraAppView<TBottom: View>: TnLoggable {
+public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
     @EnvironmentObject var cameraModel: TnCameraViewModel
     
     @ViewBuilder var bottom: () -> TBottom?
