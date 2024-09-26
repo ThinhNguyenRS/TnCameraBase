@@ -55,18 +55,18 @@ public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {
         Task {
             await cameraProxy.statusPublisher
                 .onReceive(cancellables: &cameraCancellables) { [self] v in
+                    logDebug("status changed", v)
                     withAnimation {
 //                        status = v
-                        logDebug("status changed", v)
                     }
                     delegate?.onChanged(status: v)
                 }
             
             await cameraProxy.settingsPublisher
-                .onReceive(debounceMs: 500, cancellables: &cameraCancellables) { [self] v in
+                .onReceive(cancellables: &cameraCancellables) { [self] v in
+                    logDebug("settings changed")
                     withAnimation {
 //                        settings = v
-                        logDebug("settings changed")
                     }
                     delegate?.onChanged(settings: v)
                 }
@@ -76,10 +76,10 @@ public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {
             let motionOrientation: DeviceMotionOrientationListener = .shared
             motionOrientation.$orientation
                 .onReceive(cancellables: &cameraCancellables) { [self] _ in
+                    logDebug("orientation changed")
                     withAnimation {
                         orientation = motionOrientation.orientation
                         orientationAngle = motionOrientation.angle
-                        self.logDebug("orientation changed")
                     }
                 }
         }
