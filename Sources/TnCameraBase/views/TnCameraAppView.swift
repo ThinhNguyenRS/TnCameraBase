@@ -57,6 +57,7 @@ struct TnCameraToolbarView<TBottom: View>: View, TnLoggable {
     @ViewBuilder private let bottom: () -> TBottom?
     
     @Binding var showToolbar: Bool
+    @State private var toolbarType: TnCameraToolbarViewType = .main
 
     init(bottom: @escaping () -> TBottom?, showToolbar: Binding<Bool>) {
         self.bottom = bottom
@@ -69,8 +70,8 @@ struct TnCameraToolbarView<TBottom: View>: View, TnLoggable {
         if showToolbar {
             VStack(alignment: .leading) {
                 Spacer()
-                TnCameraToolbarMiscView()
-                TnCameraToolbarMainView(bottom: bottom)
+                TnCameraToolbarMiscView(toolbarType: $toolbarType)
+                TnCameraToolbarMainView(bottom: bottom, toolbarType: $toolbarType)
             }
         }
     }

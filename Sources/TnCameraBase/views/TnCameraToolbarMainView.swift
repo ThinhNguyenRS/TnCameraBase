@@ -13,13 +13,16 @@ import TnIosBase
 public struct TnCameraToolbarMainView<TBottom: View>: View, TnCameraViewProtocol, TnLoggable {
     @EnvironmentObject public var cameraModel: TnCameraViewModel
     @ViewBuilder private let bottom: () -> TBottom?
+    
+    @Binding var toolbarType: TnCameraToolbarViewType
 
     var cameraProxy: TnCameraProxyProtocol {
         cameraModel.cameraProxy
     }
 
-    init(bottom: @escaping () -> TBottom?) {
+    init(bottom: @escaping () -> TBottom?, toolbarType: Binding<TnCameraToolbarViewType>) {
         self.bottom = bottom
+        self._toolbarType = toolbarType
         logDebug("inited")
     }
 
@@ -58,3 +61,30 @@ public struct TnCameraToolbarMainView<TBottom: View>: View, TnCameraViewProtocol
         }
     }
 }
+
+extension TnCameraToolbarMainView {
+    public func getSettingsButton(type: TnCameraToolbarViewType, text: String) -> some View {
+        circleButtonRotation(text: text) {
+            withAnimation {
+                if toolbarType != type {
+                    toolbarType = type
+                } else {
+                    toolbarType = .none
+                }
+            }
+        }
+    }
+
+    public func getSettingsButton(type: TnCameraToolbarViewType, imageName: String) -> some View {
+        circleButtonRotation(imageName: imageName) {
+            withAnimation {
+                if toolbarType != type {
+                    toolbarType = type
+                } else {
+                    toolbarType = .none
+                }
+            }
+        }
+    }
+}
+

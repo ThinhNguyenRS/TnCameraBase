@@ -15,18 +15,19 @@ public struct TnCameraToolbarMiscView: View, TnLoggable {
         cameraModel.cameraProxy
     }
     
-    init() {
+    @Binding var toolbarType: TnCameraToolbarViewType
+    
+    init(toolbarType: Binding<TnCameraToolbarViewType>) {
+        _toolbarType = toolbarType
         logDebug("inited")
     }
     
     public var body: some View {
         Group {
-            switch cameraModel.toolbarType {
+            switch toolbarType {
             case .zoom:
-//                zoomView
                 ZoomView()
             case .misc:
-//                miscView
                 MiscView()
             default:
                 EmptyView()
