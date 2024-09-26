@@ -13,6 +13,8 @@ public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
     @EnvironmentObject var cameraModel: TnCameraViewModel
     @ViewBuilder private let bottom: () -> TBottom?
     
+    @State private var showToolbar = false
+    
     public init(bottom: @escaping () -> TBottom?) {
         self.bottom = bottom
         logDebug("inited")
@@ -26,12 +28,12 @@ public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
                     TnCameraPreviewViewMetal(imagePublisher: { await cameraModel.cameraProxy.currentCiImagePublisher })
                         .onTapGesture {
                             withAnimation {
-                                cameraModel.showToolbar.toggle()
+                                showToolbar.toggle()
                             }
                         }
 
                     // bottom toolbar
-                    TnCameraToolbarView(bottom: bottom)
+                    TnCameraToolbarView(bottom: bottom, showToolbar: $showToolbar)
                 }
                 .onAppear {
                     logDebug("appear")
@@ -53,15 +55,18 @@ extension TnCameraAppView where TBottom == EmptyView {
 struct TnCameraToolbarView<TBottom: View>: View, TnLoggable {
     @EnvironmentObject var cameraModel: TnCameraViewModel
     @ViewBuilder private let bottom: () -> TBottom?
+    
+    @Binding var showToolbar: Bool
 
-    init(bottom: @escaping () -> TBottom?) {
+    init(bottom: @escaping () -> TBottom?, showToolbar: Binding<Bool>) {
         self.bottom = bottom
+        self._showToolbar = showToolbar
         logDebug("inited")
     }
     
     var body: some View {
         // bottom toolbar
-        if cameraModel.showToolbar {
+        if showToolbar {
             VStack(alignment: .leading) {
                 Spacer()
                 TnCameraToolbarMiscView()
