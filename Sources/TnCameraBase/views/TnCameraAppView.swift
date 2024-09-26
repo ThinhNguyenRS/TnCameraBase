@@ -45,7 +45,7 @@ public struct TnCameraAppView<TBottom: View>: TnLoggable {
 }
 
 extension TnCameraAppView where TBottom == EmptyView {
-    init() {
+    public init() {
         self.init(bottom: { nil })
     }
 }
