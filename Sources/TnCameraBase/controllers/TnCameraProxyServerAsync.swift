@@ -59,7 +59,6 @@ public class TnCameraProxyServerAsync: TnLoggable {
             ble.delegate = newValue
         }
     }
-
     public var captureCompletion: TnCameraPhotoOutputCompletion?
 }
 

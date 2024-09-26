@@ -50,6 +50,7 @@ public protocol TnCameraProtocol {
 
 // MARK: CameraManagerProxyProtocol
 public protocol TnCameraProxyProtocol: TnCameraProtocol {
+    var captureCompletion: TnCameraPhotoOutputCompletion? { get set }
     func setup()
     func send(_ object: TnCameraMessageProtocol, useBle: Bool)
     var albums: [String] { get }

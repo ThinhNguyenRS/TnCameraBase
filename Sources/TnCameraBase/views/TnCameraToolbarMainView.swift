@@ -14,7 +14,8 @@ public struct TnCameraToolbarMainView<TBottom: View>: View, TnCameraViewProtocol
     @EnvironmentObject public var cameraModel: TnCameraViewModel
     @ViewBuilder private let bottom: () -> TBottom?
     
-    @Binding var toolbarType: TnCameraToolbarViewType
+    @Binding private var toolbarType: TnCameraToolbarViewType
+    @State private var capturedImage: UIImage? = nil
 
     var cameraProxy: TnCameraProxyProtocol {
         cameraModel.cameraProxy
@@ -28,7 +29,7 @@ public struct TnCameraToolbarMainView<TBottom: View>: View, TnCameraViewProtocol
 
     public var body: some View {
         HStack {
-            if let capturedImage = cameraModel.capturedImage {
+            if let capturedImage {
                 Image(uiImage: capturedImage)
                     .tnMakeScalable()
                     .frame(width: 80, height: 80)
@@ -58,6 +59,17 @@ public struct TnCameraToolbarMainView<TBottom: View>: View, TnCameraViewProtocol
             getSettingsButton(type: .misc, imageName: "ellipsis")
 
             Spacer()
+        }
+        .task {
+            cameraModel.cameraProxy.captureCompletion = { output in
+                let uiImage = UIImage(data: output.photoData)
+                DispatchQueue.main.async {
+                    withAnimation {
+                        capturedImage = uiImage
+                    }
+//                    cameraProxy.sendImage()
+                }
+            }
         }
     }
 }

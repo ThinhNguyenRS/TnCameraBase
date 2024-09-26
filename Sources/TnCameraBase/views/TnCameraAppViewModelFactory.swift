@@ -53,15 +53,6 @@ public struct TnCameraAppViewModelFactory {
 
         cameraModel.delegate = delegate ?? ServerDelegate(cameraProxy: cameraProxy)
         cameraProxy.bleDelegate = cameraProxy
-        cameraProxy.captureCompletion = { output in
-            let uiImage = UIImage(data: output.photoData)
-            DispatchQueue.main.async {
-                withAnimation {
-                    cameraModel.capturedImage = uiImage
-                }
-                cameraProxy.sendImage()
-            }
-        }
         return cameraModel
     }
 
