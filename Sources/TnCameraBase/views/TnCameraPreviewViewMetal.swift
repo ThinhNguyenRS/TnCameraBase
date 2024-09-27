@@ -36,7 +36,7 @@ public struct TnCameraPreviewViewMetal: TnLoggable {
             
             Task { [self] in
                 await imagePublisher()
-                    .onReceive { [weak self] ciImage in
+                    .onReceive(queue: .main) { [weak self] ciImage in
                         self?.ciImage = ciImage
                         self?.setNeedsDisplay()
                     }
