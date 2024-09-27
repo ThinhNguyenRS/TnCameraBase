@@ -17,10 +17,6 @@ public struct TnCameraToolbarMainView<TBottom: View>: View, TnCameraViewProtocol
     @ViewBuilder private let bottom: () -> TBottom?
     @Binding private var toolbarType: TnCameraToolbarViewType
 
-    var cameraProxy: TnCameraProxyProtocol {
-        cameraModel.cameraProxy
-    }
-
     init(bottom: @escaping () -> TBottom?, toolbarType: Binding<TnCameraToolbarViewType>) {
         self.bottom = bottom
         self._toolbarType = toolbarType
@@ -36,12 +32,12 @@ public struct TnCameraToolbarMainView<TBottom: View>: View, TnCameraViewProtocol
             }
 
             Spacer()
-            circleButtonRotation(imageName: cameraModel.settings.cameraPosition.imageName) {
+            circleButtonRotation(imageName: cameraProxy.settings.cameraPosition.imageName) {
                 cameraProxy.switchCamera()
             }
 
             Spacer()
-            getSettingsButton(type: .zoom, text: cameraModel.settings.zoomFactor.toString("%0.2f"))
+            getSettingsButton(type: .zoom, text: cameraProxy.settings.zoomFactor.toString("%0.2f"))
 
             if let bottomView = bottom() {
                 Spacer()
@@ -61,15 +57,15 @@ public struct TnCameraToolbarMainView<TBottom: View>: View, TnCameraViewProtocol
             Spacer()
         }
         .task {
-            cameraModel.cameraProxy.captureCompletion = { output in
-                let uiImage = UIImage(data: output.photoData)
-                DispatchQueue.main.async {
-                    withAnimation {
-                        capturedImage = uiImage
-                    }
-//                    cameraProxy.sendImage()
-                }
-            }
+//            cameraProxy.captureCompletion = { output in
+//                let uiImage = UIImage(data: output.photoData)
+//                DispatchQueue.main.async {
+//                    withAnimation {
+//                        capturedImage = uiImage
+//                    }
+////                    cameraProxy.sendImage()
+//                }
+//            }
         }
     }
 }

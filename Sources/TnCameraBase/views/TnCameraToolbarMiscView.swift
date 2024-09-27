@@ -11,9 +11,6 @@ import TnIosBase
 
 public struct TnCameraToolbarMiscView: View, TnLoggable {
     @EnvironmentObject var cameraModel: TnCameraViewModel
-    var cameraProxy: TnCameraProxyProtocol {
-        cameraModel.cameraProxy
-    }
     
     @Binding var toolbarType: TnCameraToolbarViewType
     
@@ -41,9 +38,6 @@ public struct TnCameraToolbarMiscView: View, TnLoggable {
 
 struct MiscView: View, TnLoggable {
     @EnvironmentObject var cameraModel: TnCameraViewModel
-    var cameraProxy: TnCameraProxyProtocol {
-        cameraModel.cameraProxy
-    }
 
     init() {
         logDebug("inited")
@@ -228,13 +222,11 @@ struct MiscView: View, TnLoggable {
     }
 }
 
-struct ZoomView: View {
+struct ZoomView: View, TnLoggable {
     @EnvironmentObject var cameraModel: TnCameraViewModel
-    var cameraProxy: TnCameraProxyProtocol {
-        cameraModel.cameraProxy
-    }
 
     init() {
+        logDebug("inited")
     }
     
     var body: some View {
@@ -275,9 +267,6 @@ struct ZoomView: View {
 
 struct SelectAlbumView: View, TnLoggable {
     @EnvironmentObject var cameraModel: TnCameraViewModel
-    var cameraProxy: TnCameraProxyProtocol {
-        cameraModel.cameraProxy
-    }
 
     @Binding var album: String
     let albumNames: [String]

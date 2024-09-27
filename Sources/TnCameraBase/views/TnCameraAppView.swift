@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 import TnIosBase
 
+
 public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
     @EnvironmentObject var cameraModel: TnCameraViewModel
     @ViewBuilder private let bottom: () -> TBottom?
@@ -16,7 +17,8 @@ public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
     @State private var showToolbar = false
     @State private var status: TnCameraStatus = .none
 
-    public init(bottom: @escaping () -> TBottom?) {
+    public init(cameraProxy: TnCameraProxyProtocol, bottom: @escaping () -> TBottom?) {
+        globalCameraProxy = cameraProxy
         self.bottom = bottom
         logDebug("inited")
     }
@@ -26,7 +28,7 @@ public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
             if status == .started {
                 ZStack {
                     // preview
-                    TnCameraPreviewViewMetal(imagePublisher: { await cameraModel.cameraProxy.currentCiImagePublisher })
+                    TnCameraPreviewViewMetal(imagePublisher: { await cameraProxy.currentCiImagePublisher })
                         .onTapGesture {
                             withAnimation {
                                 showToolbar.toggle()
@@ -42,7 +44,6 @@ public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
             }
         }
         .task {
-            let cameraProxy = cameraModel.cameraProxy
             cameraProxy.setup()
             // listen changes here
             await cameraProxy.statusPublisher
@@ -69,8 +70,8 @@ public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
 }
 
 extension TnCameraAppView where TBottom == EmptyView {
-    public init() {
-        self.init(bottom: { nil })
+    public init(cameraProxy: TnCameraProxyProtocol) {
+        self.init(cameraProxy: cameraProxy, bottom: { nil })
     }
 }
 
@@ -95,6 +96,18 @@ struct TnCameraToolbarView<TBottom: View>: View, TnLoggable {
                 TnCameraToolbarMiscView(toolbarType: $toolbarType)
                 TnCameraToolbarMainView(bottom: bottom, toolbarType: $toolbarType)
             }
+        }
+    }
+}
+
+var globalCameraProxy: TnCameraProxyProtocol!
+extension View {
+    var cameraProxy: TnCameraProxyProtocol {
+        get {
+            globalCameraProxy
+        }
+        set {
+            globalCameraProxy = newValue
         }
     }
 }

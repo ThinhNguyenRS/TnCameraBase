@@ -47,21 +47,21 @@ public struct TnCameraAppViewModelFactory {
         }
     }
     
-    public static func createServerAsyncModel(delegate: TnCameraViewModelDelegate? = nil, EOM: String? = nil, MTU: Int? = nil) -> TnCameraViewModel {
+    public static func createServerAsyncModel(delegate: TnCameraViewModelDelegate? = nil, EOM: String? = nil, MTU: Int? = nil) -> (proxy: TnCameraProxyProtocol, model: TnCameraViewModel) {
         let cameraProxy = TnCameraProxyServerAsync(TnCameraService.shared, networkInfo: TnCameraProxyServiceInfo.getInstance(EOM: EOM, MTU: MTU))
-        let cameraModel = TnCameraViewModel(cameraProxy: cameraProxy)
+        let cameraModel = TnCameraViewModel()
 
         cameraModel.delegate = delegate ?? ServerDelegate(cameraProxy: cameraProxy)
         cameraProxy.bleDelegate = cameraProxy
-        return cameraModel
+        return (cameraProxy, cameraModel)
     }
 
-    public static func createClientModel(delegate: TnCameraViewModelDelegate? = nil, EOM: String? = nil, MTU: Int? = nil) -> TnCameraViewModel {
+    public static func createClientModel(delegate: TnCameraViewModelDelegate? = nil, EOM: String? = nil, MTU: Int? = nil) -> (proxy: TnCameraProxyProtocol, model: TnCameraViewModel) {
         let cameraProxy = TnCameraProxyClient(networkInfo: TnCameraProxyServiceInfo.getInstance(EOM: EOM, MTU: MTU))
-        let cameraModel = TnCameraViewModel(cameraProxy: cameraProxy)
+        let cameraModel = TnCameraViewModel()
         
         cameraModel.delegate = delegate ?? ClientDelegate(cameraManager: cameraProxy)
         cameraProxy.bleDelegate = cameraProxy
-        return cameraModel
+        return (cameraProxy, cameraModel)
     }
 }
