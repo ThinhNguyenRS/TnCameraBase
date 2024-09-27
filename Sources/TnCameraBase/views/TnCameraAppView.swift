@@ -120,8 +120,9 @@ struct TnCameraToolbarView<TBottom: View>: View, TnLoggable {
 struct TestToolbar: View {
     @State var value: Double = 0
     var body: some View {
-        tnSliderView(
+        tnSliderViewVert(
             value: $value,
+            label: "Test slider",
             bounds: 0...10,
             step: 1,
             formatter: getNumberFormatter(".0f")
