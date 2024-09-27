@@ -107,11 +107,25 @@ struct TnCameraToolbarView<TBottom: View>: View, TnLoggable {
         // bottom toolbar
         if showToolbar {
             VStack(alignment: .leading) {
+                TestToolbar()
+                
                 Spacer()
                 TnCameraToolbarMiscView(toolbarType: $toolbarType)
                 TnCameraToolbarMainView(bottom: bottom, toolbarType: $toolbarType)
             }
         }
+    }
+}
+
+struct TestToolbar: View {
+    @State var value: Double = 0
+    var body: some View {
+        tnSliderView(
+            value: $value,
+            bounds: 0...10,
+            step: 1,
+            formatter: getNumberFormatter(".0f")
+        )
     }
 }
 
