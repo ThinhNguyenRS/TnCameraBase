@@ -35,6 +35,7 @@ public struct TnCameraPreviewViewMetal: TnLoggable {
             self.clearColor = MTLClearColor(red: 0, green: 0, blue: 0, alpha: 0)
             
             Task { [self] in
+                logDebug("listening ...")
                 await imagePublisher()
                     .onReceive(queue: .main) { [weak self] ciImage in
                         self?.ciImage = ciImage
