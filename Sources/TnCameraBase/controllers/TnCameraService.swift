@@ -251,7 +251,7 @@ extension TnCameraService {
             }
             fetchSettings()
 
-            self.logDebug("setup session", name, "!")
+            self.logDebug("setup session", name, status, "!")
         }
         
         if !session.canSetSessionPreset(settings.preset) {
@@ -273,11 +273,8 @@ extension TnCameraService {
             try setupDevice(name: name, deviceLock: deviceLock, deviceHandler: deviceHandler)
             
             setStatus(.inited)
-            
-            logDebug("setup session", "!")
         } catch {
             setStatus(.failed)
-            logError("setup session", "failed !")
             throw error
         }
     }
