@@ -51,6 +51,7 @@ public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
                 }
             }
         }
+        .environmentObject(cameraModel)
         .task {
             cameraProxy.setup()
             await self.listen()
