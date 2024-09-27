@@ -11,14 +11,22 @@ import TnIosBase
 
 
 public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
-    @EnvironmentObject var cameraModel: TnCameraViewModel
+    @StateObject var cameraModel: TnCameraViewModel
     @ViewBuilder private let bottom: () -> TBottom?
     
     @State private var showToolbar = false
     @State private var status: TnCameraStatus = .none
 
-    public init(cameraProxy: TnCameraProxyProtocol, bottom: @escaping () -> TBottom?) {
-        globalCameraProxy = cameraProxy
+    public init(serverMode: Bool, bottom: @escaping () -> TBottom?, EOM: String? = nil, MTU: Int = 512*1024) {
+        var model: (proxy: TnCameraProxyProtocol, model: TnCameraViewModel)
+        if serverMode {
+            model = TnCameraAppViewModelFactory.createServerAsyncModel(EOM: EOM, MTU: MTU)
+        } else {
+            model = TnCameraAppViewModelFactory.createClientModel(EOM: EOM, MTU: MTU)
+        }
+        globalCameraProxy = model.proxy
+        
+        self._cameraModel = StateObject(wrappedValue: model.model)
         self.bottom = bottom
         logDebug("inited")
     }
@@ -45,33 +53,39 @@ public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
         }
         .task {
             cameraProxy.setup()
-            // listen changes here
-            await cameraProxy.statusPublisher
-                .onReceive { [self] v in
-                    if status != v {
-                        logDebug("status changed", v)
-                        withAnimation {
-                            status = v
-                        }
-//                        delegate?.onChanged(status: v)
+            await self.listen()
+        }
+    }
+    
+    func listen() async {
+        // listen changes here
+        await cameraProxy.statusPublisher
+            .onReceive { [self] v in
+                if status != v {
+                    logDebug("status changed", v)
+                    withAnimation {
+                        status = v
                     }
+//                        delegate?.onChanged(status: v)
                 }
-            
-            await cameraProxy.settingsPublisher
-                .onReceive { [self] v in
+            }
+        
+        await cameraProxy.settingsPublisher
+            .onReceive { [self] v in
+                if status == .started {
                     logDebug("settings changed")
                     withAnimation {
-//                        settings = v
+    //                        settings = v
                     }
-//                    delegate?.onChanged(settings: v)
+    //                    delegate?.onChanged(settings: v)
                 }
-        }
+            }
     }
 }
 
 extension TnCameraAppView where TBottom == EmptyView {
-    public init(cameraProxy: TnCameraProxyProtocol) {
-        self.init(cameraProxy: cameraProxy, bottom: { nil })
+    public init(serverMode: Bool) {
+        self.init(serverMode: serverMode, bottom: { nil })
     }
 }
 
