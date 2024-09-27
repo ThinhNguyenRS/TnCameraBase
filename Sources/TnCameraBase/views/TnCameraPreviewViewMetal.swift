@@ -15,12 +15,11 @@ public struct TnCameraPreviewViewMetal: TnLoggable {
     public class InternalView: MTKView, TnLoggable {
         /// The image that should be displayed next.
         private var ciImage: CIImage?
-        private var cancelables = Set<AnyCancellable>()
         
         private lazy var commandQueue: MTLCommandQueue = self.device!.makeCommandQueue()!
         private lazy var context: CIContext = CIContext(mtlDevice: self.device!)
         
-        init(device: MTLDevice) {
+        init(device: MTLDevice, imagePublisher: @escaping () async -> Published<CIImage?>.Publisher) {
             super.init(frame: .zero, device: device)
             
             // setup view to only draw when we need it (i.e., a new pixel buffer arrived), not continuously
@@ -35,6 +34,14 @@ public struct TnCameraPreviewViewMetal: TnLoggable {
             self.framebufferOnly = false
             self.clearColor = MTLClearColor(red: 0, green: 0, blue: 0, alpha: 0)
             
+            Task { [self] in
+                await imagePublisher()
+                    .onReceive { [weak self] ciImage in
+                        self?.ciImage = ciImage
+                        self?.setNeedsDisplay()
+                    }
+            }
+
             logDebug("inited")
         }
         
@@ -89,43 +96,18 @@ public struct TnCameraPreviewViewMetal: TnLoggable {
             commandBuffer.present(currentDrawable)
             commandBuffer.commit()
         }
-        
-        func setImagePublisher(imagePublisher: AnyPublisher<CIImage?, Never>) {
-            // the key point here: this is combine. sink or subcribe the publisher
-            imagePublisher
-                .receive(on: DispatchQueue.main)
-                .sink { [weak self] ciImage in
-                    self?.ciImage = ciImage
-                    self?.setNeedsDisplay()
-                }
-                .store(in: &cancelables)
-        }
     }
     
-    let internalView: InternalView = InternalView(device: MTLCreateSystemDefaultDevice()!)
-    
-    public init() {
-        logDebug("inited")
-    }
-    
+    private let imagePublisher: () async -> Published<CIImage?>.Publisher
     public init(imagePublisher: @escaping () async -> Published<CIImage?>.Publisher) {
-        self.init()
-        self.setImagePublisher(imagePublisher: imagePublisher)
-    }
-    
-    @discardableResult
-    public func setImagePublisher(imagePublisher: @escaping () async -> Published<CIImage?>.Publisher) -> Self {
-        Task { /*@MainActor in*/
-            await internalView.setImagePublisher(imagePublisher: await imagePublisher().eraseToAnyPublisher())
-            logDebug("listen image ...")
-        }
-        return self
+        self.imagePublisher = imagePublisher
+        logDebug("inited")
     }
 }
 
 extension TnCameraPreviewViewMetal: UIViewRepresentable {
     public func makeUIView(context: Context) -> InternalView {
-        internalView
+        InternalView(device: MTLCreateSystemDefaultDevice()!, imagePublisher: imagePublisher)
     }
 
     public func updateUIView(_ uiView: InternalView, context: Context) {

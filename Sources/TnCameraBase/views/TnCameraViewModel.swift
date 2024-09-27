@@ -18,9 +18,6 @@ public protocol TnCameraViewModelDelegate {
 }
 
 public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {
-//    @Published public var status: TnCameraStatus = .none
-//    @Published public var capturedImage: UIImage? = nil
-    
     @Published public var orientation: UIDeviceOrientation = .unknown
     @Published public var orientationAngle: Angle = .zero
     

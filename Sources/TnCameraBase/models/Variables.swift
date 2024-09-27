@@ -8,4 +8,4 @@
 import Foundation
 import Combine
 
-public var cameraCancellables: Set<AnyCancellable> = .init()
+//public var cameraCancellables: Set<AnyCancellable> = .init()

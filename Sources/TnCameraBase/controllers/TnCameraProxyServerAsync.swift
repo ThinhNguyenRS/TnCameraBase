@@ -33,15 +33,15 @@ public class TnCameraProxyServerAsync: TnLoggable {
             self.settings = await cameraService.settings
             self.albums = await cameraService.library.getAlbums()
             
-            await cameraService.$isSettingsChanging.sink { v in
+            await cameraService.$isSettingsChanging.onReceive { v in
                 if !v {
                     Task {
                         self.settings = await cameraService.settings
                     }
                 }
-            }.store(in: &cameraCancellables)
+            }
 
-            await cameraService.$status.onReceive(cancellables: &cameraCancellables) { v in
+            await cameraService.$status.onReceive { v in
                 if self.status != v {
                     self.status = v
                 }

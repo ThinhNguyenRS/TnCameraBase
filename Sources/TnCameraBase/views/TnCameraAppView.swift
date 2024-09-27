@@ -46,7 +46,7 @@ public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
             cameraProxy.setup()
             // listen changes here
             await cameraProxy.statusPublisher
-                .onReceive(cancellables: &cameraCancellables) { [self] v in
+                .onReceive { [self] v in
                     if status != v {
                         logDebug("status changed", v)
                         withAnimation {
@@ -57,7 +57,7 @@ public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
                 }
             
             await cameraProxy.settingsPublisher
-                .onReceive(cancellables: &cameraCancellables) { [self] v in
+                .onReceive { [self] v in
                     logDebug("settings changed")
                     withAnimation {
 //                        settings = v
@@ -78,7 +78,7 @@ struct TnCameraToolbarView<TBottom: View>: View, TnLoggable {
     @EnvironmentObject var cameraModel: TnCameraViewModel
     @ViewBuilder private let bottom: () -> TBottom?
     
-    @Binding var showToolbar: Bool
+    @Binding private var showToolbar: Bool
     @State private var toolbarType: TnCameraToolbarViewType = .main
 
     init(bottom: @escaping () -> TBottom?, showToolbar: Binding<Bool>) {

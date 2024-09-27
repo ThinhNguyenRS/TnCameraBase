@@ -22,7 +22,6 @@ public actor TnCameraService: NSObject, TnLoggable {
     //    @Published public var settings: TnCameraSettings = .init()
     public var settings: TnCameraSettings = .init()
     @Published public var status: TnCameraStatus = .none
-//    public var status: TnCameraStatus = .none
     @Published public var currentCiImage: CIImage?
     
     @Published private(set) var isSettingsChanging = false
@@ -168,12 +167,11 @@ extension TnCameraService {
         
         // listen videoZoomFactor
         device.publisher(for: \.isRampingVideoZoom)
-            .sink { [self] v in
+            .onReceive { [self] v in
                 if !v {
                     settings.zoomFactor = device.videoZoomFactor / settings.zoomMainFactor
                 }
             }
-            .store(in: &cameraCancellables)
 
         self.logDebug("addSessionInputs !")
     }
@@ -555,6 +553,7 @@ extension TnCameraService {
     }
 }
 
+// MARK: AVCaptureVideoDataOutputSampleBufferDelegate
 extension TnCameraService: AVCaptureVideoDataOutputSampleBufferDelegate {
     private func setImage(_ ciImage: CIImage) async {
         self.currentCiImage = ciImage
