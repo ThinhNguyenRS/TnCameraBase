@@ -107,9 +107,8 @@ struct TnCameraToolbarView<TBottom: View>: View, TnLoggable {
         // bottom toolbar
         if showToolbar {
             VStack(alignment: .leading) {
-                TestToolbar()
-                
                 Spacer()
+                TestToolbar()
                 TnCameraToolbarMiscView(toolbarType: $toolbarType)
                 TnCameraToolbarMainView(bottom: bottom, toolbarType: $toolbarType)
             }
