@@ -38,7 +38,6 @@ public class TnCameraProxyClient: NSObject, ObservableObject, TnLoggable {
             ble.delegate = newValue
         }
     }
-    public var captureCompletion: TnCameraPhotoOutputCompletion?
 }
 
 // MARK: solve messages

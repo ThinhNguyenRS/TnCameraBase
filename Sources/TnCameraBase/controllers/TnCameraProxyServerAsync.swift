@@ -56,7 +56,6 @@ public class TnCameraProxyServerAsync: TnLoggable {
             ble.delegate = newValue
         }
     }
-    public var captureCompletion: TnCameraPhotoOutputCompletion?
 }
 
 // MARK: solve messages
@@ -226,7 +225,7 @@ extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
         Task {
             let output = try? await cameraService.captureImage()
             if let output {
-                captureCompletion?(output)
+                delegate?.tnCamera(captured: output)
             }
         }
     }

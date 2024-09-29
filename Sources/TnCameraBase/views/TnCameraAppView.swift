@@ -78,6 +78,22 @@ extension TnCameraAppView where TBottom == EmptyView {
     }
 }
 
+extension TnCameraAppView: TnCameraDelegate {
+    public func tnCamera(captured: TnCameraPhotoOutput) {
+    }
+    
+    public func tnCamera(status: TnCameraStatus) {
+    }
+    
+    public func tnCamera(settings: TnCameraSettings) {
+        DispatchQueue.main.async {
+            logDebug("settings changed")
+            self.settings = settings
+        }
+    }
+}
+
+// MARK: TnCameraToolbarView
 struct TnCameraToolbarView<TBottom: View>: View, TnLoggable {
     @ViewBuilder private let bottom: () -> TBottom?
     

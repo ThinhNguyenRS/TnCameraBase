@@ -16,7 +16,6 @@ import TnIosBase
 public protocol TnCameraProtocol {
     var currentCiImagePublisher: Published<CIImage?>.Publisher { get async }
     var albums: [String] { get }
-    var captureCompletion: TnCameraPhotoOutputCompletion? { get set }
     var delegate: TnCameraDelegate? { get set }
     
 //    var settings: TnCameraSettings { get set }
