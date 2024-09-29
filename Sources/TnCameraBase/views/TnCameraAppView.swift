@@ -10,15 +10,26 @@ import SwiftUI
 import TnIosBase
 
 
-public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
-    @ViewBuilder private let bottom: () -> TBottom?
-    
+var globalCameraProxy: TnCameraProxyProtocol!
+extension View {
+    var cameraProxy: TnCameraProxyProtocol {
+        get {
+            globalCameraProxy
+        }
+        set {
+            globalCameraProxy = newValue
+        }
+    }
+}
+
+
+public struct TnCameraAppView: View, TnLoggable {
     @State private var showToolbar = false
     @State private var toolbarType: TnCameraToolbarViewType = .main
     @State private var settings: TnCameraSettings = .init()
     @State private var capturedImage: UIImage? = nil
 
-    public init(serverMode: Bool, bottom: @escaping () -> TBottom?, EOM: String? = nil, MTU: Int = 512*1024) {
+    public init(serverMode: Bool, EOM: String? = nil, MTU: Int = 512*1024) {
         var model: (proxy: TnCameraProxyProtocol, model: TnCameraViewModel)
         if serverMode {
             model = TnCameraAppViewModelFactory.createServerAsyncModel(EOM: EOM, MTU: MTU)
@@ -27,7 +38,6 @@ public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
         }
         globalCameraProxy = model.proxy
 
-        self.bottom = bottom
         logDebug("inited")
     }
     
@@ -41,27 +51,15 @@ public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
                             showToolbar.toggle()
                         }
                     }
+                
+                // toolbar
+                TnCameraToolbarView(
+                    showToolbar: $showToolbar,
+                    toolbarType: $toolbarType,
+                    settings: $settings,
+                    capturedImage: $capturedImage
+                )
 
-                // bottom toolbar
-                if showToolbar {
-                    VStack(alignment: .leading) {
-                        Spacer()
-
-                        // variant toolbar
-                        if toolbarType == .zoom {
-                            TnCameraToolbarZoomView(settings: $settings)
-                                .padding(.all, 12)
-                                .background(Color.appleAsparagus.opacity(0.75))
-                                .cornerRadius(8)
-                        }
-                        else if toolbarType == .misc {
-                            TnCameraToolbarMiscView(settings: $settings)
-                        }
-
-                        // main toolbar
-                        TnCameraToolbarMainView(bottom: bottom, toolbarType: $toolbarType, settings: $settings, capturedImage: $capturedImage)
-                    }
-                }
             }
             .onAppear {
                 logDebug("appear")
@@ -71,12 +69,6 @@ public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
             globalCameraProxy.delegate = self
             globalCameraProxy.setup()
         }
-    }
-}
-
-extension TnCameraAppView where TBottom == EmptyView {
-    public init(serverMode: Bool) {
-        self.init(serverMode: serverMode, bottom: { nil })
     }
 }
 
@@ -96,38 +88,41 @@ extension TnCameraAppView: TnCameraDelegate {
     }
 }
 
-struct TestToolbar: View, TnLoggable {
-    @State private var value: Double = 0
-    @Binding var settings: TnCameraSettings
-
-//    init(cameraModel: TnCameraViewModel) {
-//        self._cameraModel = StateObject(wrappedValue: cameraModel)
-//    }
+struct TnCameraToolbarView: View, TnLoggable {
+    @Binding private var showToolbar: Bool
+    @Binding private var toolbarType: TnCameraToolbarViewType
+    @Binding private var settings: TnCameraSettings
+    @Binding private var capturedImage: UIImage?
     
-    init(settings: Binding<TnCameraSettings>) {
-        _settings = settings
+    init(showToolbar: Binding<Bool>, toolbarType: Binding<TnCameraToolbarViewType>, settings: Binding<TnCameraSettings>, capturedImage: Binding<UIImage?>) {
+        self._showToolbar = showToolbar
+        self._toolbarType = toolbarType
+        self._settings = settings
+        self._capturedImage = capturedImage
+        
         logDebug("inited")
     }
-
+    
     var body: some View {
-        tnSliderViewVert(
-            value: $settings.zoomFactor,
-            label: "Test slider",
-            bounds: 0.5...4,
-            step: 0.05,
-            formatter: getNumberFormatter("%.2f")
-        )
-    }
-}
+        // bottom toolbar
+        if showToolbar {
+            VStack(alignment: .leading) {
+                Spacer()
 
-var globalCameraProxy: TnCameraProxyProtocol!
-extension View {
-    var cameraProxy: TnCameraProxyProtocol {
-        get {
-            globalCameraProxy
-        }
-        set {
-            globalCameraProxy = newValue
+                // variant toolbar
+                if toolbarType == .zoom {
+                    TnCameraToolbarZoomView(settings: $settings)
+                        .padding(.all, 12)
+                        .background(Color.appleAsparagus.opacity(0.75))
+                        .cornerRadius(8)
+                }
+                else if toolbarType == .misc {
+                    TnCameraToolbarMiscView(settings: $settings)
+                }
+
+                // main toolbar
+                TnCameraToolbarMainView(toolbarType: $toolbarType, settings: $settings, capturedImage: $capturedImage)
+            }
         }
     }
 }

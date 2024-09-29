@@ -10,14 +10,12 @@ import SwiftUI
 import Combine
 import TnIosBase
 
-public struct TnCameraToolbarMainView<TBottom: View>: View, TnLoggable {
+public struct TnCameraToolbarMainView: View, TnLoggable {
     @Binding private var capturedImage: UIImage?
-    @ViewBuilder private let bottom: () -> TBottom?
     @Binding private var toolbarType: TnCameraToolbarViewType
     @Binding var settings: TnCameraSettings
 
-    init(bottom: @escaping () -> TBottom?, toolbarType: Binding<TnCameraToolbarViewType>, settings: Binding<TnCameraSettings>, capturedImage: Binding<UIImage?>) {
-        self.bottom = bottom
+    init(toolbarType: Binding<TnCameraToolbarViewType>, settings: Binding<TnCameraSettings>, capturedImage: Binding<UIImage?>) {
         self._toolbarType = toolbarType
         self._settings = settings
         self._capturedImage = capturedImage
@@ -40,11 +38,6 @@ public struct TnCameraToolbarMainView<TBottom: View>: View, TnLoggable {
 
             Spacer()
             getSettingsButton(type: .zoom, text: settings.zoomFactor.toString("%0.2f"))
-
-            if let bottomView = bottom() {
-                Spacer()
-                bottomView
-            }
 
             // capture
             Spacer()
