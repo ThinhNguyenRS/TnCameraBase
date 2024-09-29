@@ -169,8 +169,10 @@ extension TnCameraService {
         device.publisher(for: \.isRampingVideoZoom)
             .onReceive { [self] v in
                 if !v {
+                    isSettingsChanging = true
                     settings.zoomFactor = device.videoZoomFactor / settings.zoomMainFactor
                     logDebug("zoom changed", settings.zoomFactor)
+                    isSettingsChanging = false
                 }
             }
 
