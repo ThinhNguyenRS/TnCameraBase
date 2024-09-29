@@ -16,6 +16,7 @@ public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
     
     @State private var showToolbar = false
     @State private var status: TnCameraStatus = .none
+    @State var settings: TnCameraSettings = .init()
 
     public init(serverMode: Bool, bottom: @escaping () -> TBottom?, EOM: String? = nil, MTU: Int = 512*1024) {
         var model: (proxy: TnCameraProxyProtocol, model: TnCameraViewModel)
@@ -44,7 +45,7 @@ public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
                         }
 
                     // bottom toolbar
-                    TnCameraToolbarView(bottom: bottom, showToolbar: $showToolbar)
+                    TnCameraToolbarView(bottom: bottom, showToolbar: $showToolbar, settings: $settings)
                 }
                 .onAppear {
                     logDebug("appear")
@@ -91,15 +92,17 @@ extension TnCameraAppView where TBottom == EmptyView {
 }
 
 struct TnCameraToolbarView<TBottom: View>: View, TnLoggable {
-    @EnvironmentObject var cameraModel: TnCameraViewModel
     @ViewBuilder private let bottom: () -> TBottom?
     
     @Binding private var showToolbar: Bool
     @State private var toolbarType: TnCameraToolbarViewType = .main
+    @Binding var settings: TnCameraSettings
 
-    init(bottom: @escaping () -> TBottom?, showToolbar: Binding<Bool>) {
+    init(bottom: @escaping () -> TBottom?, showToolbar: Binding<Bool>, settings: Binding<TnCameraSettings>) {
         self.bottom = bottom
         self._showToolbar = showToolbar
+        self._settings = settings
+        
         logDebug("inited")
     }
     
@@ -109,7 +112,7 @@ struct TnCameraToolbarView<TBottom: View>: View, TnLoggable {
             VStack(alignment: .leading) {
                 Spacer()
                 TestToolbar()
-                TnCameraToolbarMiscView(toolbarType: $toolbarType)
+                TnCameraToolbarMiscView(toolbarType: $toolbarType, settings: $settings)
                 TnCameraToolbarMainView(bottom: bottom, toolbarType: $toolbarType)
             }
         }

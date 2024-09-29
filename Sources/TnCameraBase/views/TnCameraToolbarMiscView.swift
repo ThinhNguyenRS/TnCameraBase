@@ -10,12 +10,14 @@ import SwiftUI
 import TnIosBase
 
 public struct TnCameraToolbarMiscView: View, TnLoggable {
-    @EnvironmentObject var cameraModel: TnCameraViewModel
+//    @EnvironmentObject var cameraModel: TnCameraViewModel
     
+    @Binding var settings: TnCameraSettings
     @Binding var toolbarType: TnCameraToolbarViewType
     
-    init(toolbarType: Binding<TnCameraToolbarViewType>) {
+    init(toolbarType: Binding<TnCameraToolbarViewType>, settings: Binding<TnCameraSettings>) {
         _toolbarType = toolbarType
+        _settings = settings
         logDebug("inited")
     }
     
@@ -23,9 +25,9 @@ public struct TnCameraToolbarMiscView: View, TnLoggable {
         Group {
             switch toolbarType {
             case .zoom:
-                ZoomView()
+                ZoomView(settings: $settings)
             case .misc:
-                MiscView()
+                MiscView(settings: $settings)
             default:
                 EmptyView()
             }
@@ -37,9 +39,11 @@ public struct TnCameraToolbarMiscView: View, TnLoggable {
 }
 
 struct MiscView: View, TnLoggable {
-    @EnvironmentObject var cameraModel: TnCameraViewModel
+//    @EnvironmentObject var cameraModel: TnCameraViewModel
+    @Binding var settings: TnCameraSettings
 
-    init() {
+    init(settings: Binding<TnCameraSettings>) {
+        _settings = settings
         logDebug("inited")
     }
     
@@ -48,8 +52,8 @@ struct MiscView: View, TnLoggable {
             Section("Camera Type") {
                 tnPickerViewVert(
                     label: "Preset",
-                    value: $cameraModel.settings.preset,
-                    values: cameraModel.settings.presets,
+                    value: $settings.preset,
+                    values: settings.presets,
                     onChanged: { v in
                         cameraProxy.setPreset(v)
                     }
@@ -57,8 +61,8 @@ struct MiscView: View, TnLoggable {
                 
                 tnPickerViewVert(
                     label: "Type",
-                    value: $cameraModel.settings.cameraType,
-                    values: cameraModel.settings.cameraTypes,
+                    value: $settings.cameraType,
+                    values: settings.cameraTypes,
                     onChanged: { v in
                         cameraProxy.setCameraType(v)
                     }
@@ -66,19 +70,19 @@ struct MiscView: View, TnLoggable {
                 
                 tnPickerViewVert(
                     label: "Priority",
-                    value: $cameraModel.settings.priority,
+                    value: $settings.priority,
                     onChanged: { v in
                         cameraProxy.setPriority(v)
                     }
                 )
                 
-                TnToggleField(label: "Wide color", value: $cameraModel.settings.wideColor) { v in
+                TnToggleField(label: "Wide color", value: $settings.wideColor) { v in
                     cameraProxy.setWideColor(v)
                 }
                 .toggleStyle(.switch)
 
-                if cameraModel.settings.livephotoSupported {
-                    TnToggleField(label: "Live photo", value: $cameraModel.settings.livephoto) { v in
+                if settings.livephotoSupported {
+                    TnToggleField(label: "Live photo", value: $settings.livephoto) { v in
                         cameraProxy.setLivephoto(v)
                     }
                     .toggleStyle(.switch)
@@ -86,35 +90,35 @@ struct MiscView: View, TnLoggable {
             }
             
             Section("Capturing") {
-                Stepper("Count: \(cameraModel.settings.capturing.count)", value: $cameraModel.settings.capturing.count, onEditingChanged: { _ in
-                    cameraProxy.setCapturing(cameraModel.settings.capturing)
+                Stepper("Count: \(settings.capturing.count)", value: $settings.capturing.count, onEditingChanged: { _ in
+                    cameraProxy.setCapturing(settings.capturing)
                 })
-                Stepper("Delay: \(cameraModel.settings.capturing.delay)s", value: $cameraModel.settings.capturing.delay, in: 0...10, onEditingChanged: { _ in
-                    cameraProxy.setCapturing(cameraModel.settings.capturing)
+                Stepper("Delay: \(settings.capturing.delay)s", value: $settings.capturing.delay, in: 0...10, onEditingChanged: { _ in
+                    cameraProxy.setCapturing(settings.capturing)
                 })
                 
 //                SelectAlbumView(
-//                    album: $cameraModel.settings.capturing.album,
+//                    album: $settings.capturing.album,
 //                    albumNames: cameraProxy.albums
 //                )
             }
             
             Section("Light") {
-                if cameraModel.settings.flashSupported {
+                if settings.flashSupported {
                     tnPickerViewVert(
                         label: "Flash",
-                        value: $cameraModel.settings.flashMode,
-                        values: cameraModel.settings.flashModes,
+                        value: $settings.flashMode,
+                        values: settings.flashModes,
                         onChanged: { v in
                             cameraProxy.setFlash(v)
                         }
                     )
                 }
                 
-                if cameraModel.settings.hdrSupported {
+                if settings.hdrSupported {
                     tnPickerViewVert(
                         label: "HDR",
-                        value: $cameraModel.settings.hdr,
+                        value: $settings.hdr,
                         onChanged: { v in
                             cameraProxy.setHDR(v)
                         }
@@ -124,11 +128,11 @@ struct MiscView: View, TnLoggable {
             }
             
             Section("Exposure & Focus") {
-                if !cameraModel.settings.focusModes.isEmpty {
+                if !settings.focusModes.isEmpty {
                     tnPickerViewVert(
                         label: "Focus mode",
-                        value: $cameraModel.settings.focusMode,
-                        values: cameraModel.settings.focusModes,
+                        value: $settings.focusMode,
+                        values: settings.focusModes,
                         onChanged: { v in
                             cameraProxy.setFocusMode(v)
                         }
@@ -137,19 +141,19 @@ struct MiscView: View, TnLoggable {
 
                 tnPickerViewVert(
                     label: "Exposure mode",
-                    value: $cameraModel.settings.exposureMode,
-                    values: cameraModel.settings.exposureModes,
+                    value: $settings.exposureMode,
+                    values: settings.exposureModes,
                     onChanged: { v in
                         cameraProxy.setExposureMode(v)
                     }
                 )
                 
-                if cameraModel.settings.exposureMode == .custom {
+                if settings.exposureMode == .custom {
                     VStack {
                         tnSliderViewVert(
-                            value: $cameraModel.settings.iso,
+                            value: $settings.iso,
                             label: "ISO",
-                            bounds: cameraModel.settings.isoRange,
+                            bounds: settings.isoRange,
                             step: 50,
                             onChanged: { [self] v in
                                 cameraProxy.setExposure(.init(iso: v))
@@ -158,9 +162,9 @@ struct MiscView: View, TnLoggable {
                         )
                         
                         tnSliderViewVert(
-                            value: $cameraModel.settings.exposureDuration,
+                            value: $settings.exposureDuration,
                             label: "Shutter speed",
-                            bounds: cameraModel.settings.exposureDurationRange,
+                            bounds: settings.exposureDurationRange,
                             step: 0.001,
                             onChanged: { [self] v in
                                 cameraProxy.setExposure(.init(duration: v))
@@ -172,15 +176,15 @@ struct MiscView: View, TnLoggable {
                 }
             }
             
-            if cameraModel.settings.depthSupported {
+            if settings.depthSupported {
                 Section("Virtual apecture") {
-                    TnToggleField(label: "Embed depth data", value: $cameraModel.settings.depth) { v in
+                    TnToggleField(label: "Embed depth data", value: $settings.depth) { v in
                         cameraProxy.setDepth(v)
                     }
                     .toggleStyle(.switch)
                     
-                    if cameraModel.settings.portraitSupported {
-                        TnToggleField(label: "Embed portrait data", value: $cameraModel.settings.portrait) { v in
+                    if settings.portraitSupported {
+                        TnToggleField(label: "Embed portrait data", value: $settings.portrait) { v in
                             cameraProxy.setPortrait(v)
                         }
                         .toggleStyle(.switch)
@@ -190,31 +194,31 @@ struct MiscView: View, TnLoggable {
 
             Section("Image Mirroring") {
                 tnSliderViewVert(
-                    value: $cameraModel.settings.transporting.scale,
+                    value: $settings.transporting.scale,
                     label: "Scale",
                     bounds: 0.02...0.40,
                     step: 0.01,
                     onChanged: { [self] v in
-                        cameraProxy.setTransporting(cameraModel.settings.transporting)
+                        cameraProxy.setTransporting(settings.transporting)
                     },
                     formatter: getNumberPercentFormatter(),
                     adjustBounds: false
                 )
 
                 tnSliderViewVert(
-                    value: $cameraModel.settings.transporting.compressQuality,
+                    value: $settings.transporting.compressQuality,
                     label: "Compress quality",
                     bounds: 0.25...1,
                     step: 0.05,
                     onChanged: { [self] v in
-                        cameraProxy.setTransporting(cameraModel.settings.transporting)
+                        cameraProxy.setTransporting(settings.transporting)
                     },
                     formatter: getNumberPercentFormatter(),
                     adjustBounds: false
                 )
 
-                TnToggleField(label: "Continuous", value: $cameraModel.settings.transporting.continuous) { v in
-                    cameraProxy.setTransporting(cameraModel.settings.transporting)
+                TnToggleField(label: "Continuous", value: $settings.transporting.continuous) { v in
+                    cameraProxy.setTransporting(settings.transporting)
                 }
                 .toggleStyle(.switch)
             }
@@ -223,18 +227,20 @@ struct MiscView: View, TnLoggable {
 }
 
 struct ZoomView: View, TnLoggable {
-    @EnvironmentObject var cameraModel: TnCameraViewModel
+//    @EnvironmentObject var cameraModel: TnCameraViewModel
+    @Binding var settings: TnCameraSettings
 
-    init() {
+    init(settings: Binding<TnCameraSettings>) {
+        _settings = settings
         logDebug("inited")
     }
     
     var body: some View {
         let step = 0.1/2
         return tnSliderViewVert(
-            value: $cameraModel.settings.zoomFactor,
+            value: $settings.zoomFactor,
             label: "Zoom",
-            bounds: cameraModel.settings.zoomRange,
+            bounds: settings.zoomRange,
             step: step,
             onChanged: { v in
                 cameraProxy.setZoomFactor(.init(value: v))
@@ -243,13 +249,13 @@ struct ZoomView: View, TnLoggable {
             bottomView: {
                 HStack {
                     tnCircleButton(imageName: "chevron.backward", radius: 40) {
-                        cameraProxy.setZoomFactor(.init(value: cameraModel.settings.zoomFactor - step))
+                        cameraProxy.setZoomFactor(.init(value: settings.zoomFactor - step))
                     }
                     
                     Spacer()
-                    tnForEach(cameraModel.settings.zoomRelativeFactors) { idx, v in
+                    tnForEach(settings.zoomRelativeFactors) { idx, v in
                         Group {
-                            tnCircleButton(text: v.toString("%0.1f"), radius: 36, backColor: cameraModel.settings.zoomFactor == v ? .orange : .gray) {
+                            tnCircleButton(text: v.toString("%0.1f"), radius: 36, backColor: settings.zoomFactor == v ? .orange : .gray) {
                                 cameraProxy.setZoomFactor(.init(value: v))
                             }
                             Spacer()
@@ -257,7 +263,7 @@ struct ZoomView: View, TnLoggable {
                     }
 
                     tnCircleButton(imageName: "chevron.forward", radius: 40) {
-                        cameraProxy.setZoomFactor(.init(value: cameraModel.settings.zoomFactor + step))
+                        cameraProxy.setZoomFactor(.init(value: settings.zoomFactor + step))
                     }
                 }
             }
