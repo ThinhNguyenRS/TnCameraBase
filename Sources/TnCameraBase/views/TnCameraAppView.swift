@@ -11,11 +11,9 @@ import TnIosBase
 
 
 public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
-    @StateObject var cameraModel: TnCameraViewModel
     @ViewBuilder private let bottom: () -> TBottom?
     
     @State private var showToolbar = false
-    @State private var status: TnCameraStatus = .none
     @State var settings: TnCameraSettings = .init()
 
     public init(serverMode: Bool, bottom: @escaping () -> TBottom?, EOM: String? = nil, MTU: Int = 512*1024) {
@@ -27,32 +25,28 @@ public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
         }
         globalCameraProxy = model.proxy
         
-        self._cameraModel = StateObject(wrappedValue: model.model)
         self.bottom = bottom
         logDebug("inited")
     }
     
     public var body: some View {
         Group {
-//            if status == .started {
-                ZStack {
-                    // preview
-                    TnCameraPreviewViewMetal(imagePublisher: { await cameraProxy.currentCiImagePublisher })
-                        .onTapGesture {
-                            withAnimation {
-                                showToolbar.toggle()
-                            }
+            ZStack {
+                // preview
+                TnCameraPreviewViewMetal(imagePublisher: { await cameraProxy.currentCiImagePublisher })
+                    .onTapGesture {
+                        withAnimation {
+                            showToolbar.toggle()
                         }
+                    }
 
-                    // bottom toolbar
-                    TnCameraToolbarView(bottom: bottom, showToolbar: $showToolbar, settings: $settings)
-                }
-                .onAppear {
-                    logDebug("appear")
-                }
-//            }
+                // bottom toolbar
+                TnCameraToolbarView(bottom: bottom, showToolbar: $showToolbar, settings: $settings)
+            }
+            .onAppear {
+                logDebug("appear")
+            }
         }
-        .environmentObject(cameraModel)
         .task {
             cameraProxy.setup()
             await self.listen()
@@ -63,24 +57,17 @@ public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
         // listen changes here
         await cameraProxy.statusPublisher
             .onReceive { [self] v in
-                if status != v {
-                    logDebug("status changed", v)
-                    withAnimation {
-                        status = v
-                    }
+                logDebug("status changed", v)
 //                        delegate?.onChanged(status: v)
-                }
             }
         
         await cameraProxy.settingsPublisher
             .onReceive { [self] v in
-                if status == .started {
-                    logDebug("settings changed")
-                    withAnimation {
-                            settings = v
-                    }
-    //                    delegate?.onChanged(settings: v)
+                logDebug("settings changed")
+                withAnimation {
+                        settings = v
                 }
+//                    delegate?.onChanged(settings: v)
             }
     }
 }
