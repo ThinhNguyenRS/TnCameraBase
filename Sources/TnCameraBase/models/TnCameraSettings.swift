@@ -19,8 +19,9 @@ public enum TnCameraStatus: Int, Comparable, Codable {
 }
 
 // MARK: TnCameraSettings
-public struct TnCameraSettings: Codable {
+public struct TnCameraSettings: Codable, TnLoggable {
     public init() {
+        logDebug("inited")
     }
     
     public var presets: [AVCaptureSession.Preset] = [.photo, .hd4K3840x2160]

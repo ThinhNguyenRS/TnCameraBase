@@ -111,7 +111,7 @@ struct TnCameraToolbarView<TBottom: View>: View, TnLoggable {
         if showToolbar {
             VStack(alignment: .leading) {
                 Spacer()
-                TestToolbar()
+                TestToolbar(settings: $settings)
                 TnCameraToolbarMiscView(toolbarType: $toolbarType, settings: $settings)
                 TnCameraToolbarMainView(bottom: bottom, toolbarType: $toolbarType)
             }
@@ -122,19 +122,20 @@ struct TnCameraToolbarView<TBottom: View>: View, TnLoggable {
 struct TestToolbar: View, TnLoggable {
     @State private var value: Double = 0
 //    @EnvironmentObject var cameraModel: TnCameraViewModel
-    @StateObject var cameraModel: TnCameraViewModel = .init()
+    @Binding var settings: TnCameraSettings
 
 //    init(cameraModel: TnCameraViewModel) {
 //        self._cameraModel = StateObject(wrappedValue: cameraModel)
 //    }
     
-    init() {
+    init(settings: Binding<TnCameraSettings>) {
+        _settings = settings
         logDebug("inited")
     }
 
     var body: some View {
         tnSliderViewVert(
-            value: $cameraModel.settings.zoomFactor,
+            value: $settings.zoomFactor,
             label: "Test slider",
             bounds: 0.5...4,
             step: 0.05,
