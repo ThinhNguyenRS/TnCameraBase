@@ -77,7 +77,7 @@ public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
                 if status == .started {
                     logDebug("settings changed")
                     withAnimation {
-    //                        settings = v
+                            settings = v
                     }
     //                    delegate?.onChanged(settings: v)
                 }
@@ -111,7 +111,7 @@ struct TnCameraToolbarView<TBottom: View>: View, TnLoggable {
         if showToolbar {
             VStack(alignment: .leading) {
                 Spacer()
-                TestToolbar(settings: $settings)
+//                TestToolbar(settings: $settings)
                 TnCameraToolbarMiscView(toolbarType: $toolbarType, settings: $settings)
                 TnCameraToolbarMainView(bottom: bottom, toolbarType: $toolbarType)
             }
