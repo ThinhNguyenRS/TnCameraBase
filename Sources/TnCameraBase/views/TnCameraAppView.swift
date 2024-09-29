@@ -24,7 +24,7 @@ public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
             model = TnCameraAppViewModelFactory.createClientModel(EOM: EOM, MTU: MTU)
         }
         globalCameraProxy = model.proxy
-        
+
         self.bottom = bottom
         logDebug("inited")
     }
@@ -48,7 +48,8 @@ public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
             }
         }
         .task {
-            cameraProxy.setup()
+            globalCameraProxy.delegate = self
+            globalCameraProxy.setup()
             await self.listen()
         }
     }
