@@ -48,19 +48,15 @@ public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
                         Spacer()
 
                         // variant toolbar
-                        Group {
-                            switch toolbarType {
-                            case .zoom:
-                                TnCameraToolbarZoomView(settings: $settings)
-                            case .misc:
-                                TnCameraToolbarMiscView(settings: $settings)
-                            default:
-                                nil as EmptyView?
-                            }
+                        if toolbarType == .zoom {
+                            TnCameraToolbarZoomView(settings: $settings)
+                                .padding(.all, 12)
+                                .background(Color.appleAsparagus.opacity(0.75))
+                                .cornerRadius(8)
                         }
-                        .padding(.all, 12)
-                        .background(Color.appleAsparagus.opacity(0.75))
-                        .cornerRadius(8)
+                        else if toolbarType == .misc {
+                            TnCameraToolbarMiscView(settings: $settings)
+                        }
 
                         // main toolbar
                         TnCameraToolbarMainView(bottom: bottom, toolbarType: $toolbarType, settings: $settings, capturedImage: $capturedImage)
