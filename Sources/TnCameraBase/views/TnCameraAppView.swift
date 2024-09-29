@@ -14,7 +14,9 @@ public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
     @ViewBuilder private let bottom: () -> TBottom?
     
     @State private var showToolbar = false
-    @State var settings: TnCameraSettings = .init()
+    @State private var toolbarType: TnCameraToolbarViewType = .main
+    @State private var settings: TnCameraSettings = .init()
+    @State private var capturedImage: UIImage? = nil
 
     public init(serverMode: Bool, bottom: @escaping () -> TBottom?, EOM: String? = nil, MTU: Int = 512*1024) {
         var model: (proxy: TnCameraProxyProtocol, model: TnCameraViewModel)
@@ -41,7 +43,29 @@ public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
                     }
 
                 // bottom toolbar
-                TnCameraToolbarView(bottom: bottom, showToolbar: $showToolbar, settings: $settings)
+                if showToolbar {
+                    VStack(alignment: .leading) {
+                        Spacer()
+
+                        // variant toolbar
+                        Group {
+                            switch toolbarType {
+                            case .zoom:
+                                TnCameraToolbarZoomView(settings: $settings)
+                            case .misc:
+                                TnCameraToolbarMiscView(settings: $settings)
+                            default:
+                                nil as EmptyView?
+                            }
+                        }
+                        .padding(.all, 12)
+                        .background(Color.appleAsparagus.opacity(0.75))
+                        .cornerRadius(8)
+
+                        // main toolbar
+                        TnCameraToolbarMainView(bottom: bottom, toolbarType: $toolbarType, settings: $settings, capturedImage: $capturedImage)
+                    }
+                }
             }
             .onAppear {
                 logDebug("appear")
@@ -50,26 +74,7 @@ public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
         .task {
             globalCameraProxy.delegate = self
             globalCameraProxy.setup()
-            await self.listen()
         }
-    }
-    
-    func listen() async {
-//        // listen changes here
-//        await cameraProxy.statusPublisher
-//            .onReceive { [self] v in
-//                logDebug("status changed", v)
-////                        delegate?.onChanged(status: v)
-//            }
-//        
-//        await cameraProxy.settingsPublisher
-//            .onReceive { [self] v in
-//                logDebug("settings changed")
-//                withAnimation {
-//                        settings = v
-//                }
-////                    delegate?.onChanged(settings: v)
-//            }
     }
 }
 
@@ -81,6 +86,7 @@ extension TnCameraAppView where TBottom == EmptyView {
 
 extension TnCameraAppView: TnCameraDelegate {
     public func tnCamera(captured: TnCameraPhotoOutput) {
+        capturedImage = UIImage(data: captured.photoData)
     }
     
     public func tnCamera(status: TnCameraStatus) {
@@ -90,35 +96,6 @@ extension TnCameraAppView: TnCameraDelegate {
         DispatchQueue.main.async {
             logDebug("settings changed")
             self.settings = settings
-        }
-    }
-}
-
-// MARK: TnCameraToolbarView
-struct TnCameraToolbarView<TBottom: View>: View, TnLoggable {
-    @ViewBuilder private let bottom: () -> TBottom?
-    
-    @Binding private var showToolbar: Bool
-    @State private var toolbarType: TnCameraToolbarViewType = .main
-    @Binding var settings: TnCameraSettings
-
-    init(bottom: @escaping () -> TBottom?, showToolbar: Binding<Bool>, settings: Binding<TnCameraSettings>) {
-        self.bottom = bottom
-        self._showToolbar = showToolbar
-        self._settings = settings
-        
-        logDebug("inited")
-    }
-    
-    var body: some View {
-        // bottom toolbar
-        if showToolbar {
-            VStack(alignment: .leading) {
-                Spacer()
-//                TestToolbar(settings: $settings)
-                TnCameraToolbarMiscView(toolbarType: $toolbarType, settings: $settings)
-                TnCameraToolbarMainView(bottom: bottom, toolbarType: $toolbarType, settings: $settings)
-            }
         }
     }
 }

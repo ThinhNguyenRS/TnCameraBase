@@ -9,37 +9,7 @@ import Foundation
 import SwiftUI
 import TnIosBase
 
-public struct TnCameraToolbarMiscView: View, TnLoggable {
-//    @EnvironmentObject var cameraModel: TnCameraViewModel
-    
-    @Binding var settings: TnCameraSettings
-    @Binding var toolbarType: TnCameraToolbarViewType
-    
-    init(toolbarType: Binding<TnCameraToolbarViewType>, settings: Binding<TnCameraSettings>) {
-        _toolbarType = toolbarType
-        _settings = settings
-        logDebug("inited")
-    }
-    
-    public var body: some View {
-        Group {
-            switch toolbarType {
-            case .zoom:
-                ZoomView(settings: $settings)
-            case .misc:
-                MiscView(settings: $settings)
-            default:
-                EmptyView()
-            }
-        }
-        .padding(.all, 12)
-        .background(Color.appleAsparagus.opacity(0.75))
-        .cornerRadius(8)
-    }
-}
-
-struct MiscView: View, TnLoggable {
-//    @EnvironmentObject var cameraModel: TnCameraViewModel
+struct TnCameraToolbarMiscView: View, TnLoggable {
     @Binding var settings: TnCameraSettings
 
     init(settings: Binding<TnCameraSettings>) {
@@ -226,8 +196,7 @@ struct MiscView: View, TnLoggable {
     }
 }
 
-struct ZoomView: View, TnLoggable {
-//    @EnvironmentObject var cameraModel: TnCameraViewModel
+struct TnCameraToolbarZoomView: View, TnLoggable {
     @Binding var settings: TnCameraSettings
 
     init(settings: Binding<TnCameraSettings>) {
@@ -271,9 +240,7 @@ struct ZoomView: View, TnLoggable {
     }
 }
 
-struct SelectAlbumView: View, TnLoggable {
-    @EnvironmentObject var cameraModel: TnCameraViewModel
-
+struct TnCameraToolbarSelectAlbumView: View, TnLoggable {
     @Binding var album: String
     let albumNames: [String]
     let albumLabels: [String]

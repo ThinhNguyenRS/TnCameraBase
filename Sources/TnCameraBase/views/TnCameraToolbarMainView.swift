@@ -11,16 +11,16 @@ import Combine
 import TnIosBase
 
 public struct TnCameraToolbarMainView<TBottom: View>: View, TnLoggable {
-    @State private var capturedImage: UIImage? = nil
-
+    @Binding private var capturedImage: UIImage?
     @ViewBuilder private let bottom: () -> TBottom?
     @Binding private var toolbarType: TnCameraToolbarViewType
     @Binding var settings: TnCameraSettings
 
-    init(bottom: @escaping () -> TBottom?, toolbarType: Binding<TnCameraToolbarViewType>, settings: Binding<TnCameraSettings>) {
+    init(bottom: @escaping () -> TBottom?, toolbarType: Binding<TnCameraToolbarViewType>, settings: Binding<TnCameraSettings>, capturedImage: Binding<UIImage?>) {
         self.bottom = bottom
         self._toolbarType = toolbarType
         self._settings = settings
+        self._capturedImage = capturedImage
         
         logDebug("inited")
     }
@@ -57,17 +57,6 @@ public struct TnCameraToolbarMainView<TBottom: View>: View, TnLoggable {
             getSettingsButton(type: .misc, imageName: "ellipsis")
 
             Spacer()
-        }
-        .task {
-//            cameraProxy.captureCompletion = { output in
-//                let uiImage = UIImage(data: output.photoData)
-//                DispatchQueue.main.async {
-//                    withAnimation {
-//                        capturedImage = uiImage
-//                    }
-////                    cameraProxy.sendImage()
-//                }
-//            }
         }
     }
 }
