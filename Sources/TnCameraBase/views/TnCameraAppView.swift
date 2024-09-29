@@ -118,13 +118,15 @@ struct TnCameraToolbarView<TBottom: View>: View, TnLoggable {
 
 struct TestToolbar: View {
     @State var value: Double = 0
+    @EnvironmentObject var cameraModel: TnCameraViewModel
+
     var body: some View {
         tnSliderViewVert(
-            value: $value,
+            value: $cameraModel.settings.zoomFactor,
             label: "Test slider",
-            bounds: 0...10,
-            step: 1,
-            formatter: getNumberFormatter(".0f")
+            bounds: 0.5...4,
+            step: 0.05,
+            formatter: getNumberFormatter(".2f")
         )
     }
 }
