@@ -67,10 +67,10 @@ struct TnCameraToolbarMiscView: View, TnLoggable {
                     cameraProxy.setCapturing(settings.capturing)
                 })
                 
-//                SelectAlbumView(
-//                    album: $settings.capturing.album,
-//                    albumNames: cameraProxy.albums
-//                )
+                TnCameraToolbarSelectAlbumView(
+                    album: $settings.capturing.album,
+                    albumNames: cameraProxy.albums
+                )
             }
             
             Section("Light") {
