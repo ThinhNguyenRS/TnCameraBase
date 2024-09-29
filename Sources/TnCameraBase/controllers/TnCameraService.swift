@@ -170,6 +170,7 @@ extension TnCameraService {
             .onReceive { [self] v in
                 if !v {
                     settings.zoomFactor = device.videoZoomFactor / settings.zoomMainFactor
+                    logDebug("zoom changed", settings.zoomFactor)
                 }
             }
 
