@@ -113,7 +113,7 @@ struct TnCameraToolbarView<TBottom: View>: View, TnLoggable {
                 Spacer()
 //                TestToolbar(settings: $settings)
                 TnCameraToolbarMiscView(toolbarType: $toolbarType, settings: $settings)
-                TnCameraToolbarMainView(bottom: bottom, toolbarType: $toolbarType)
+                TnCameraToolbarMainView(bottom: bottom, toolbarType: $toolbarType, settings: $settings)
             }
         }
     }
@@ -121,7 +121,6 @@ struct TnCameraToolbarView<TBottom: View>: View, TnLoggable {
 
 struct TestToolbar: View, TnLoggable {
     @State private var value: Double = 0
-//    @EnvironmentObject var cameraModel: TnCameraViewModel
     @Binding var settings: TnCameraSettings
 
 //    init(cameraModel: TnCameraViewModel) {

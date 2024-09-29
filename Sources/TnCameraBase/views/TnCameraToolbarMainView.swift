@@ -10,16 +10,18 @@ import SwiftUI
 import Combine
 import TnIosBase
 
-public struct TnCameraToolbarMainView<TBottom: View>: View, TnCameraViewProtocol, TnLoggable {
-    @EnvironmentObject public var cameraModel: TnCameraViewModel
+public struct TnCameraToolbarMainView<TBottom: View>: View, TnLoggable {
     @State private var capturedImage: UIImage? = nil
 
     @ViewBuilder private let bottom: () -> TBottom?
     @Binding private var toolbarType: TnCameraToolbarViewType
+    @Binding var settings: TnCameraSettings
 
-    init(bottom: @escaping () -> TBottom?, toolbarType: Binding<TnCameraToolbarViewType>) {
+    init(bottom: @escaping () -> TBottom?, toolbarType: Binding<TnCameraToolbarViewType>, settings: Binding<TnCameraSettings>) {
         self.bottom = bottom
         self._toolbarType = toolbarType
+        self._settings = settings
+        
         logDebug("inited")
     }
 
@@ -32,12 +34,12 @@ public struct TnCameraToolbarMainView<TBottom: View>: View, TnCameraViewProtocol
             }
 
             Spacer()
-            circleButtonRotation(imageName: cameraProxy.settings.cameraPosition.imageName) {
+            circleButtonRotation(imageName: settings.cameraPosition.imageName) {
                 cameraProxy.switchCamera()
             }
 
             Spacer()
-            getSettingsButton(type: .zoom, text: cameraProxy.settings.zoomFactor.toString("%0.2f"))
+            getSettingsButton(type: .zoom, text: settings.zoomFactor.toString("%0.2f"))
 
             if let bottomView = bottom() {
                 Spacer()
