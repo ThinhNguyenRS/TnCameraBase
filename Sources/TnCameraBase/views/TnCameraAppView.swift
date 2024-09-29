@@ -34,7 +34,7 @@ public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
     
     public var body: some View {
         Group {
-            if status == .started {
+//            if status == .started {
                 ZStack {
                     // preview
                     TnCameraPreviewViewMetal(imagePublisher: { await cameraProxy.currentCiImagePublisher })
@@ -50,7 +50,7 @@ public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
                 .onAppear {
                     logDebug("appear")
                 }
-            }
+//            }
         }
         .environmentObject(cameraModel)
         .task {
