@@ -15,11 +15,14 @@ import TnIosBase
 // MARK: TnCameraProtocol
 public protocol TnCameraProtocol {
     var currentCiImagePublisher: Published<CIImage?>.Publisher { get async }
-    var settingsPublisher: Published<TnCameraSettings>.Publisher { get async }
-    var statusPublisher: Published<TnCameraStatus>.Publisher { get async }
+    var albums: [String] { get }
+    var captureCompletion: TnCameraPhotoOutputCompletion? { get set }
+    var delegate: TnCameraDelegate? { get set }
+    
+//    var settings: TnCameraSettings { get set }
+//    var status: TnCameraStatus { get }
 
-    var settings: TnCameraSettings { get set }
-    var status: TnCameraStatus { get }
+    func setup()
 
     func toggleCapturing()
     func startCapturing()
@@ -48,12 +51,9 @@ public protocol TnCameraProtocol {
     func createAlbum(_ v: String)
 }
 
-// MARK: CameraManagerProxyProtocol
+// MARK: TnCameraProxyProtocol
 public protocol TnCameraProxyProtocol: TnCameraProtocol {
-    var captureCompletion: TnCameraPhotoOutputCompletion? { get set }
-    func setup()
     func send(_ object: TnCameraMessageProtocol, useBle: Bool)
-    var albums: [String] { get }
 }
 
 extension TnCameraProxyProtocol {
@@ -70,4 +70,11 @@ extension TnCameraProxyProtocol {
             handler(msg.value)
         }
     }
+}
+
+// MARK: TnCameraDelegate
+public protocol TnCameraDelegate {
+    func tnCamera(captured: TnCameraPhotoOutput)
+    func tnCamera(status: TnCameraStatus)
+    func tnCamera(settings: TnCameraSettings)
 }

@@ -15,9 +15,8 @@ import TnIosBase
 
 public class TnCameraProxyClient: NSObject, ObservableObject, TnLoggable {
     @Published public private(set) var currentCiImage: CIImage?
-    @Published public var settings: TnCameraSettings = .init()
-    @Published public private(set) var status: TnCameraStatus = .none
     @Published public private(set) var albums: [String] = []
+    public var delegate: TnCameraDelegate? = nil
 
     private let ble: TnBluetoothClient
     private var network: TnNetworkConnection?
@@ -52,8 +51,8 @@ extension TnCameraProxyClient {
         switch messageType {
         case .getSettingsResponse:
             solveMsgValue(receivedMsg) { (v: TnCameraSettingsValue) in
-                self.status = v.status
-                self.settings = v.settings
+                delegate?.tnCamera(settings: v.settings)
+                delegate?.tnCamera(status: v.status)
                 // connect to TCP
                 if network == nil {
                     if let ipHost = v.ipHost, let ipPort = v.ipPort {
@@ -71,9 +70,6 @@ extension TnCameraProxyClient {
                 self.currentCiImage = ciImage
             }
 
-            if settings.transporting.continuous {
-                send(.getImage)
-            }
         case .getAlbumsResponse:
             solveMsgValue(receivedMsg) { (v: [String]) in
                 self.albums = v
@@ -88,14 +84,6 @@ extension TnCameraProxyClient {
 extension TnCameraProxyClient: TnCameraProtocol {
     public var currentCiImagePublisher: Published<CIImage?>.Publisher {
         $currentCiImage
-    }
-    
-    public var settingsPublisher: Published<TnCameraSettings>.Publisher {
-        $settings
-    }
-    
-    public var statusPublisher: Published<TnCameraStatus>.Publisher {
-        $status
     }
     
     public func startCapturing() {

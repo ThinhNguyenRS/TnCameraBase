@@ -462,7 +462,7 @@ extension TnCameraService {
         settings.flashMode = v
     }
 
-    public func setTransport(_ v: TnCameraTransportingValue) {
+    public func setTransporting(_ v: TnCameraTransportingValue) {
         settings.transporting = v
     }
     

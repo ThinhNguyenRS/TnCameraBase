@@ -54,21 +54,21 @@ public struct TnCameraAppView<TBottom: View>: View, TnLoggable {
     }
     
     func listen() async {
-        // listen changes here
-        await cameraProxy.statusPublisher
-            .onReceive { [self] v in
-                logDebug("status changed", v)
-//                        delegate?.onChanged(status: v)
-            }
-        
-        await cameraProxy.settingsPublisher
-            .onReceive { [self] v in
-                logDebug("settings changed")
-                withAnimation {
-                        settings = v
-                }
-//                    delegate?.onChanged(settings: v)
-            }
+//        // listen changes here
+//        await cameraProxy.statusPublisher
+//            .onReceive { [self] v in
+//                logDebug("status changed", v)
+////                        delegate?.onChanged(status: v)
+//            }
+//        
+//        await cameraProxy.settingsPublisher
+//            .onReceive { [self] v in
+//                logDebug("settings changed")
+//                withAnimation {
+//                        settings = v
+//                }
+////                    delegate?.onChanged(settings: v)
+//            }
     }
 }
 

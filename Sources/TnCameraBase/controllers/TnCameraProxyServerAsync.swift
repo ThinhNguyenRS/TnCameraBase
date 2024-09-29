@@ -17,9 +17,9 @@ public class TnCameraProxyServerAsync: TnLoggable {
     private var network: TnNetworkServer?
     private let ble: TnBluetoothServer
     
-    @Published public var settings: TnCameraSettings = .init()
-    @Published public private(set) var status: TnCameraStatus = .none
     @Published public private(set) var albums: [String] = []
+
+    public var delegate: TnCameraDelegate? = nil
 
     public init(_ cameraService: TnCameraService, networkInfo: TnNetworkServiceInfo) {
         self.cameraService = cameraService
@@ -30,21 +30,18 @@ public class TnCameraProxyServerAsync: TnLoggable {
         }
         
         Task {
-            self.settings = await cameraService.settings
             self.albums = await cameraService.library.getAlbums()
             
             await cameraService.$isSettingsChanging.onReceive { v in
                 if !v {
                     Task {
-                        self.settings = await cameraService.settings
+                        self.delegate?.tnCamera(settings: await cameraService.settings)
                     }
                 }
             }
 
             await cameraService.$status.onReceive { v in
-                if self.status != v {
-                    self.status = v
-                }
+                self.delegate?.tnCamera(status: v)
             }
         }
         
@@ -183,8 +180,8 @@ extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
     public func sendImage() {
         Task {
             if let currentCiImage = await cameraService.currentCiImage {
-                let transportScale = settings.transporting.scale,
-                    compressionQuality = settings.transporting.compressQuality
+                let transportScale = await cameraService.settings.transporting.scale,
+                    compressionQuality = await cameraService.settings.transporting.compressQuality
                 send(.getImageResponse, currentCiImage.jpegData(scale: transportScale, compressionQuality: compressionQuality))
             }
         }
@@ -198,16 +195,6 @@ extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
         get async {
             await cameraService.$currentCiImage
         }
-    }
-    
-    public var settingsPublisher: Published<TnCameraSettings>.Publisher {
-        get async {
-            $settings
-        }
-    }
-    
-    public var statusPublisher: Published<TnCameraStatus>.Publisher {
-        $status
     }
     
     public func startCapturing() {
@@ -324,7 +311,7 @@ extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
     
     public func setTransporting(_ v: TnCameraTransportingValue) {
         Task {
-            await cameraService.setTransport(v)
+            await cameraService.setTransporting(v)
         }
     }
     
