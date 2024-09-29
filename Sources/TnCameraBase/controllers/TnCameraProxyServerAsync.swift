@@ -42,6 +42,7 @@ public class TnCameraProxyServerAsync: TnLoggable {
             }
 
             await cameraService.$status.onReceive { v in
+                self.logDebug("status changed", v)
                 self.delegate?.tnCamera(status: v)
             }
         }
