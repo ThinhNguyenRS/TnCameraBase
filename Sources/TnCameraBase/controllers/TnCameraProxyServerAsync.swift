@@ -35,6 +35,7 @@ public class TnCameraProxyServerAsync: TnLoggable {
             await cameraService.$isSettingsChanging.onReceive { v in
                 if !v {
                     Task {
+                        self.logDebug("settings changed")
                         self.delegate?.tnCamera(settings: await cameraService.settings)
                     }
                 }
