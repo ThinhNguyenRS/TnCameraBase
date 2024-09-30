@@ -69,7 +69,10 @@ struct TnCameraToolbarMiscView: View, TnLoggable {
                 
                 TnCameraToolbarSelectAlbumView(
                     album: $settings.capturing.album,
-                    albumNames: cameraProxy.albums
+                    albumNames: cameraProxy.albums,
+                    onChanged: { _ in
+                        cameraProxy.setCapturing(settings.capturing)
+                    }
                 )
             }
             
@@ -248,10 +251,13 @@ struct TnCameraToolbarSelectAlbumView: View, TnLoggable {
     @State private var showSheet = false
     @State private var newAlbum = ""
 
-    init(album: Binding<String>, albumNames: [String]) {
+    let onChanged: (String) -> Void
+    
+    init(album: Binding<String>, albumNames: [String], onChanged: @escaping (String) -> Void) {
         _album = album
         self.albumNames = [""] + albumNames
         self.albumLabels = ["Default album"] + albumNames
+        self.onChanged = onChanged
         
         logDebug("inited")
     }
@@ -271,6 +277,9 @@ struct TnCameraToolbarSelectAlbumView: View, TnLoggable {
                 showSheet = true
             }
         }
+        .onChange(of: album, perform: {_ in
+            onChanged(album)
+        })
         .sheet(isPresented: $showSheet) {
             VStack {
                 Text("Create new album")
