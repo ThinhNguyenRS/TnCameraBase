@@ -28,8 +28,12 @@ public struct TnCameraAppView: View, TnLoggable {
     @State private var toolbarType: TnCameraToolbarViewType = .main
     @State private var settings: TnCameraSettings = .init()
     @State private var capturedImage: UIImage? = nil
+    
+    private let serverMode: Bool
 
     public init(serverMode: Bool, EOM: String? = nil, MTU: Int = 512*1024) {
+        self.serverMode = serverMode
+        
         var model: (proxy: TnCameraProxyProtocol, model: TnCameraViewModel)
         if serverMode {
             model = TnCameraAppViewModelFactory.createServerAsyncModel(EOM: EOM, MTU: MTU)
@@ -81,6 +85,14 @@ extension TnCameraAppView: TnCameraDelegate {
     }
     
     public func tnCamera(settings: TnCameraSettings) {
+        if serverMode {
+            Task {
+                try? TnCodablePersistenceController.shared.update(
+                    objectID: await TnCameraService.shared.settingsID,
+                    object: await TnCameraService.shared.settings
+                )
+            }
+        }
         DispatchQueue.main.async {
             logDebug("settings changed")
             self.settings = settings
