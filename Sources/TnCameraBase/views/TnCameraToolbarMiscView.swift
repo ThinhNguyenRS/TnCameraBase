@@ -111,33 +111,33 @@ struct TnCameraToolbarMiscView: View, TnLoggable {
 
                 tnPickerViewVert(
                     label: "Exposure mode",
-                    value: $settings.exposureMode,
+                    value: $settings.exposure.mode,
                     values: settings.exposureModes,
-                    onChanged: { v in
-                        cameraProxy.setExposureMode(v)
+                    onChanged: { _ in
+                        cameraProxy.setExposure(settings.exposure)
                     }
                 )
                 
-                if settings.exposureMode == .custom {
+                if settings.exposure.mode == .custom {
                     VStack {
                         tnSliderViewVert(
-                            value: $settings.iso,
+                            value: $settings.exposure.iso,
                             label: "ISO",
                             bounds: settings.isoRange,
                             step: 50,
-                            onChanged: { [self] v in
-                                cameraProxy.setExposure(.init(iso: v))
+                            onChanged: { [self] _ in
+                                cameraProxy.setExposure(settings.exposure)
                             },
                             formatter: getNumberFormatter("%.0f")
                         )
                         
                         tnSliderViewVert(
-                            value: $settings.exposureDuration,
+                            value: $settings.exposure.duration,
                             label: "Shutter speed",
                             bounds: settings.exposureDurationRange,
                             step: 0.001,
-                            onChanged: { [self] v in
-                                cameraProxy.setExposure(.init(duration: v))
+                            onChanged: { [self] _ in
+                                cameraProxy.setExposure(settings.exposure)
                             },
                             formatter: getNumberFormatter("%.3f")
                         )

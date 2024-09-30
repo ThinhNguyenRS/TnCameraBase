@@ -67,21 +67,19 @@ extension TnCameraService {
         settings.hdr = .fromTwoBool(device.automaticallyAdjustsVideoHDREnabled, device.isVideoHDREnabled)
 
         // exposure
-        settings.exposureMode = device.exposureMode
         settings.exposureModes = AVCaptureDevice.ExposureMode.allCases.filter { v in
             device.isExposureModeSupported(v)
         }
         settings.exposureSupported = !settings.exposureModes.isEmpty
-
         settings.isoSupported = device.isExposureModeSupported(.custom)
         settings.isoRange = device.activeFormat.minISO ... device.activeFormat.maxISO
-        settings.iso = device.iso
-
-        settings.exposureDuration = device.exposureDuration.seconds
-        if settings.exposureDuration.isNaN {
-            settings.exposureDuration = 0
-        }
         settings.exposureDurationRange = device.activeFormat.minExposureDuration.seconds ... device.activeFormat.maxExposureDuration.seconds
+
+        settings.exposure = .init(
+            mode: device.exposureMode,
+            iso: device.iso,
+            duration: device.exposureDuration.seconds.isNaN ? 0 : device.exposureDuration.seconds
+        )
 
         settings.depthSupported = photoOutput.isDepthDataDeliverySupported
         settings.depth = photoOutput.isDepthDataDeliveryEnabled
@@ -255,10 +253,17 @@ extension TnCameraService {
         defer {
             session.commitConfiguration()
             // start capturing if reset
-            if reset && !session.isRunning {
+            if !session.isRunning {
                 session.startRunning()
                 setStatus(.started)
             }
+            
+            // apply current settings
+            try? setZoomFactor(.init(value: settings.zoomFactor))
+            try? setHDR(settings.hdr)
+            try? setExposure(settings.exposure)
+            
+            
             fetchSettings()
 
             self.logDebug("setup session", name, status, "!")
@@ -425,24 +430,17 @@ extension TnCameraService {
         settings.priority = v
     }
     
-    public func setExposureMode(_ v: AVCaptureDevice.ExposureMode) throws {
-        guard settings.exposureMode != v else { return }
-
-        try configSession(name: "setExposureMode", sessionLock: false, deviceLock: true) { _, device in
-            device.exposureMode = v
-        }
-    }
-
     public func setExposure(_ v: TnCameraExposureValue) throws {
-        guard settings.exposureMode == .custom else { return }
+        settings.exposure = v
+        guard settings.exposure.mode == .custom else { return }
 
         try configSession(name: "setExposure", sessionLock: false, deviceLock: true) { _, device in
             let defaultISO = device.iso /*AVCaptureDevice.currentISO*/
             let defaultDuration = device.exposureDuration /*AVCaptureDevice.currentExposureDuration*/
             
             device.setExposureModeCustom(
-                duration: v.duration == nil ? defaultDuration : CMTime(seconds: v.duration!, preferredTimescale: device.exposureDuration.timescale),
-                iso: v.iso ?? defaultISO
+                duration: v.duration == 0 ? defaultDuration : CMTime(seconds: v.duration, preferredTimescale: device.exposureDuration.timescale),
+                iso: v.iso == 0 ? defaultISO : v.iso
             )
         }
     }
@@ -469,15 +467,21 @@ extension TnCameraService {
 
     public func setFlash(_ v: AVCaptureDevice.FlashMode) {
         guard settings.flashSupported && settings.flashMode != v else { return }
+        isSettingsChanging = true
         settings.flashMode = v
+        isSettingsChanging = false
     }
 
     public func setTransporting(_ v: TnCameraTransportingValue) {
+        isSettingsChanging = true
         settings.transporting = v
+        isSettingsChanging = false
     }
     
     public func setCapturing(_ v: TnCameraCapturingValue) {
+        isSettingsChanging = true
         settings.capturing = v
+        isSettingsChanging = false
     }
 }
 

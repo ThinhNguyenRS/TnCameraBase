@@ -268,12 +268,6 @@ extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
         }
     }
     
-    public func setExposureMode(_ v: AVCaptureDevice.ExposureMode) {
-        Task {
-            try? await cameraService.setExposureMode(v)
-        }
-    }
-    
     public func setExposure(_ v: TnCameraExposureValue) {
         Task {
             try? await cameraService.setExposure(v)

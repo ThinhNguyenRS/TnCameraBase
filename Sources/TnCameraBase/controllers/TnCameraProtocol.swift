@@ -36,7 +36,6 @@ public protocol TnCameraProtocol {
     func setPreset(_ v: AVCaptureSession.Preset)
     func setCameraType(_ v: AVCaptureDevice.DeviceType)
     func setZoomFactor(_ v: TnCameraZoomFactorValue)
-    func setExposureMode(_ v: AVCaptureDevice.ExposureMode)
     func setExposure(_ v: TnCameraExposureValue)
     
     func setDepth(_ v: Bool)

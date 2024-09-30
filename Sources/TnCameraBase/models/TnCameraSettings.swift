@@ -59,14 +59,13 @@ public struct TnCameraSettings: Codable, TnLoggable {
     
     public var exposureSupported = false
     public var exposureModes: [AVCaptureDevice.ExposureMode] = []
-    public var exposureMode: AVCaptureDevice.ExposureMode = .locked
-    
-    public var isoSupported = false
-    public var iso: Float = 0
-    public var isoRange: ClosedRange<Float> = 0...0
-    
-    public var exposureDuration: Double = .zero
     public var exposureDurationRange: ClosedRange<Double> = .zero ... .zero
+    public var isoSupported = false
+    public var isoRange: ClosedRange<Float> = 0...0
+
+    public var exposure: TnCameraExposureValue = .init()
+    
+    
     
     public var depthSupported = false
     public var depth = false

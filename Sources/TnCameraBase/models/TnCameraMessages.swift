@@ -127,12 +127,14 @@ public struct TnCameraTransportingValue: Codable {
 
 // MARK: TnCameraExposureValue
 public struct TnCameraExposureValue: Codable {
-    public let iso: Float?
-    public let duration: Double?
+    public var mode: AVCaptureDevice.ExposureMode
+    public var iso: Float
+    public var duration: Double
     
-    public init(iso: Float? = nil, duration: Double? = nil) {
-        self.iso = iso
-        self.duration = duration
+    public init(mode: AVCaptureDevice.ExposureMode = .autoExpose, iso: Float? = nil, duration: Double? = nil) {
+        self.mode = mode
+        self.iso = iso ?? 0
+        self.duration = duration ?? 0
     }
 }
 
