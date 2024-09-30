@@ -85,17 +85,18 @@ extension TnCameraAppView: TnCameraDelegate {
     }
     
     public func tnCamera(settings: TnCameraSettings) {
+        DispatchQueue.main.async {
+            logDebug("settings changed")
+            self.settings = settings
+        }
         if serverMode {
             Task {
+                logDebug("save settings")
                 try? TnCodablePersistenceController.shared.update(
                     objectID: await TnCameraService.shared.settingsID,
                     object: await TnCameraService.shared.settings
                 )
             }
-        }
-        DispatchQueue.main.async {
-            logDebug("settings changed")
-            self.settings = settings
         }
     }
 }
