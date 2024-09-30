@@ -12,6 +12,7 @@ import Combine
 import UIKit
 import TnIosBase
 import Photos
+import CoreData
 
 public actor TnCameraService: NSObject, TnLoggable {
     public static let shared: TnCameraService = .init()
@@ -21,6 +22,7 @@ public actor TnCameraService: NSObject, TnLoggable {
 
     //    @Published public var settings: TnCameraSettings = .init()
     public var settings: TnCameraSettings = .init()
+    public private(set) var settingsID: NSManagedObjectID = .init()
     @Published public var status: TnCameraStatus = .none
     @Published public var currentCiImage: CIImage?
     
@@ -43,6 +45,11 @@ public actor TnCameraService: NSObject, TnLoggable {
 
 // MARK: config misc
 extension TnCameraService {
+    func setSettings(settings: TnCameraSettings, settingsID: NSManagedObjectID) async {
+        self.settings = settings
+        self.settingsID = settingsID
+    }
+    
     private func fetchSettings() {
         isSettingsChanging = true
         

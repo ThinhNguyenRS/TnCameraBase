@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import TnIosBase
 
 public struct TnCameraAppViewModelFactory {
     private init() {}
@@ -48,6 +49,13 @@ public struct TnCameraAppViewModelFactory {
     }
     
     public static func createServerAsyncModel(delegate: TnCameraViewModelDelegate? = nil, EOM: String? = nil, MTU: Int? = nil) -> (proxy: TnCameraProxyProtocol, model: TnCameraViewModel) {
+        
+        if let settingsPair = try? TnCodablePersistenceController.shared.fetch(defaultObject: { TnCameraSettings.init() }) {
+            Task {
+                await TnCameraService.shared.setSettings(settings: settingsPair.object, settingsID: settingsPair.objectID)
+            }
+        }
+        
         let cameraProxy = TnCameraProxyServerAsync(TnCameraService.shared, networkInfo: TnCameraProxyServiceInfo.getInstance(EOM: EOM, MTU: MTU))
         let cameraModel = TnCameraViewModel()
 
