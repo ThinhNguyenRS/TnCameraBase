@@ -7,5 +7,19 @@
 
 import Foundation
 import Combine
+import SwiftUI
+import CoreData
 
-//public var cameraCancellables: Set<AnyCancellable> = .init()
+var globalCameraProxy: TnCameraProxyProtocol!
+extension View {
+    var cameraProxy: TnCameraProxyProtocol {
+        get {
+            globalCameraProxy
+        }
+        set {
+            globalCameraProxy = newValue
+        }
+    }
+}
+
+var globalCameraSettingsID: NSManagedObjectID!

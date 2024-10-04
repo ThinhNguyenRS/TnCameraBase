@@ -22,7 +22,6 @@ public actor TnCameraService: NSObject, TnLoggable {
 
     //    @Published public var settings: TnCameraSettings = .init()
     public var settings: TnCameraSettings = .init()
-    public private(set) var settingsID: NSManagedObjectID = .init()
     @Published public var status: TnCameraStatus = .none
     @Published public var currentCiImage: CIImage?
     
@@ -45,9 +44,8 @@ public actor TnCameraService: NSObject, TnLoggable {
 
 // MARK: config misc
 extension TnCameraService {
-    func setSettings(settings: TnCameraSettings, settingsID: NSManagedObjectID) async {
+    func setSettings(settings: TnCameraSettings) {
         self.settings = settings
-        self.settingsID = settingsID
     }
     
     private func fetchSettings() {

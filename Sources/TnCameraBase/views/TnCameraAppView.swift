@@ -10,17 +10,6 @@ import SwiftUI
 import TnIosBase
 
 
-var globalCameraProxy: TnCameraProxyProtocol!
-extension View {
-    var cameraProxy: TnCameraProxyProtocol {
-        get {
-            globalCameraProxy
-        }
-        set {
-            globalCameraProxy = newValue
-        }
-    }
-}
 
 
 public struct TnCameraAppView: View, TnLoggable {
@@ -92,8 +81,8 @@ extension TnCameraAppView: TnCameraDelegate {
         if serverMode {
             Task {
                 logDebug("save settings")
-                try? TnCodablePersistenceController.shared.update(
-                    objectID: await TnCameraService.shared.settingsID,
+                try? await TnCodablePersistenceController.shared.update(
+                    objectID: globalCameraSettingsID,
                     object: await TnCameraService.shared.settings
                 )
             }

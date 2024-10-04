@@ -50,9 +50,12 @@ public struct TnCameraAppViewModelFactory {
     
     public static func createServerAsyncModel(delegate: TnCameraViewModelDelegate? = nil, EOM: String? = nil, MTU: Int? = nil) -> (proxy: TnCameraProxyProtocol, model: TnCameraViewModel) {
         
-        if let settingsPair = try? TnCodablePersistenceController.shared.fetch(defaultObject: { TnCameraSettings.init() }) {
-            Task {
-                await TnCameraService.shared.setSettings(settings: settingsPair.object, settingsID: settingsPair.objectID)
+        Task {
+            if let settingsPair = try? await TnCodablePersistenceController.shared.fetch(defaultObject: { TnCameraSettings.init() }) {
+                globalCameraSettingsID = settingsPair.objectID
+                Task {
+                    await TnCameraService.shared.setSettings(settings: settingsPair.object)
+                }
             }
         }
         
