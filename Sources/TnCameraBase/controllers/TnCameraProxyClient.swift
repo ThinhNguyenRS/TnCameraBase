@@ -44,7 +44,7 @@ public class TnCameraProxyClient: NSObject, ObservableObject, TnLoggable {
 extension TnCameraProxyClient {
     func solveData(data: Data) {
         let receivedMsg = TnMessage(data: data)
-        let messageType: TnCameraMessageType = .init(rawValue: receivedMsg.typeCode)!
+        guard let messageType: TnCameraMessageType = .init(rawValue: receivedMsg.typeCode) else { return }
         logDebug("receive", messageType)
 
         switch messageType {
