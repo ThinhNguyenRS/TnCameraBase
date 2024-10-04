@@ -82,17 +82,16 @@ public actor TnPhotoLibrary: TnLoggable {
     }
     
     private func addPhoto(image: UIImage, album: PHAssetCollection?) async throws {
+        let location = await self.location.request()
         // Add the asset to the photo library.
         try await PHPhotoLibrary.shared().performChanges {
-            Task {
-                // add photo
-                let creationRequest = PHAssetChangeRequest.creationRequestForAsset(from: image)
-                creationRequest.location = await self.location.request()
-                // add to album
-                if let album {
-                    if let addAssetRequest = PHAssetCollectionChangeRequest(for: album) {
-                        addAssetRequest.addAssets([creationRequest.placeholderForCreatedAsset!] as NSArray)
-                    }
+            // add photo
+            let creationRequest = PHAssetChangeRequest.creationRequestForAsset(from: image)
+            creationRequest.location = location
+            // add to album
+            if let album {
+                if let addAssetRequest = PHAssetCollectionChangeRequest(for: album) {
+                    addAssetRequest.addAssets([creationRequest.placeholderForCreatedAsset!] as NSArray)
                 }
             }
         }
@@ -119,23 +118,23 @@ public actor TnPhotoLibrary: TnLoggable {
     }
     
     private func addPhoto(imageData: Data, liveURL: URL, album: PHAssetCollection?) async throws {
+        let location = await self.location.request()
+
         try await PHPhotoLibrary.shared().performChanges {
-            Task {
-                // Add the captured photo's file data as the main resource for the Photos asset.
-                let creationRequest = PHAssetCreationRequest.forAsset()
-                creationRequest.location = await self.location.request()
-                creationRequest.addResource(with: .photo, data: imageData, options: nil)
-                
-                // Add the movie file URL as the Live Photo's paired video resource.
-                let options = PHAssetResourceCreationOptions()
-                options.shouldMoveFile = true
-                creationRequest.addResource(with: .pairedVideo, fileURL: liveURL, options: options)
-                
-                // add to album
-                if let album {
-                    if let addAssetRequest = PHAssetCollectionChangeRequest(for: album) {
-                        addAssetRequest.addAssets([creationRequest.placeholderForCreatedAsset!] as NSArray)
-                    }
+            // Add the captured photo's file data as the main resource for the Photos asset.
+            let creationRequest = PHAssetCreationRequest.forAsset()
+            creationRequest.location = location
+            creationRequest.addResource(with: .photo, data: imageData, options: nil)
+            
+            // Add the movie file URL as the Live Photo's paired video resource.
+            let options = PHAssetResourceCreationOptions()
+            options.shouldMoveFile = true
+            creationRequest.addResource(with: .pairedVideo, fileURL: liveURL, options: options)
+            
+            // add to album
+            if let album {
+                if let addAssetRequest = PHAssetCollectionChangeRequest(for: album) {
+                    addAssetRequest.addAssets([creationRequest.placeholderForCreatedAsset!] as NSArray)
                 }
             }
         }
