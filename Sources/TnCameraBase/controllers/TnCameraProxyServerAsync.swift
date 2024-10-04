@@ -58,16 +58,16 @@ public class TnCameraProxyServerAsync: TnLoggable {
         }
     }
     
-    private func startSendImage() {
-        Task.detached { [self] in
-            while (true) {
-                if let network, network.hasConnections, let currentImageData = await cameraService.currentImageData {
-                    try? await network.sendAsync(currentImageData)
-                }
-                try await Task.sleep(nanoseconds: 10_000_000)
-            }
-        }
-    }
+//    private func startSendImage() {
+//        Task.detached { [self] in
+//            while (true) {
+//                if let network, network.hasConnections, let currentImageData = await cameraService.currentImageData {
+//                    try? await network.sendAsync(currentImageData)
+//                }
+//                try await Task.sleep(nanoseconds: 10_000_000)
+//            }
+//        }
+//    }
 }
 
 // MARK: solve messages
@@ -336,7 +336,6 @@ extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
 // MARK: TnNetworkDelegateServer
 extension TnCameraProxyServerAsync: TnNetworkDelegateServer {
     public func tnNetworkReady(_ server: TnNetworkServer) {
-        startSendImage()
     }
     
     public func tnNetworkStop(_ server: TnNetworkServer, error: (any Error)?) {
@@ -348,6 +347,7 @@ extension TnCameraProxyServerAsync: TnNetworkDelegateServer {
             .getAlbumsResponse,
             albums
         )
+        sendImage()
     }
     
     public func tnNetwork(_ server: TnNetworkServer, stopped: TnNetworkConnectionServer, error: (any Error)?) {

@@ -21,6 +21,7 @@ public class TnCameraProxyClient: NSObject, ObservableObject, TnLoggable {
     private let ble: TnBluetoothClient
     private var network: TnNetworkConnection?
     private let networkInfo: TnNetworkServiceInfo
+    private var settings: TnCameraSettings? = nil
     
     public init(networkInfo: TnNetworkServiceInfo) {
         self.networkInfo = networkInfo
@@ -50,6 +51,8 @@ extension TnCameraProxyClient {
         switch messageType {
         case .getSettingsResponse:
             solveMsgValue(receivedMsg) { (v: TnCameraSettingsValue) in
+                settings = v.settings
+                
                 delegate?.tnCamera(settings: v.settings)
                 delegate?.tnCamera(status: v.status)
                 // connect to TCP
@@ -67,6 +70,10 @@ extension TnCameraProxyClient {
 
                 let ciImage = CIImage(image: uiImage)!
                 self.currentCiImage = ciImage
+                
+                if settings!.transporting.continuous {
+                    send(.getImage)
+                }
             }
 
         case .getAlbumsResponse:
