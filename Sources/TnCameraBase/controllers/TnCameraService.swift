@@ -556,6 +556,10 @@ extension TnCameraService {
         for _ in 1...capturing.count {
             lastOutput = try await captureImageInternal()
             try await library.addPhoto(imageData: lastOutput.photoData, liveURL: lastOutput.photoLiveURL, album: album)
+
+            if capturing.interval > 0 {
+                try await Task.sleep(nanoseconds: settings.capturing.intervalNanoseconds)
+            }
         }
         
         return lastOutput

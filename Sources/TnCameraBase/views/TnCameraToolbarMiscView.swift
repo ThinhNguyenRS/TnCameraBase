@@ -60,13 +60,16 @@ struct TnCameraToolbarMiscView: View, TnLoggable {
             }
             
             Section("Capturing") {
-                Stepper("Count: \(settings.capturing.count)", value: $settings.capturing.count, onEditingChanged: { _ in
-                    cameraProxy.setCapturing(settings.capturing)
-                })
                 Stepper("Delay: \(settings.capturing.delay)s", value: $settings.capturing.delay, in: 0...10, onEditingChanged: { _ in
                     cameraProxy.setCapturing(settings.capturing)
                 })
-                
+                Stepper("Count: \(settings.capturing.count)", value: $settings.capturing.count, in: 0...10, onEditingChanged: { _ in
+                    cameraProxy.setCapturing(settings.capturing)
+                })
+                Stepper("Interval: \(settings.capturing.interval)", value: $settings.capturing.interval, in: 0...10, onEditingChanged: { _ in
+                    cameraProxy.setCapturing(settings.capturing)
+                })
+
                 TnCameraToolbarSelectAlbumView(
                     album: $settings.capturing.album,
                     albumNames: cameraProxy.albums,

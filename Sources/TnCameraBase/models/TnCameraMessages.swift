@@ -143,15 +143,21 @@ public struct TnCameraCapturingValue: Codable {
     public var album: String
     public var delay: Int
     public var count: Int
+    public var interval: Int
     
     var delayNanoseconds: UInt64 {
-        UInt64(delay*1000000000)
+        UInt64(delay*1000_000_000)
     }
     
-    public init(album: String = "", delay: Int = 0, count: Int = 1) {
+    var intervalNanoseconds: UInt64 {
+        UInt64(interval*1000_000_000)
+    }
+
+    public init(album: String = "", delay: Int = 0, count: Int = 1, interval: Int = 0) {
         self.album = album
         self.delay = delay
         self.count = count
+        self.interval = interval
     }
     
     public static var `default`: Self {
