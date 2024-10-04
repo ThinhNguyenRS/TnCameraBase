@@ -39,6 +39,10 @@ public actor TnCameraService: NSObject, TnLoggable {
 
     private override init() {
     }
+    
+    var currentImageData: Data? {
+        return currentCiImage?.jpegData(scale: settings.transporting.scale, compressionQuality: settings.transporting.compressQuality)
+    }
 }
 
 

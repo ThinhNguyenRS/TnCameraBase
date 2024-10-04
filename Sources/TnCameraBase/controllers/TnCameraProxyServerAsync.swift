@@ -16,7 +16,6 @@ public class TnCameraProxyServerAsync: TnLoggable {
     private let cameraService: TnCameraService
     private var network: TnNetworkServer?
     private let ble: TnBluetoothServer
-    
     @Published public private(set) var albums: [String] = []
 
     public var delegate: TnCameraDelegate? = nil
@@ -56,6 +55,17 @@ public class TnCameraProxyServerAsync: TnLoggable {
         }
         set {
             ble.delegate = newValue
+        }
+    }
+    
+    private func startSendImage() {
+        Task.detached { [self] in
+            while (true) {
+                if let network, network.hasConnections, let currentImageData = await cameraService.currentImageData {
+                    try? await network.sendAsync(currentImageData)
+                }
+                try await Task.sleep(nanoseconds: 10_000_000)
+            }
         }
     }
 }
@@ -171,7 +181,7 @@ extension TnCameraProxyServerAsync: TnBluetoothServerDelegate {
 // MARK: TnCameraProxyProtocol
 extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
     public func send(_ object: TnCameraMessageProtocol, useBle: Bool = false) {
-        if useBle {
+        if useBle /*|| network == nil*/ {
             try? ble.send(object: object)
         } else {
             try? network?.send(object: object)
@@ -180,10 +190,8 @@ extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
     
     public func sendImage() {
         Task {
-            if let currentCiImage = await cameraService.currentCiImage {
-                let transportScale = await cameraService.settings.transporting.scale,
-                    compressionQuality = await cameraService.settings.transporting.compressQuality
-                send(.getImageResponse, currentCiImage.jpegData(scale: transportScale, compressionQuality: compressionQuality))
+            if let currentImageData = await cameraService.currentImageData {
+                send(.getImageResponse, currentImageData)
             }
         }
     }
@@ -225,8 +233,7 @@ extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
     // MARK: captureImage
     public func captureImage() {
         Task {
-            let output = try? await cameraService.captureImage()
-            if let output {
+            if let output = try? await cameraService.captureImage() {
                 delegate?.tnCamera(captured: output)
             }
         }
@@ -329,6 +336,7 @@ extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
 // MARK: TnNetworkDelegateServer
 extension TnCameraProxyServerAsync: TnNetworkDelegateServer {
     public func tnNetworkReady(_ server: TnNetworkServer) {
+        startSendImage()
     }
     
     public func tnNetworkStop(_ server: TnNetworkServer, error: (any Error)?) {
@@ -340,7 +348,6 @@ extension TnCameraProxyServerAsync: TnNetworkDelegateServer {
             .getAlbumsResponse,
             albums
         )
-        sendImage()
     }
     
     public func tnNetwork(_ server: TnNetworkServer, stopped: TnNetworkConnectionServer, error: (any Error)?) {
