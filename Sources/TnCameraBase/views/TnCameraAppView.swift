@@ -44,7 +44,10 @@ public struct TnCameraAppView: View, TnLoggable {
                             showToolbar.toggle()
                         }
                     }
-                
+                    .onTapGesture(count: 2){
+                        cameraProxy.captureImage()
+                    }
+
                 // toolbar
                 TnCameraToolbarView(
                     showToolbar: $showToolbar,
