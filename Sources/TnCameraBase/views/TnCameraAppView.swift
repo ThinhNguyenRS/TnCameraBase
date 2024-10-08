@@ -44,33 +44,39 @@ public struct TnCameraAppView: View, TnLoggable {
                 Rectangle()
                     .fill(.black)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                
+                    .onTapGesture(count: 2) {
+                        cameraProxy.startCapturing()
+                    }
+
                 if status == .started {
                     // preview
                     TnCameraPreviewViewMetal(imagePublisher: { await cameraProxy.currentCiImagePublisher })
-                        .gesture(DragGesture(minimumDistance: 3.0, coordinateSpace: .local)
-                            .onEnded { value in
-    //                            logDebug("swipe", value.translation)
-                                switch(value.translation.width, value.translation.height) {
-                                case (...0, -30...30): // left
-                                    logDebug("swipe", "left")
-                                    break
-                                case (0..., -30...30): // right
-                                    logDebug("swipe", "right")
-                                    break
-                                case (-100...100, ...0): // up
-    //                                logDebug("swipe", "up")
-    //                                break
-                                    cameraProxy.startCapturing()
-                                case (-100...100, 0...): // down
-    //                                logDebug("swipe", "down")
-    //                                break
-                                    cameraProxy.stopCapturing()
-                                default:
-                                    break
-                                }
-                            }
-                        )
+//                        .gesture(DragGesture(minimumDistance: 3.0, coordinateSpace: .local)
+//                            .onEnded { value in
+//    //                            logDebug("swipe", value.translation)
+//                                switch(value.translation.width, value.translation.height) {
+//                                case (...0, -30...30): // left
+//                                    logDebug("swipe", "left")
+//                                    break
+//                                case (0..., -30...30): // right
+//                                    logDebug("swipe", "right")
+//                                    break
+//                                case (-100...100, ...0): // up
+//    //                                logDebug("swipe", "up")
+//    //                                break
+//                                    cameraProxy.startCapturing()
+//                                case (-100...100, 0...): // down
+//    //                                logDebug("swipe", "down")
+//    //                                break
+//                                    cameraProxy.stopCapturing()
+//                                default:
+//                                    break
+//                                }
+//                            }
+//                        )
+                        .onTapGesture(count: 3) {
+                            cameraProxy.stopCapturing()
+                        }
                         .onTapGesture(count: 2) {
                             cameraProxy.captureImage()
                         }
