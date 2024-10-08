@@ -65,7 +65,7 @@ public struct TnCameraAppView: View, TnLoggable {
                     }
                 case .right:
                     if serverMode {
-                        cameraProxy.send(.getSettingsResponse, settings)
+                        cameraProxy.send(.getSettingsResponse, TnCameraSettingsValue(settings: settings, status: status))
                     } else {
                         cameraProxy.send(.getSettings)
                     }
@@ -134,7 +134,7 @@ extension TnCameraAppView: TnCameraDelegate {
         }
         if serverMode {
             logDebug("send settings")
-            cameraProxy.send(.getSettingsResponse, settings)
+            cameraProxy.send(.getSettingsResponse, TnCameraSettingsValue(settings: settings, status: status))
 
 //            logDebug("send image")
 //            cameraProxy.sendImage()
