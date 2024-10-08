@@ -39,14 +39,6 @@ public struct TnCameraAppView: View, TnLoggable {
             ZStack {
                 // preview
                 TnCameraPreviewViewMetal(imagePublisher: { await cameraProxy.currentCiImagePublisher })
-                    .onTapGesture(count: 2) {
-                        cameraProxy.captureImage()
-                    }
-                    .onTapGesture {
-                        withAnimation {
-                            showToolbar.toggle()
-                        }
-                    }
                     .gesture(DragGesture(minimumDistance: 3.0, coordinateSpace: .local)
                         .onEnded { value in
                             print(value.translation)
@@ -64,6 +56,14 @@ public struct TnCameraAppView: View, TnLoggable {
                             }
                         }
                     )
+                    .onTapGesture(count: 2) {
+                        cameraProxy.captureImage()
+                    }
+                    .onTapGesture {
+                        withAnimation {
+                            showToolbar.toggle()
+                        }
+                    }
                 // toolbar
                 TnCameraToolbarView(
                     showToolbar: $showToolbar,
