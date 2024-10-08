@@ -114,6 +114,7 @@ extension TnCameraAppView: TnCameraDelegate {
             self.settings = settings
         }
         if serverMode {
+            cameraProxy.send(.getSettingsResponse, TnCameraSettingsValue(settings: settings, status: status))
             Task {
                 logDebug("save settings")
                 try? await TnCodablePersistenceController.shared.update(
