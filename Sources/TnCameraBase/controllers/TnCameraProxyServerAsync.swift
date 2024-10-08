@@ -89,12 +89,12 @@ extension TnCameraProxyServerAsync {
         case .getSettings:
             // response settings
             Task {
-                send(.getNetworkInfoResponse, network.hostInfo, useBle: true)
                 send(
                     .getSettingsResponse,
                     await cameraService.settings,
                     useBle: true
                 )
+                send(.getNetworkInfoResponse, network.hostInfo, useBle: true)
             }
 
         case .getImage:
