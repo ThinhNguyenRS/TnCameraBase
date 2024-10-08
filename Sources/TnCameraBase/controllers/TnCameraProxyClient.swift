@@ -61,7 +61,7 @@ extension TnCameraProxyClient {
                 }
 
                 if network == nil, let hostInfo = v.network {
-                    network = .init(hostInfo: hostInfo, queue: nil, delegate: self, transportingInfo: transportingInfo)
+                    network = .init(hostInfo: hostInfo, delegate: self, transportingInfo: transportingInfo)
                     network!.start()
                 }
             }
