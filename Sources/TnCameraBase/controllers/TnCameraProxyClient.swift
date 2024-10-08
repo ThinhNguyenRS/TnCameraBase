@@ -207,6 +207,9 @@ extension TnCameraProxyClient: TnCameraProxyProtocol {
             try? network?.send(object: object)
         }
     }
+
+    public func sendImage() {
+    }
 }
 
 // MARK: TnBluetoothClientDelegate

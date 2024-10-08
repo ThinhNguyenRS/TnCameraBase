@@ -50,6 +50,7 @@ public protocol TnCameraProtocol {
 public protocol TnCameraProxyProtocol: TnCameraProtocol {
     var decoder: TnDecoder { get }
     func send(_ object: TnCameraMessageProtocol, useBle: Bool)
+    func sendImage()
 }
 
 extension TnCameraProxyProtocol {
