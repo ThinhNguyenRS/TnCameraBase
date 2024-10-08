@@ -99,6 +99,8 @@ extension TnCameraAppView: TnCameraDelegate {
     }
     
     public func tnCamera(status: TnCameraStatus) {
+        guard self.status != status else { return }
+        
         DispatchQueue.main.async {
             logDebug("status changed", status)
             self.status = status
