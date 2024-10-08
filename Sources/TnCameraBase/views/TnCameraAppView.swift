@@ -47,7 +47,23 @@ public struct TnCameraAppView: View, TnLoggable {
                             showToolbar.toggle()
                         }
                     }
-
+                    .gesture(DragGesture(minimumDistance: 3.0, coordinateSpace: .local)
+                        .onEnded { value in
+                            print(value.translation)
+                            switch(value.translation.width, value.translation.height) {
+                            case (...0, -30...30): // left
+                                break
+                            case (0..., -30...30): // right
+                                break
+                            case (-100...100, ...0): // up
+                                cameraProxy.startCapturing()
+                            case (-100...100, 0...): // down
+                                cameraProxy.stopCapturing()
+                            default:
+                                break
+                            }
+                        }
+                    )
                 // toolbar
                 TnCameraToolbarView(
                     showToolbar: $showToolbar,
