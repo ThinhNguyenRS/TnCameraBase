@@ -55,7 +55,9 @@ extension TnCameraProxyClient {
                 settings = v
                 delegate?.tnCamera(settings: v)
                 
-                send(.getNetworkInfo)
+                if network == nil {
+                    send(.getNetworkInfo)
+                }
             }
             
         case .getStatusResponse:
