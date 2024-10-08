@@ -47,18 +47,23 @@ public struct TnCameraAppView: View, TnLoggable {
                             }
                         }
                         .onSwipe { side in
-                            if !serverMode {
-                                switch side {
-                                case .left:
+                            switch side {
+                            case .left:
+                                if serverMode {
+                                    cameraProxy.sendImage()
+                                } else {
                                     cameraProxy.send(.getImage)
-                                case .right:
-                                    cameraProxy.send(.getSettings)
-                                    break
-                                case .up:
-                                    break
-                                case .down:
-                                    break
                                 }
+                            case .right:
+                                if serverMode {
+                                    cameraProxy.send(.getSettingsResponse, settings)
+                                } else {
+                                    cameraProxy.send(.getSettings)
+                                }
+                            case .up:
+                                break
+                            case .down:
+                                break
                             }
                         }
                     // toolbar
