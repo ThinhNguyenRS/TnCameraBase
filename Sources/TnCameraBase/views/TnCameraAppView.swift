@@ -123,7 +123,7 @@ extension TnCameraAppView: TnCameraDelegate {
             self.status = status
         }
         if serverMode {
-            cameraProxy.send(.getStatusResponse, status)
+            cameraProxy.send(.getSettingsResponse, TnCameraSettingsValue(settings: settings, status: status))
         }
     }
     

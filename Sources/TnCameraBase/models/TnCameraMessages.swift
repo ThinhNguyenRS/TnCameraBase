@@ -14,11 +14,7 @@ import TnIosBase
 public enum TnCameraMessageType: UInt8, Codable {
     case getSettings
     case getSettingsResponse
-    case getStatusResponse
     
-    case getNetworkInfo
-    case getNetworkInfoResponse
-
     case getImage
     case getImageResponse
 
@@ -150,5 +146,18 @@ public struct TnCameraCapturingValue: Codable {
     
     public static var `default`: Self {
         .init()
+    }
+}
+
+// MARK: TnCameraSettingsValue
+public struct TnCameraSettingsValue: Codable {
+    public let settings: TnCameraSettings
+    public let status: TnCameraStatus
+    public let network: TnNetworkHostInfo?
+    
+    public init(settings: TnCameraSettings, status: TnCameraStatus, network: TnNetworkHostInfo? = nil) {
+        self.settings = settings
+        self.status = status
+        self.network = network
     }
 }
