@@ -52,6 +52,7 @@ public struct TnCameraAppView: View, TnLoggable {
                                 case .left:
                                     cameraProxy.send(.getImage)
                                 case .right:
+                                    cameraProxy.send(.getSettings)
                                     break
                                 case .up:
                                     break
