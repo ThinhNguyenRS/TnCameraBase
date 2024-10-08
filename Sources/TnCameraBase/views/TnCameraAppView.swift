@@ -46,26 +46,6 @@ public struct TnCameraAppView: View, TnLoggable {
                                 showToolbar.toggle()
                             }
                         }
-                        .onSwipe { side in
-                            switch side {
-                            case .left:
-                                if serverMode {
-                                    cameraProxy.sendImage()
-                                } else {
-                                    cameraProxy.send(.getImage)
-                                }
-                            case .right:
-                                if serverMode {
-                                    cameraProxy.send(.getSettingsResponse, settings)
-                                } else {
-                                    cameraProxy.send(.getSettings)
-                                }
-                            case .up:
-                                break
-                            case .down:
-                                break
-                            }
-                        }
                     // toolbar
                     TnCameraToolbarView(
                         showToolbar: $showToolbar,
@@ -73,6 +53,26 @@ public struct TnCameraAppView: View, TnLoggable {
                         settings: $settings,
                         capturedImage: $capturedImage
                     )
+                }
+            }
+            .onSwipe { side in
+                switch side {
+                case .left:
+                    if serverMode {
+                        cameraProxy.sendImage()
+                    } else {
+                        cameraProxy.send(.getImage)
+                    }
+                case .right:
+                    if serverMode {
+                        cameraProxy.send(.getSettingsResponse, settings)
+                    } else {
+                        cameraProxy.send(.getSettings)
+                    }
+                case .up:
+                    break
+                case .down:
+                    break
                 }
             }
             .onTapGesture(count: 3) {
