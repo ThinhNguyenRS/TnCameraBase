@@ -350,12 +350,12 @@ extension TnCameraProxyServerAsync: TnNetworkDelegateServer {
     public func tnNetworkAccepted(_ server: TnNetworkServer, connection: TnNetworkConnectionServer) {
     }
     
-    public func tnNetworkReceived(_ server: TnNetworkServer, connection: TnNetworkConnection) {
+    public func tnNetworkReceived(_ server: TnNetworkServer, connection: TnNetworkConnection, count: Int) {
         connection.processMsgQueue { msgData in
             self.solveData(data: msgData)
         }
     }
     
-    public func tnNetworkSent(_ server: TnNetworkServer, connection: TnNetworkConnection) {
+    public func tnNetworkSent(_ server: TnNetworkServer, connection: TnNetworkConnection, count: Int) {
     }
 }
