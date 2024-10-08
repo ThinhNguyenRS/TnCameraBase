@@ -20,14 +20,14 @@ public struct TnCameraAppView: View, TnLoggable {
     
     private let serverMode: Bool
 
-    public init(serverMode: Bool, EOM: String? = nil, MTU: Int = 512*1024) {
+    public init(serverMode: Bool, EOM: String? = nil, MTU: Int? = nil, encoder: TnEncoder, decoder: TnDecoder) {
         self.serverMode = serverMode
         
         var model: (proxy: TnCameraProxyProtocol, model: TnCameraViewModel)
         if serverMode {
-            model = TnCameraAppViewModelFactory.createServerAsyncModel(EOM: EOM, MTU: MTU)
+            model = TnCameraAppViewModelFactory.createServerAsyncModel(delegate: nil, EOM: EOM, MTU: MTU, encoder: encoder, decoder: decoder)
         } else {
-            model = TnCameraAppViewModelFactory.createClientModel(EOM: EOM, MTU: MTU)
+            model = TnCameraAppViewModelFactory.createClientModel(delegate: nil, EOM: EOM, MTU: MTU, encoder: encoder, decoder: decoder)
         }
         globalCameraProxy = model.proxy
 

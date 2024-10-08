@@ -20,11 +20,11 @@ public class TnCameraProxyServerAsync: TnLoggable {
 
     public var delegate: TnCameraDelegate? = nil
 
-    public init(_ cameraService: TnCameraService, networkInfo: TnNetworkServiceInfo) {
+    public init(_ cameraService: TnCameraService, bleInfo: TnNetworkBleInfo, transportingInfo: TnNetworkTransportingInfo) {
         self.cameraService = cameraService
-        self.ble = .init(info: networkInfo)
+        self.ble = .init(bleInfo: bleInfo, transportingInfo: transportingInfo)
         if let address = TnNetworkHelper.getAddressList(for: [.wifi, .cellularBridge, .cellular]).first {
-            self.network = .init(host: address.address, port: 1234, queue: .main, delegate: self, EOM: networkInfo.EOM, MTU: networkInfo.MTU)
+            self.network = .init(host: address.address, port: 1234, queue: .main, delegate: self, transportingInfo: transportingInfo)
             self.network!.start()
         }
         
@@ -180,6 +180,10 @@ extension TnCameraProxyServerAsync: TnBluetoothServerDelegate {
 
 // MARK: TnCameraProxyProtocol
 extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
+    public var decoder: TnDecoder {
+        ble.decoder
+    }
+
     public func send(_ object: TnCameraMessageProtocol, useBle: Bool = false) {
         if useBle /*|| network == nil*/ {
             try? ble.send(object: object)

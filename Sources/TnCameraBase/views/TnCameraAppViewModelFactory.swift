@@ -48,7 +48,7 @@ public struct TnCameraAppViewModelFactory {
         }
     }
     
-    public static func createServerAsyncModel(delegate: TnCameraViewModelDelegate? = nil, EOM: String? = nil, MTU: Int? = nil) -> (proxy: TnCameraProxyProtocol, model: TnCameraViewModel) {
+    public static func createServerAsyncModel(delegate: TnCameraViewModelDelegate?, EOM: String?, MTU: Int?, encoder: TnEncoder, decoder: TnDecoder) -> (proxy: TnCameraProxyProtocol, model: TnCameraViewModel) {
         
         Task {
             if let settingsPair = try? await TnCodablePersistenceController.shared.fetch(defaultObject: { TnCameraSettings.init() }) {
@@ -59,7 +59,7 @@ public struct TnCameraAppViewModelFactory {
             }
         }
         
-        let cameraProxy = TnCameraProxyServerAsync(TnCameraService.shared, networkInfo: TnCameraProxyServiceInfo.getInstance(EOM: EOM, MTU: MTU))
+        let cameraProxy = TnCameraProxyServerAsync(TnCameraService.shared, bleInfo: TnCameraProxyServiceInfo.getBle(), transportingInfo: TnCameraProxyServiceInfo.getTransporting(EOM: EOM, MTU: MTU, encoder: encoder, decoder: decoder))
         let cameraModel = TnCameraViewModel()
 
         cameraModel.delegate = delegate ?? ServerDelegate(cameraProxy: cameraProxy)
@@ -67,8 +67,8 @@ public struct TnCameraAppViewModelFactory {
         return (cameraProxy, cameraModel)
     }
 
-    public static func createClientModel(delegate: TnCameraViewModelDelegate? = nil, EOM: String? = nil, MTU: Int? = nil) -> (proxy: TnCameraProxyProtocol, model: TnCameraViewModel) {
-        let cameraProxy = TnCameraProxyClient(networkInfo: TnCameraProxyServiceInfo.getInstance(EOM: EOM, MTU: MTU))
+    public static func createClientModel(delegate: TnCameraViewModelDelegate?, EOM: String?, MTU: Int?, encoder: TnEncoder, decoder: TnDecoder) -> (proxy: TnCameraProxyProtocol, model: TnCameraViewModel) {
+        let cameraProxy = TnCameraProxyClient(bleInfo: TnCameraProxyServiceInfo.getBle(), transportingInfo: TnCameraProxyServiceInfo.getTransporting(EOM: EOM, MTU: MTU, encoder: encoder, decoder: decoder))
         let cameraModel = TnCameraViewModel()
         
         cameraModel.delegate = delegate ?? ClientDelegate(cameraManager: cameraProxy)

@@ -18,9 +18,6 @@ public protocol TnCameraProtocol {
     var albums: [String] { get }
     var delegate: TnCameraDelegate? { get set }
     
-//    var settings: TnCameraSettings { get set }
-//    var status: TnCameraStatus { get }
-
     func setup()
 
     func toggleCapturing()
@@ -51,6 +48,7 @@ public protocol TnCameraProtocol {
 
 // MARK: TnCameraProxyProtocol
 public protocol TnCameraProxyProtocol: TnCameraProtocol {
+    var decoder: TnDecoder { get }
     func send(_ object: TnCameraMessageProtocol, useBle: Bool)
 }
 
@@ -64,7 +62,7 @@ extension TnCameraProxyProtocol {
     }
     
     public func solveMsgValue<TMessageValue: Codable>(_ receivedMsg: TnMessage, handler: (TMessageValue) -> Void) {
-        if let msg: TnCameraMessageValue<TMessageValue> = receivedMsg.toObject() {
+        if let msg: TnCameraMessageValue<TMessageValue> = receivedMsg.toObject(decoder: decoder) {
             handler(msg.value)
         }
     }

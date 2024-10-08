@@ -20,12 +20,12 @@ public class TnCameraProxyClient: NSObject, ObservableObject, TnLoggable {
 
     private let ble: TnBluetoothClient
     private var network: TnNetworkConnection?
-    private let networkInfo: TnNetworkServiceInfo
+    private let transportingInfo: TnNetworkTransportingInfo
     private var settings: TnCameraSettings? = nil
     
-    public init(networkInfo: TnNetworkServiceInfo) {
-        self.networkInfo = networkInfo
-        self.ble = .init(info: networkInfo)
+    public init(bleInfo: TnNetworkBleInfo, transportingInfo: TnNetworkTransportingInfo) {
+        self.transportingInfo = transportingInfo
+        self.ble = .init(info: bleInfo, transportingInfo: transportingInfo)
         super.init()
         
         logDebug("inited")
@@ -58,7 +58,7 @@ extension TnCameraProxyClient {
                 // connect to TCP
                 if network == nil {
                     if let ipHost = v.ipHost, let ipPort = v.ipPort {
-                        network = .init(host: ipHost, port: ipPort, queue: nil, delegate: self, EOM: networkInfo.EOM, MTU: networkInfo.MTU)
+                        network = .init(host: ipHost, port: ipPort, queue: nil, delegate: self, transportingInfo: transportingInfo)
                         network?.start()
                     }
                 }
@@ -176,6 +176,10 @@ extension TnCameraProxyClient: TnCameraProtocol {
 
 // MARK: TnCameraProxyProtocol
 extension TnCameraProxyClient: TnCameraProxyProtocol {
+    public var decoder: TnDecoder {
+        ble.decoder
+    }
+    
     public func setup() {
         ble.setupBle()
     }
