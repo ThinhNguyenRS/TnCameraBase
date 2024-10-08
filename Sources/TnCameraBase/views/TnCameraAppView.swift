@@ -49,13 +49,17 @@ public struct TnCameraAppView: View, TnLoggable {
                             logDebug("swipe", value.translation)
                             switch(value.translation.width, value.translation.height) {
                             case (...0, -30...30): // left
+                                logDebug("swipe", "left")
                                 break
                             case (0..., -30...30): // right
+                                logDebug("swipe", "right")
                                 break
                             case (-100...100, ...0): // up
+                                logDebug("swipe", "up")
                                 break
 //                                cameraProxy.startCapturing()
                             case (-100...100, 0...): // down
+                                logDebug("swipe", "down")
                                 break
 //                                cameraProxy.stopCapturing()
                             default:
