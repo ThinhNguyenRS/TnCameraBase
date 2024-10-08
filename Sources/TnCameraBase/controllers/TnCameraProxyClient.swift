@@ -22,7 +22,7 @@ public class TnCameraProxyClient: NSObject, ObservableObject, TnLoggable {
     private var network: TnNetworkConnection?
     private let transportingInfo: TnNetworkTransportingInfo
     private var settings: TnCameraSettings? = nil
-    private var status: TnCameraStatus? = nil
+    private var status: TnCameraStatus = .none
     
     public init(bleInfo: TnNetworkBleInfo, transportingInfo: TnNetworkTransportingInfo) {
         self.transportingInfo = transportingInfo
