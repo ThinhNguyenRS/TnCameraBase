@@ -12,10 +12,8 @@ import TnIosBase
 public struct TnCameraAppView: View, TnLoggable {
     @State private var showToolbar = false
     @State private var toolbarType: TnCameraToolbarViewType = .main
-
     @State private var settings: TnCameraSettings = .init()
     @State private var status: TnCameraStatus = .none
-    
     @State private var capturedImage: UIImage? = nil
     
     private let serverMode: Bool
@@ -104,6 +102,9 @@ extension TnCameraAppView: TnCameraDelegate {
         DispatchQueue.main.async {
             logDebug("status changed", status)
             self.status = status
+        }
+        if serverMode {
+            cameraProxy.send(.getSettingsResponse, TnCameraSettingsValue(settings: settings, status: status))
         }
     }
     
