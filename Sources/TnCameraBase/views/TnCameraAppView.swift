@@ -15,7 +15,10 @@ import TnIosBase
 public struct TnCameraAppView: View, TnLoggable {
     @State private var showToolbar = false
     @State private var toolbarType: TnCameraToolbarViewType = .main
+
     @State private var settings: TnCameraSettings = .init()
+    @State private var status: TnCameraStatus = .none
+    
     @State private var capturedImage: UIImage? = nil
     
     private let serverMode: Bool
@@ -37,20 +40,24 @@ public struct TnCameraAppView: View, TnLoggable {
     public var body: some View {
         Group {
             ZStack {
+                // background
+                
                 // preview
                 TnCameraPreviewViewMetal(imagePublisher: { await cameraProxy.currentCiImagePublisher })
                     .gesture(DragGesture(minimumDistance: 3.0, coordinateSpace: .local)
                         .onEnded { value in
-                            print(value.translation)
+                            logDebug("swipe", value.translation)
                             switch(value.translation.width, value.translation.height) {
                             case (...0, -30...30): // left
                                 break
                             case (0..., -30...30): // right
                                 break
                             case (-100...100, ...0): // up
-                                cameraProxy.startCapturing()
+                                break
+//                                cameraProxy.startCapturing()
                             case (-100...100, 0...): // down
-                                cameraProxy.stopCapturing()
+                                break
+//                                cameraProxy.stopCapturing()
                             default:
                                 break
                             }
@@ -90,6 +97,7 @@ extension TnCameraAppView: TnCameraDelegate {
     }
     
     public func tnCamera(status: TnCameraStatus) {
+        logDebug("status changed", status)
     }
     
     public func tnCamera(settings: TnCameraSettings) {

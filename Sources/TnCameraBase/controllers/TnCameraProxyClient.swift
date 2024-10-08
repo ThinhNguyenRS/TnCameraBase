@@ -22,6 +22,7 @@ public class TnCameraProxyClient: NSObject, ObservableObject, TnLoggable {
     private var network: TnNetworkConnection?
     private let transportingInfo: TnNetworkTransportingInfo
     private var settings: TnCameraSettings? = nil
+    private var status: TnCameraStatus? = nil
     
     public init(bleInfo: TnNetworkBleInfo, transportingInfo: TnNetworkTransportingInfo) {
         self.transportingInfo = transportingInfo
@@ -52,6 +53,7 @@ extension TnCameraProxyClient {
         case .getSettingsResponse:
             solveMsgValue(receivedMsg) { (v: TnCameraSettingsValue) in
                 settings = v.settings
+                status = v.status
                 
                 delegate?.tnCamera(settings: v.settings)
                 delegate?.tnCamera(status: v.status)
@@ -71,7 +73,7 @@ extension TnCameraProxyClient {
                 let ciImage = CIImage(image: uiImage)!
                 self.currentCiImage = ciImage
                 
-                if settings!.transporting.continuous {
+                if status! == .started && settings!.transporting.continuous {
                     send(.getImage)
                 }
             }

@@ -57,17 +57,6 @@ public class TnCameraProxyServerAsync: TnLoggable {
             ble.delegate = newValue
         }
     }
-    
-//    private func startSendImage() {
-//        Task.detached { [self] in
-//            while (true) {
-//                if let network, network.hasConnections, let currentImageData = await cameraService.currentImageData {
-//                    try? await network.sendAsync(currentImageData)
-//                }
-//                try await Task.sleep(nanoseconds: 10_000_000)
-//            }
-//        }
-//    }
 }
 
 // MARK: solve messages
