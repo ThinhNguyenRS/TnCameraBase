@@ -95,9 +95,11 @@ extension TnCameraProxyClient: TnCameraProtocol {
     }
     
     public func startCapturing() {
+        send(.startCapturing)
     }
     
     public func stopCapturing() {
+        send(.stopCapturing)
     }
     
     public func toggleCapturing() {

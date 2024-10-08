@@ -70,6 +70,12 @@ extension TnCameraProxyServerAsync {
         case .toggleCapturing:
             toggleCapturing()
 
+        case .startCapturing:
+            startCapturing()
+
+        case .stopCapturing:
+            stopCapturing()
+
         case .switchCamera:
             switchCamera()
             

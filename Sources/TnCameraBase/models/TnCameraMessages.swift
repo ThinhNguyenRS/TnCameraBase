@@ -26,6 +26,8 @@ public enum TnCameraMessageType: UInt8, Codable {
     case switchCamera
 
     case toggleCapturing
+    case stopCapturing
+    case startCapturing
 
     case setLivephoto
     case setFlash
