@@ -89,11 +89,9 @@ extension TnCameraProxyServerAsync {
         case .getSettings:
             // response settings
             Task {
-                send(
-                    .getSettingsResponse,
-                    await cameraService.settings,
-                    useBle: true
-                )
+                send(.getStatusResponse, await cameraService.status, useBle: true)
+                send(.getSettingsResponse, await cameraService.settings, useBle: true)
+                send(.getNetworkInfoResponse, network.hostInfo, useBle: true)
             }
 
         case .getNetworkInfo:
@@ -348,10 +346,6 @@ extension TnCameraProxyServerAsync: TnNetworkDelegateServer {
     
     public func tnNetwork(_ server: TnNetworkServer, accepted: TnNetworkConnectionServer) {
         sendImage()
-//        send(
-//            .getAlbumsResponse,
-//            albums
-//        )        
     }
     
     public func tnNetwork(_ server: TnNetworkServer, stopped: TnNetworkConnectionServer, error: (any Error)?) {
