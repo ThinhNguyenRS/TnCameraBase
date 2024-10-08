@@ -356,6 +356,7 @@ extension TnCameraService {
         
         session.stopRunning()
         setStatus(.inited)
+        currentCiImage = nil
     }
     
     public func toggleCapturing() async throws {
