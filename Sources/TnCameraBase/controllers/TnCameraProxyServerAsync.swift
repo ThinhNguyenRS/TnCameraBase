@@ -27,8 +27,7 @@ public class TnCameraProxyServerAsync: TnLoggable {
             fatalError("Cannot start without network")
         }
         
-        self.network = .init(hostInfo: .init(host: address.address, port: 1234), queue: .main, delegate: self, transportingInfo: transportingInfo)
-        self.network.start()
+        self.network = .init(hostInfo: .init(host: address.address, port: 1234), queue: .main, delegate: nil, transportingInfo: transportingInfo)
 
         Task {
             self.albums = await cameraService.library.getAlbums()
@@ -48,6 +47,9 @@ public class TnCameraProxyServerAsync: TnLoggable {
             }
         }
         
+        self.network.delegate = self
+        self.network.start()
+
         logDebug("inited")
     }
     
