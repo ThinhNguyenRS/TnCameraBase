@@ -65,7 +65,7 @@ public class TnCameraProxyServerAsync: TnLoggable {
 
 // MARK: solve messages
 extension TnCameraProxyServerAsync {
-    func solveData(data: Data) {
+    private func solveData(data: Data) {
         let receivedMsg = TnMessage(data: data)
         guard let messageType: TnCameraMessageType = .init(rawValue: receivedMsg.typeCode) else { return }
         logDebug("receive", messageType)
@@ -343,18 +343,19 @@ extension TnCameraProxyServerAsync: TnNetworkDelegateServer {
     
     public func tnNetworkStop(_ server: TnNetworkServer, error: (any Error)?) {
     }
-    
-    public func tnNetwork(_ server: TnNetworkServer, accepted: TnNetworkConnectionServer) {
-        sendImage()
+
+    public func tnNetworkStop(_ server: TnNetworkServer, connection: TnNetworkConnectionServer, error: (any Error)?) {
+    }
+
+    public func tnNetworkAccepted(_ server: TnNetworkServer, connection: TnNetworkConnectionServer) {
     }
     
-    public func tnNetwork(_ server: TnNetworkServer, stopped: TnNetworkConnectionServer, error: (any Error)?) {
+    public func tnNetworkReceived(_ server: TnNetworkServer, connection: TnNetworkConnection) {
+        connection.processMsgQueue { msgData in
+            self.solveData(data: msgData)
+        }
     }
     
-    public func tnNetwork(_ server: TnNetworkServer, connection: TnNetworkConnection, receivedData: Data) {
-        self.solveData(data: receivedData)
-    }
-    
-    public func tnNetwork(_ server: TnNetworkServer, connection: TnNetworkConnection, sentData: Data) {
+    public func tnNetworkSent(_ server: TnNetworkServer, connection: TnNetworkConnection) {
     }
 }
