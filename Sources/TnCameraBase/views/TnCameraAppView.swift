@@ -136,8 +136,8 @@ extension TnCameraAppView: TnCameraDelegate {
             logDebug("send settings")
             cameraProxy.send(.getSettingsResponse, settings)
 
-            logDebug("send image")
-            cameraProxy.sendImage()
+//            logDebug("send image")
+//            cameraProxy.sendImage()
 
             Task {
                 logDebug("save settings")
