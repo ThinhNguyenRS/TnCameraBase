@@ -34,22 +34,30 @@ public struct TnCameraAppView: View, TnLoggable {
                 Rectangle()
                     .fill(.black)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .onTapGesture(count: 2) {
-                        cameraProxy.startCapturing()
-                    }
 
                 if status == .started {
                     // preview
                     TnCameraPreviewViewMetal(imagePublisher: { await cameraProxy.currentCiImagePublisher })
-                        .onTapGesture(count: 3) {
-                            cameraProxy.stopCapturing()
-                        }
                         .onTapGesture(count: 2) {
                             cameraProxy.captureImage()
                         }
                         .onTapGesture {
                             withAnimation {
                                 showToolbar.toggle()
+                            }
+                        }
+                        .onSwipe { side in
+                            if !serverMode {
+                                switch side {
+                                case .left:
+                                    cameraProxy.send(.getImage)
+                                case .right:
+                                    break
+                                case .up:
+                                    break
+                                case .down:
+                                    break
+                                }
                             }
                         }
                     // toolbar
@@ -60,6 +68,9 @@ public struct TnCameraAppView: View, TnLoggable {
                         capturedImage: $capturedImage
                     )
                 }
+            }
+            .onTapGesture(count: 3) {
+                cameraProxy.toggleCapturing()
             }
             .onAppear {
                 logDebug("appear")
@@ -172,21 +183,25 @@ struct TnCameraToolbarView: View, TnLoggable {
     }
 }
 
+enum TnSwipeSide {
+    case left, right, up, down
+}
+
 extension View {
-    func onSwipe(left: @escaping () -> Void, right: @escaping () -> Void, up: @escaping () -> Void, down: @escaping () -> Void) -> some View {
+    func onSwipe(_ handler: @escaping (TnSwipeSide) -> Void) -> some View {
         self.gesture(DragGesture(minimumDistance: 3.0, coordinateSpace: .local)
             .onEnded { value in
                 switch(value.translation.width, value.translation.height) {
                 case (...0, -30...30): // left
-                    left()
+                    handler(.left)
                     break
                 case (0..., -30...30): // right
-                    right()
+                    handler(.right)
                     break
                 case (-100...100, ...0): // up
-                    up()
+                    handler(.up)
                 case (-100...100, 0...): // down
-                    down()
+                    handler(.down)
                 default:
                     break
                 }
