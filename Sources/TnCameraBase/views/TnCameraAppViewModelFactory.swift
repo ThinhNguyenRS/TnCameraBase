@@ -16,19 +16,9 @@ public struct TnCameraAppViewModelFactory {
         let cameraProxy: TnCameraProxyServerAsync
         
         func onChanged(status: TnCameraBase.TnCameraStatus) {
-//            cameraProxy.send(
-//                .getSettingsResponse,
-//                TnCameraSettingsValue(settings: settings, status: status)
-//            )
-//            cameraProxy.sendImage()
         }
         
         func onChanged(settings: TnCameraBase.TnCameraSettings) {
-//            cameraProxy.send(
-//                .getSettingsResponse,
-//                TnCameraSettingsValue(settings: settings, status: status)
-//            )
-//            cameraProxy.sendImage()
         }
 
         func onVolumeButton() {

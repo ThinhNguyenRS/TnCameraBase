@@ -14,7 +14,6 @@ import TnIosBase
 public protocol TnCameraViewModelDelegate {
     func onChanged(settings: TnCameraSettings)
     func onChanged(status: TnCameraStatus)
-    func onVolumeButton()
 }
 
 public class TnCameraViewModel: NSObject, ObservableObject, TnLoggable {
