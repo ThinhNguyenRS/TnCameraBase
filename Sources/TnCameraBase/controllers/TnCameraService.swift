@@ -41,7 +41,7 @@ public actor TnCameraService: NSObject, TnLoggable {
     }
     
     var currentImageData: Data? {
-        guard let currentCiImage, status == .started else { return nil }
+        guard let currentCiImage, status == .started, !isSettingsChanging else { return nil }
         return currentCiImage.jpegData(scale: settings.transporting.scale, compressionQuality: settings.transporting.compressQuality)
     }
 }
