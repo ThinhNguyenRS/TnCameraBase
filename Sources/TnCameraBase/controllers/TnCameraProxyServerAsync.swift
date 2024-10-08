@@ -14,7 +14,7 @@ import TnIosBase
 
 public class TnCameraProxyServerAsync: TnLoggable {
     private let cameraService: TnCameraService
-    private var network: TnNetworkServer?
+    private let network: TnNetworkServer
     private let ble: TnBluetoothServer
     @Published public private(set) var albums: [String] = []
 
@@ -23,11 +23,13 @@ public class TnCameraProxyServerAsync: TnLoggable {
     public init(_ cameraService: TnCameraService, bleInfo: TnNetworkBleInfo, transportingInfo: TnNetworkTransportingInfo) {
         self.cameraService = cameraService
         self.ble = .init(bleInfo: bleInfo, transportingInfo: transportingInfo)
-        if let address = TnNetworkHelper.getAddressList(for: [.wifi, .cellularBridge, .cellular]).first {
-            self.network = .init(hostInfo: .init(host: address.address, port: 1234), queue: .main, delegate: self, transportingInfo: transportingInfo)
-            self.network!.start()
+        guard let address = TnNetworkHelper.getAddressList(for: [.wifi, .cellularBridge, .cellular]).first else {
+            fatalError("Cannot start without network")
         }
         
+        self.network = .init(hostInfo: .init(host: address.address, port: 1234), queue: .main, delegate: self, transportingInfo: transportingInfo)
+        self.network.start()
+
         Task {
             self.albums = await cameraService.library.getAlbums()
             
@@ -182,7 +184,7 @@ extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
         if useBle /*|| network == nil*/ {
             try? ble.send(object: object)
         } else {
-            try? network?.send(object: object)
+            try? network.send(object: object)
         }
     }
     
@@ -337,11 +339,10 @@ extension TnCameraProxyServerAsync: TnNetworkDelegateServer {
     }
     
     public func tnNetworkStop(_ server: TnNetworkServer, error: (any Error)?) {
-        network = nil
     }
     
     public func tnNetwork(_ server: TnNetworkServer, accepted: TnNetworkConnectionServer) {
-        send(.getNetworkInfoResponse, network?.hostInfo)
+        send(.getNetworkInfoResponse, network.hostInfo)
         
         send(
             .getAlbumsResponse,
