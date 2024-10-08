@@ -54,7 +54,10 @@ extension TnCameraProxyClient {
             solveMsgValue(receivedMsg) { (v: TnCameraSettings) in
                 settings = v
                 delegate?.tnCamera(settings: v)
+                
+                send(.getNetworkInfo)
             }
+            
         case .getStatusResponse:
             solveMsgValue(receivedMsg) { (v: TnCameraStatus) in
                 if status != v {

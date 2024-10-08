@@ -15,6 +15,8 @@ public enum TnCameraMessageType: UInt8, Codable {
     case getSettings
     case getSettingsResponse
     case getStatusResponse
+    
+    case getNetworkInfo
     case getNetworkInfoResponse
 
     case getImage
