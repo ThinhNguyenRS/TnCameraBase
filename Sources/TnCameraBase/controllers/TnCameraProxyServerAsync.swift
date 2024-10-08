@@ -24,7 +24,7 @@ public class TnCameraProxyServerAsync: TnLoggable {
         self.cameraService = cameraService
         self.ble = .init(bleInfo: bleInfo, transportingInfo: transportingInfo)
         if let address = TnNetworkHelper.getAddressList(for: [.wifi, .cellularBridge, .cellular]).first {
-            self.network = .init(host: address.address, port: 1234, queue: .main, delegate: self, transportingInfo: transportingInfo)
+            self.network = .init(hostInfo: .init(host: address.address, port: 1234), queue: .main, delegate: self, transportingInfo: transportingInfo)
             self.network!.start()
         }
         
@@ -85,10 +85,9 @@ extension TnCameraProxyServerAsync {
         case .getSettings:
             // response settings
             Task {
-                let settings = await cameraService.settings, status = await cameraService.status
                 send(
                     .getSettingsResponse,
-                    TnCameraSettingsValue(settings: settings, status: status, network: network),
+                    await cameraService.settings,
                     useBle: true
                 )
             }
@@ -342,10 +341,13 @@ extension TnCameraProxyServerAsync: TnNetworkDelegateServer {
     }
     
     public func tnNetwork(_ server: TnNetworkServer, accepted: TnNetworkConnectionServer) {
+        send(.getNetworkInfoResponse, network?.hostInfo)
+        
         send(
             .getAlbumsResponse,
             albums
         )
+        
         sendImage()
     }
     

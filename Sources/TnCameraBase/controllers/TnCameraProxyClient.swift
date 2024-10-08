@@ -51,20 +51,27 @@ extension TnCameraProxyClient {
 
         switch messageType {
         case .getSettingsResponse:
-            solveMsgValue(receivedMsg) { (v: TnCameraSettingsValue) in
-                settings = v.settings
-                status = v.status
-                
-                delegate?.tnCamera(settings: v.settings)
-                delegate?.tnCamera(status: v.status)
-                // connect to TCP
-                if network == nil {
-                    if let ipHost = v.ipHost, let ipPort = v.ipPort {
-                        network = .init(host: ipHost, port: ipPort, queue: nil, delegate: self, transportingInfo: transportingInfo)
-                        network?.start()
-                    }
+            solveMsgValue(receivedMsg) { (v: TnCameraSettings) in
+                settings = v
+                delegate?.tnCamera(settings: v)
+            }
+        case .getStatusResponse:
+            solveMsgValue(receivedMsg) { (v: TnCameraStatus) in
+                if status != v {
+                    status = v
+                    delegate?.tnCamera(status: v)
                 }
             }
+            
+        case .getNetworkInfoResponse:
+            // connect to TCP
+            if network == nil {
+                solveMsgValue(receivedMsg) { (v: TnNetworkHostInfo) in
+                    network = .init(hostInfo: v, queue: nil, delegate: self, transportingInfo: transportingInfo)
+                    network!.start()
+                }
+            }
+
         case .getImageResponse:
             solveMsgValue(receivedMsg) { (v: Data) in
                 let uiImage: UIImage = .init(data: v)!
