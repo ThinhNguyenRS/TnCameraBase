@@ -201,10 +201,12 @@ extension TnCameraProxyClient: TnCameraProxyProtocol {
     }
 
     public func send(_ object: TnCameraMessageProtocol, useBle: Bool = false) {
-        if useBle || network == nil {
-            try? ble.send(object: object)
-        } else {
-            try? network?.send(object: object)
+        Task {
+            if useBle || network == nil {
+                try? await ble.send(object: object)
+            } else {
+                try? await network?.send(object: object)
+            }
         }
     }
 
