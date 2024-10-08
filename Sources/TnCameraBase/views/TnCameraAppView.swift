@@ -9,9 +9,6 @@ import Foundation
 import SwiftUI
 import TnIosBase
 
-
-
-
 public struct TnCameraAppView: View, TnLoggable {
     @State private var showToolbar = false
     @State private var toolbarType: TnCameraToolbarViewType = .main
@@ -22,18 +19,13 @@ public struct TnCameraAppView: View, TnLoggable {
     @State private var capturedImage: UIImage? = nil
     
     private let serverMode: Bool
+    private let bleInfo: TnNetworkBleInfo
+    private let transportingInfo: TnNetworkTransportingInfo
 
     public init(serverMode: Bool, EOM: String? = nil, MTU: Int? = nil, encoder: TnEncoder, decoder: TnDecoder) {
         self.serverMode = serverMode
-        
-        var model: (proxy: TnCameraProxyProtocol, model: TnCameraViewModel)
-        if serverMode {
-            model = TnCameraAppViewModelFactory.createServerAsyncModel(delegate: nil, EOM: EOM, MTU: MTU, encoder: encoder, decoder: decoder)
-        } else {
-            model = TnCameraAppViewModelFactory.createClientModel(delegate: nil, EOM: EOM, MTU: MTU, encoder: encoder, decoder: decoder)
-        }
-        globalCameraProxy = model.proxy
-
+        bleInfo = TnCameraProxyServiceInfo.getBle()
+        transportingInfo = TnCameraProxyServiceInfo.getTransporting(EOM: EOM, MTU: MTU, encoder: encoder, decoder: decoder)
         logDebug("inited")
     }
     
@@ -51,29 +43,6 @@ public struct TnCameraAppView: View, TnLoggable {
                 if status == .started {
                     // preview
                     TnCameraPreviewViewMetal(imagePublisher: { await cameraProxy.currentCiImagePublisher })
-//                        .gesture(DragGesture(minimumDistance: 3.0, coordinateSpace: .local)
-//                            .onEnded { value in
-//    //                            logDebug("swipe", value.translation)
-//                                switch(value.translation.width, value.translation.height) {
-//                                case (...0, -30...30): // left
-//                                    logDebug("swipe", "left")
-//                                    break
-//                                case (0..., -30...30): // right
-//                                    logDebug("swipe", "right")
-//                                    break
-//                                case (-100...100, ...0): // up
-//    //                                logDebug("swipe", "up")
-//    //                                break
-//                                    cameraProxy.startCapturing()
-//                                case (-100...100, 0...): // down
-//    //                                logDebug("swipe", "down")
-//    //                                break
-//                                    cameraProxy.stopCapturing()
-//                                default:
-//                                    break
-//                                }
-//                            }
-//                        )
                         .onTapGesture(count: 3) {
                             cameraProxy.stopCapturing()
                         }
@@ -99,8 +68,29 @@ public struct TnCameraAppView: View, TnLoggable {
             }
         }
         .task {
-            globalCameraProxy.delegate = self
-            globalCameraProxy.setup()
+            try? await tnDoCatchAsync(name: "TnCameraAppView setup") {
+                if serverMode {
+                    let settingsPair = try await TnCodablePersistenceController.shared.fetch(defaultObject: { TnCameraSettings.init() })
+                    globalCameraSettingsID = settingsPair.objectID
+                    await TnCameraService.shared.setSettings(settings: settingsPair.object)
+                    let cameraProxy = TnCameraProxyServerAsync(
+                        TnCameraService.shared,
+                        bleInfo: bleInfo,
+                        transportingInfo: transportingInfo
+                    )
+                    cameraProxy.bleDelegate = cameraProxy
+                    globalCameraProxy = cameraProxy
+                } else {
+                    let cameraProxy = TnCameraProxyClient(
+                        bleInfo: bleInfo,
+                        transportingInfo: transportingInfo
+                    )
+                    cameraProxy.bleDelegate = cameraProxy
+                    globalCameraProxy = cameraProxy
+                }
+                globalCameraProxy.delegate = self
+                globalCameraProxy.setup()
+            }
         }
     }
 }
@@ -170,5 +160,28 @@ struct TnCameraToolbarView: View, TnLoggable {
                 TnCameraToolbarMainView(toolbarType: $toolbarType, settings: $settings, capturedImage: $capturedImage)
             }
         }
+    }
+}
+
+extension View {
+    func onSwipe(left: @escaping () -> Void, right: @escaping () -> Void, up: @escaping () -> Void, down: @escaping () -> Void) -> some View {
+        self.gesture(DragGesture(minimumDistance: 3.0, coordinateSpace: .local)
+            .onEnded { value in
+                switch(value.translation.width, value.translation.height) {
+                case (...0, -30...30): // left
+                    left()
+                    break
+                case (0..., -30...30): // right
+                    right()
+                    break
+                case (-100...100, ...0): // up
+                    up()
+                case (-100...100, 0...): // down
+                    down()
+                default:
+                    break
+                }
+            }
+        )
     }
 }
