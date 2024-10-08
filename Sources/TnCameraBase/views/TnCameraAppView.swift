@@ -39,13 +39,13 @@ public struct TnCameraAppView: View, TnLoggable {
             ZStack {
                 // preview
                 TnCameraPreviewViewMetal(imagePublisher: { await cameraProxy.currentCiImagePublisher })
+                    .onTapGesture(count: 2) {
+                        cameraProxy.captureImage()
+                    }
                     .onTapGesture {
                         withAnimation {
                             showToolbar.toggle()
                         }
-                    }
-                    .onTapGesture(count: 2){
-                        cameraProxy.captureImage()
                     }
 
                 // toolbar
