@@ -14,6 +14,7 @@ import TnIosBase
 import Photos
 import CoreData
 
+@available(iOS 17.0, *)
 public actor TnCameraService: NSObject, TnLoggable {
     public static let shared: TnCameraService = .init()
 
@@ -36,6 +37,9 @@ public actor TnCameraService: NSObject, TnLoggable {
     var captureDelegate: TnCameraCaptureDelegate? = nil
 
     let library = TnPhotoLibrary()
+        
+    private var rotationObservers = [AnyObject]()
+    private var rotationCoordinator: AVCaptureDevice.RotationCoordinator!
 
     private override init() {
     }
@@ -48,6 +52,7 @@ public actor TnCameraService: NSObject, TnLoggable {
 
 
 // MARK: config misc
+@available(iOS 17.0, *)
 extension TnCameraService {
     func setSettings(settings: TnCameraSettings) {
         self.settings = settings
@@ -126,6 +131,7 @@ extension TnCameraService {
 
 
 // MARK: session
+@available(iOS 17.0, *)
 extension TnCameraService {
     private func setStatus(_ v: TnCameraStatus) {
         if status != v {
@@ -343,6 +349,7 @@ extension TnCameraService {
 
 
 // MARK: public services
+@available(iOS 17.0, *)
 extension TnCameraService {
     public func startCapturing() async throws {
         guard await isAuthorized, !session.isRunning else { return }
@@ -490,6 +497,7 @@ extension TnCameraService {
 }
 
 // MARK: captureImage
+@available(iOS 17.0, *)
 extension TnCameraService {
     private func createPhotoSettings() -> AVCapturePhotoSettings {
         var p: AVCapturePhotoSettings!
@@ -506,9 +514,8 @@ extension TnCameraService {
             p.previewPhotoFormat = [kCVPixelBufferPixelFormatTypeKey as String: previewPhotoPixelFormatType]
         }
         // maxPhotoDimensions
-        if #available(iOS 16.0, *) {
-            p.maxPhotoDimensions = photoOutput.maxPhotoDimensions
-        }
+        p.maxPhotoDimensions = photoOutput.maxPhotoDimensions
+
         // priority
         p.photoQualityPrioritization = settings.priority
         
@@ -573,6 +580,7 @@ extension TnCameraService {
 }
 
 // MARK: AVCaptureVideoDataOutputSampleBufferDelegate
+@available(iOS 17.0, *)
 extension TnCameraService: AVCaptureVideoDataOutputSampleBufferDelegate {
     private func setImage(_ ciImage: CIImage) async {
         self.currentCiImage = ciImage
@@ -588,20 +596,46 @@ extension TnCameraService: AVCaptureVideoDataOutputSampleBufferDelegate {
     }
 }
 
-//// MARK: CameraManagerProtocol
-//extension TnCameraService: TnCameraProtocol {
-//    public var currentCiImagePublisher: Published<CIImage?>.Publisher {
-//        $currentCiImage
-//    }
-//    
-//    public var settingsPublisher: Published<TnCameraSettings>.Publisher {
-//        $settings
-//    }
-//    
-//    public var statusPublisher: Published<TnCameraStatus>.Publisher {
-//        $status
-//    }
-//    
-//}
-
-
+// MARK: - Rotation handling
+@available(iOS 17.0, *)
+extension TnCameraService {
+    /// Create a new rotation coordinator for the specified device and observe its state to monitor rotation changes.
+    private func createRotationCoordinator(for device: AVCaptureDevice) {
+        // Create a new rotation coordinator for this device.
+        rotationCoordinator = AVCaptureDevice.RotationCoordinator(device: device, previewLayer: nil)
+        
+        // Set initial rotation state on the preview and output connections.
+        updatePreviewRotation(rotationCoordinator.videoRotationAngleForHorizonLevelPreview)
+        updateCaptureRotation(rotationCoordinator.videoRotationAngleForHorizonLevelCapture)
+        
+        // Cancel previous observations.
+        rotationObservers.removeAll()
+        
+        // Add observers to monitor future changes.
+        rotationObservers.append(
+            rotationCoordinator.observe(\.videoRotationAngleForHorizonLevelPreview, options: .new) { [weak self] _, change in
+                guard let self, let angle = change.newValue else { return }
+                // Update the capture preview rotation.
+                Task { await self.updatePreviewRotation(angle) }
+            }
+        )
+        
+        rotationObservers.append(
+            rotationCoordinator.observe(\.videoRotationAngleForHorizonLevelCapture, options: .new) { [weak self] _, change in
+                guard let self, let angle = change.newValue else { return }
+                // Update the capture preview rotation.
+                Task { await self.updateCaptureRotation(angle) }
+            }
+        )
+    }
+    
+    private func updateCaptureRotation(_ angle: CGFloat) {
+        videoDataOutput.connection(with: .video)?.videoRotationAngle = angle
+        photoOutput.connection(with: .video)?.videoRotationAngle = angle
+    }
+    
+    private func updatePreviewRotation(_ angle: CGFloat) {
+        videoDataOutput.connection(with: .video)?.videoRotationAngle = angle
+        photoOutput.connection(with: .video)?.videoRotationAngle = angle
+    }
+}

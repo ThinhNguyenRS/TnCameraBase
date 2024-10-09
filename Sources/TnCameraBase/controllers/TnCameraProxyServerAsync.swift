@@ -12,6 +12,7 @@ import AVFoundation
 import CoreImage
 import TnIosBase
 
+@available(iOS 17.0, *)
 public class TnCameraProxyServerAsync: TnLoggable {
     private let cameraService: TnCameraService
     private let network: TnNetworkServer
@@ -64,6 +65,7 @@ public class TnCameraProxyServerAsync: TnLoggable {
 }
 
 // MARK: solve messages
+@available(iOS 17.0, *)
 extension TnCameraProxyServerAsync {
     private func solveData(data: Data) {
         let receivedMsg = TnMessage(data: data)
@@ -152,6 +154,7 @@ extension TnCameraProxyServerAsync {
 }
 
 // MARK: TnBluetoothServerDelegate
+@available(iOS 17.0, *)
 extension TnCameraProxyServerAsync: TnBluetoothServerDelegate {
     public func tnBluetoothServer(ble: TnBluetoothServer, statusChanged: TnBluetoothServer.Status) {
         switch statusChanged {
@@ -176,6 +179,7 @@ extension TnCameraProxyServerAsync: TnBluetoothServerDelegate {
 
 
 // MARK: TnCameraProxyProtocol
+@available(iOS 17.0, *)
 extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
     public var decoder: TnDecoder {
         ble.decoder
@@ -337,6 +341,7 @@ extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
 }
 
 // MARK: TnNetworkDelegateServer
+@available(iOS 17.0, *)
 extension TnCameraProxyServerAsync: TnNetworkDelegateServer {
     public func tnNetworkReady(_ server: TnNetworkServer) {
     }

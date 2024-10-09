@@ -172,7 +172,7 @@ struct TnCameraToolbarMiscView: View, TnLoggable {
                 tnSliderViewVert(
                     value: $settings.transporting.scale,
                     label: "Scale",
-                    bounds: 0.02...0.40,
+                    bounds: 0.02...0.80,
                     step: 0.01,
                     onChanged: { [self] v in
                         cameraProxy.setTransporting(settings.transporting)
