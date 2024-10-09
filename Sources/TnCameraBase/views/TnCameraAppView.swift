@@ -78,16 +78,16 @@ extension TnCameraAppViewInternal: TnCameraDelegate {
         DispatchQueue.main.async {
             logDebug("status changed", status)
             self.status = status
-            delegate?.onChanged(status: status, settings: settings)
         }
+        delegate?.onChanged(status: status, settings: settings)
     }
     
     public func tnCamera(settings: TnCameraSettings) {
         DispatchQueue.main.async {
             logDebug("settings changed")
             self.settings = settings
-            delegate?.onChanged(status: status, settings: settings)
         }
+        delegate?.onChanged(status: status, settings: settings)
     }
 }
 
