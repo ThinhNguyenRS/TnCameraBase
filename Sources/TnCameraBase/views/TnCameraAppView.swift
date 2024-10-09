@@ -108,17 +108,18 @@ extension TnCameraAppView: TnCameraDelegate {
         DispatchQueue.main.async {
             logDebug("settings changed")
             self.settings = settings
-        }
-        if serverMode {
-            logDebug("send settings")
-            cameraProxy.send(.getSettingsResponse, TnCameraSettingsValue(settings: settings, status: status))
 
-            Task {
-                logDebug("save settings")
-                try? await TnCodablePersistenceController.shared.update(
-                    objectID: globalCameraSettingsID,
-                    object: settings
-                )
+            if serverMode {
+                logDebug("send settings")
+                cameraProxy.send(.getSettingsResponse, TnCameraSettingsValue(settings: settings, status: status))
+
+                Task {
+                    logDebug("save settings")
+                    try? await TnCodablePersistenceController.shared.update(
+                        objectID: globalCameraSettingsID,
+                        object: settings
+                    )
+                }
             }
         }
     }
