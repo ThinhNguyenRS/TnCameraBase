@@ -62,7 +62,7 @@ struct TnCameraAppViewInternal: View, TnLoggable {
                 logDebug("appear")
             }
         }
-        .background(.black)
+//        .background(.black)
     }
 }
 
