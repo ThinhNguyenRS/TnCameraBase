@@ -98,9 +98,10 @@ extension TnCameraAppView: TnCameraDelegate {
         DispatchQueue.main.async {
             logDebug("status changed", status)
             self.status = status
-        }
-        if serverMode {
-            cameraProxy.send(.getSettingsResponse, TnCameraSettingsValue(settings: settings, status: status))
+
+            if serverMode {
+                cameraProxy.send(.getSettingsResponse, TnCameraSettingsValue(settings: settings, status: status))
+            }
         }
     }
     
