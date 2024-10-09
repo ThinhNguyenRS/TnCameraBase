@@ -237,11 +237,15 @@ extension TnCameraProxyClient: TnNetworkDelegate {
     }
 
     public func tnNetworkReceived(_ connection: TnNetworkConnection, count: Int) {
-        connection.processMsgQueue { msgData in
-            self.solveData(data: msgData)
-        }
+//        connection.processMsgQueue { msgData in
+//            self.solveData(data: msgData)
+//        }
     }
     
+    public func tnNetworkReceived(_ connection: TnNetworkConnection, data: Data) {
+        self.solveData(data: data)
+    }
+
     public func tnNetworkSent(_ connection: TnNetworkConnection, count: Int) {
     }
 }

@@ -139,13 +139,13 @@ extension TnCameraAppView: TnCameraDelegate {
 //            logDebug("send image")
 //            cameraProxy.sendImage()
 
-//            Task {
-//                logDebug("save settings")
-//                try? await TnCodablePersistenceController.shared.update(
-//                    objectID: globalCameraSettingsID,
-//                    object: settings
-//                )
-//            }
+            Task {
+                logDebug("save settings")
+                try? await TnCodablePersistenceController.shared.update(
+                    objectID: globalCameraSettingsID,
+                    object: settings
+                )
+            }
         }
     }
 }
