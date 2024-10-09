@@ -21,5 +21,3 @@ extension View {
         }
     }
 }
-
-var globalCameraSettingsID: NSManagedObjectID!

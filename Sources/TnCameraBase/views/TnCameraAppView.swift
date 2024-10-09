@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 import TnIosBase
+import CoreData
 
 // MARK: TnCameraAppViewDelegate
 protocol TnCameraAppViewDelegate {
@@ -93,6 +94,8 @@ extension TnCameraAppViewInternal: TnCameraDelegate {
 // MARK: TnCameraAppViewMaster
 @available(iOS 17.0, *)
 public struct TnCameraAppViewMaster: View, TnLoggable {
+    @State private var cameraSettingsID: NSManagedObjectID = .init()
+
     public init(EOM: String? = nil, MTU: Int? = nil, encoder: TnEncoder, decoder: TnDecoder) {
         let cameraProxy = TnCameraProxyServerAsync(
             TnCameraService.shared,
@@ -111,7 +114,7 @@ public struct TnCameraAppViewMaster: View, TnLoggable {
                     logDebug("setup ...")
 
                     let settingsPair = try await TnCodablePersistenceController.shared.fetch(defaultObject: { TnCameraSettings.init() })
-                    globalCameraSettingsID = settingsPair.objectID
+                    cameraSettingsID = settingsPair.objectID
                     await TnCameraService.shared.setSettings(settings: settingsPair.object)
                     
                     globalCameraProxy.setup()
@@ -131,7 +134,7 @@ extension TnCameraAppViewMaster: TnCameraAppViewDelegate {
         Task {
             logDebug("save settings")
             try? await TnCodablePersistenceController.shared.update(
-                objectID: globalCameraSettingsID,
+                objectID: cameraSettingsID,
                 object: settings
             )
         }
