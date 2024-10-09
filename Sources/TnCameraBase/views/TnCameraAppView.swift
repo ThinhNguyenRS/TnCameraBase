@@ -32,38 +32,35 @@ struct TnCameraAppViewInternal: View, TnLoggable {
     }
     
     var body: some View {
-        Group {
-            ZStack {
-                // background
-                Rectangle()
-                    .fill(.black)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+        ZStack {
+            // background
+            Rectangle()
+                .fill(.black)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-                if status == .started {
-                    // preview
-                    TnCameraPreviewViewMetal(imagePublisher: { await cameraProxy.currentCiImagePublisher })
-                        .onTapGesture {
-                            withAnimation {
-                                showToolbar.toggle()
-                            }
+            if status == .started {
+                // preview
+                TnCameraPreviewViewMetal(imagePublisher: { await cameraProxy.currentCiImagePublisher })
+                    .onTapGesture {
+                        withAnimation {
+                            showToolbar.toggle()
                         }
-                    // toolbar
-                    TnCameraToolbarView(
-                        showToolbar: $showToolbar,
-                        toolbarType: $toolbarType,
-                        settings: $settings,
-                        capturedImage: $capturedImage
-                    )
-                }
-            }
-            .overlay(alignment: .top) {
-                TnCameraToolbarTopView()
-            }
-            .onAppear {
-                logDebug("appear")
+                    }
+                // toolbar
+                TnCameraToolbarView(
+                    showToolbar: $showToolbar,
+                    toolbarType: $toolbarType,
+                    settings: $settings,
+                    capturedImage: $capturedImage
+                )
             }
         }
-//        .background(.black)
+        .overlay(alignment: .top) {
+            TnCameraToolbarTopView()
+        }
+        .onAppear {
+            logDebug("appear")
+        }
     }
 }
 
