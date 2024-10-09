@@ -38,9 +38,6 @@ public struct TnCameraAppView: View, TnLoggable {
                 if status == .started {
                     // preview
                     TnCameraPreviewViewMetal(imagePublisher: { await cameraProxy.currentCiImagePublisher })
-                        .onTapGesture(count: 2) {
-                            cameraProxy.captureImage()
-                        }
                         .onTapGesture {
                             withAnimation {
                                 showToolbar.toggle()
@@ -55,28 +52,8 @@ public struct TnCameraAppView: View, TnLoggable {
                     )
                 }
             }
-            .onSwipe { side in
-                switch side {
-                case .left:
-                    if serverMode {
-                        cameraProxy.sendImage()
-                    } else {
-                        cameraProxy.send(.getImage)
-                    }
-                case .right:
-                    if serverMode {
-                        cameraProxy.send(.getSettingsResponse, TnCameraSettingsValue(settings: settings, status: status))
-                    } else {
-                        cameraProxy.send(.getSettings)
-                    }
-                case .up:
-                    break
-                case .down:
-                    break
-                }
-            }
-            .onTapGesture(count: 3) {
-                cameraProxy.toggleCapturing()
+            .overlay(alignment: .top) {
+                TnCameraToolbarTopView()
             }
             .onAppear {
                 logDebug("appear")
@@ -136,9 +113,6 @@ extension TnCameraAppView: TnCameraDelegate {
             logDebug("send settings")
             cameraProxy.send(.getSettingsResponse, TnCameraSettingsValue(settings: settings, status: status))
 
-//            logDebug("send image")
-//            cameraProxy.sendImage()
-
             Task {
                 logDebug("save settings")
                 try? await TnCodablePersistenceController.shared.update(
@@ -189,29 +163,14 @@ struct TnCameraToolbarView: View, TnLoggable {
     }
 }
 
-enum TnSwipeSide {
-    case left, right, up, down
-}
-
-extension View {
-    func onSwipe(_ handler: @escaping (TnSwipeSide) -> Void) -> some View {
-        self.gesture(DragGesture(minimumDistance: 3.0, coordinateSpace: .local)
-            .onEnded { value in
-                switch(value.translation.width, value.translation.height) {
-                case (...0, -30...30): // left
-                    handler(.left)
-                    break
-                case (0..., -30...30): // right
-                    handler(.right)
-                    break
-                case (-100...100, ...0): // up
-                    handler(.up)
-                case (-100...100, 0...): // down
-                    handler(.down)
-                default:
-                    break
-                }
+struct TnCameraToolbarTopView: View {
+    var body: some View {
+        HStack {
+            
+            Spacer()
+            tnCircleButton(imageName: "autostartstop") {
+                cameraProxy.toggleCapturing()
             }
-        )
+        }
     }
 }
