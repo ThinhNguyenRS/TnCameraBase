@@ -60,6 +60,10 @@ extension TnCameraProxyClient {
                     delegate?.tnCamera(status: v.status)
                 }
 
+                if status == .started && network != nil {
+                    send(.getImage)
+                }
+
                 if network == nil, let hostInfo = v.network {
                     network = .init(hostInfo: hostInfo, delegate: self, transportingInfo: transportingInfo)
                     network!.start()
