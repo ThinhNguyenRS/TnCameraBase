@@ -168,8 +168,8 @@ struct TnCameraToolbarView: View, TnLoggable {
 struct TnCameraToolbarTopView: View {
     var body: some View {
         HStack {
-            tnCircleButton(imageName: "photo.tv") {
-            }
+//            tnCircleButton(imageName: "photo.tv") {
+//            }
             
             Spacer()
             tnCircleButton(imageName: "playpause") {
