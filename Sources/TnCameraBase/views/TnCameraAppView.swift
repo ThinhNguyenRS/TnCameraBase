@@ -61,6 +61,7 @@ struct TnCameraAppViewInternal: View, TnLoggable {
                 logDebug("appear")
             }
         }
+        .background(.black)
         .task {
             globalCameraProxy.delegate = self
             globalCameraProxy.setup()
