@@ -230,18 +230,13 @@ extension TnCameraProxyClient: TnBluetoothClientDelegate {
 // MARK: TnNetworkDelegate
 extension TnCameraProxyClient: TnNetworkDelegate {
     public func tnNetworkReady(_ connection: TnNetworkConnection) {
+        send(.getImage)
     }
     
     public func tnNetworkStop(_ connection: TnNetworkConnection, error: (any Error)?) {
         network = nil
     }
 
-    public func tnNetworkReceived(_ connection: TnNetworkConnection, count: Int) {
-//        connection.processMsgQueue { msgData in
-//            self.solveData(data: msgData)
-//        }
-    }
-    
     public func tnNetworkReceived(_ connection: TnNetworkConnection, data: Data) {
         self.solveData(data: data)
     }

@@ -341,19 +341,13 @@ extension TnCameraProxyServerAsync: TnNetworkDelegateServer {
     public func tnNetworkReady(_ server: TnNetworkServer) {
     }
     
-    public func tnNetworkStop(_ server: TnNetworkServer, error: (any Error)?) {
+    public func tnNetworkStop(_ server: TnNetworkServer, error: Error?) {
     }
 
-    public func tnNetworkStop(_ server: TnNetworkServer, connection: TnNetworkConnectionServer, error: (any Error)?) {
+    public func tnNetworkStop(_ server: TnNetworkServer, connection: TnNetworkConnection, error: Error?) {
     }
 
-    public func tnNetworkAccepted(_ server: TnNetworkServer, connection: TnNetworkConnectionServer) {
-    }
-    
-    public func tnNetworkReceived(_ server: TnNetworkServer, connection: TnNetworkConnection, count: Int) {
-//        connection.processMsgQueue { msgData in
-//            self.solveData(data: msgData)
-//        }
+    public func tnNetworkAccepted(_ server: TnNetworkServer, connection: TnNetworkConnection) {
     }
     
     public func tnNetworkReceived(_ server: TnNetworkServer, connection: TnNetworkConnection, data: Data) {
