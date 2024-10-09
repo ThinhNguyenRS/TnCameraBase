@@ -39,7 +39,7 @@ struct TnCameraAppViewInternal: View, TnLoggable {
                     .fill(.black)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-                if status == .started || true {
+                if status == .started {
                     // preview
                     TnCameraPreviewViewMetal(imagePublisher: { await cameraProxy.currentCiImagePublisher })
                         .onTapGesture {
