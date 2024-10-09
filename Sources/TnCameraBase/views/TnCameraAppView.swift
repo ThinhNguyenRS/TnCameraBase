@@ -26,6 +26,7 @@ struct TnCameraAppViewInternal: View, TnLoggable {
     
     init(delegate: TnCameraAppViewDelegate? = nil) {
         self.delegate = delegate
+        globalCameraProxy.delegate = self
         logDebug("inited")
     }
     
@@ -62,10 +63,6 @@ struct TnCameraAppViewInternal: View, TnLoggable {
             }
         }
         .background(.black)
-        .task {
-            globalCameraProxy.delegate = self
-            globalCameraProxy.setup()
-        }
     }
 }
 
@@ -97,22 +94,26 @@ extension TnCameraAppViewInternal: TnCameraDelegate {
 @available(iOS 17.0, *)
 public struct TnCameraAppViewMaster: View, TnLoggable {
     public init(EOM: String? = nil, MTU: Int? = nil, encoder: TnEncoder, decoder: TnDecoder) {
-        Task {
-            let settingsPair = try await TnCodablePersistenceController.shared.fetch(defaultObject: { TnCameraSettings.init() })
-            globalCameraSettingsID = settingsPair.objectID
-            await TnCameraService.shared.setSettings(settings: settingsPair.object)
-            let cameraProxy = TnCameraProxyServerAsync(
-                TnCameraService.shared,
-                bleInfo: TnCameraProxyServiceInfo.getBle(),
-                transportingInfo: TnCameraProxyServiceInfo.getTransporting(EOM: EOM, MTU: MTU, encoder: encoder, decoder: decoder)
-            )
-            cameraProxy.bleDelegate = cameraProxy
-            globalCameraProxy = cameraProxy
-        }
+        let cameraProxy = TnCameraProxyServerAsync(
+            TnCameraService.shared,
+            bleInfo: TnCameraProxyServiceInfo.getBle(),
+            transportingInfo: TnCameraProxyServiceInfo.getTransporting(EOM: EOM, MTU: MTU, encoder: encoder, decoder: decoder)
+        )
+        cameraProxy.bleDelegate = cameraProxy
+        globalCameraProxy = cameraProxy
     }
     
     public var body: some View {
         TnCameraAppViewInternal(delegate: self)
+            .task {
+                try? await tnDoCatchAsync(name: "TnCameraAppViewMaster setup") {
+                    let settingsPair = try await TnCodablePersistenceController.shared.fetch(defaultObject: { TnCameraSettings.init() })
+                    globalCameraSettingsID = settingsPair.objectID
+                    await TnCameraService.shared.setSettings(settings: settingsPair.object)
+                    
+                    globalCameraProxy.setup()
+                }
+            }
     }
 }
 
@@ -141,6 +142,7 @@ public struct TnCameraAppViewSlaver: View, TnLoggable {
         )
         cameraProxy.bleDelegate = cameraProxy
         globalCameraProxy = cameraProxy
+        globalCameraProxy.setup()
     }
     
     public var body: some View {
