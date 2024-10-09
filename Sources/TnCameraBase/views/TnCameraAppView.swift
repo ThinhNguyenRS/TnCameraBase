@@ -166,11 +166,14 @@ struct TnCameraToolbarView: View, TnLoggable {
 struct TnCameraToolbarTopView: View {
     var body: some View {
         HStack {
+            tnCircleButton(imageName: "photo.tv") {
+            }
             
             Spacer()
-            tnCircleButton(imageName: "autostartstop") {
+            tnCircleButton(imageName: "playpause") {
                 cameraProxy.toggleCapturing()
             }
         }
+        .padding(.all, 8)
     }
 }
