@@ -627,7 +627,6 @@ extension TnCameraService {
     }
     
     private func updateCaptureRotation(_ angle: CGFloat) {
-        logDebug("updateCaptureRotation", angle)
 //        videoDataOutput.rotationAngle = angle
 //        photoOutput.rotationAngle = angle
         var newAngle = angle
@@ -637,10 +636,10 @@ extension TnCameraService {
 //            }
 //        }
         videoDataOutput.rotationAngle = newAngle
+        photoOutput.rotationAngle = newAngle
     }
     
     private func updatePreviewRotation(_ angle: CGFloat) {
-        logDebug("updatePreviewRotation", angle)
 //        videoDataOutput.rotationAngle = angle
 //        photoOutput.rotationAngle = angle
     }
