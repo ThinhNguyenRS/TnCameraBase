@@ -11,6 +11,8 @@ import SwiftUI
 import CoreData
 
 var globalCameraProxy: TnCameraProxyProtocol!
+var globalCameraSettingsID: NSManagedObjectID!
+
 extension View {
     var cameraProxy: TnCameraProxyProtocol {
         get {
