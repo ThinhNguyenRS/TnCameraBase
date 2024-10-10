@@ -630,7 +630,7 @@ extension TnCameraService {
         var newAngle = angle
         if settings.cameraPosition == .front {
             if newAngle != 90 {
-                newAngle = 180
+                newAngle = 270
             }
             logDebug("updateCaptureRotation", angle, newAngle)
         }
