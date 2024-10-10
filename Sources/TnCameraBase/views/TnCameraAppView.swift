@@ -204,6 +204,7 @@ public struct TnCameraAppView: View, TnLoggable {
                 )
             }
         }
+        .background(.black)
         .overlay(alignment: .top) {
             TnCameraToolbarTopView()
         }
