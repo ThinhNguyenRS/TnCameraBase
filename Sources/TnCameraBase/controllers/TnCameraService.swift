@@ -634,7 +634,7 @@ extension TnCameraService {
             }
             logDebug("updateCaptureRotation", angle, newAngle)
         }
-//        videoDataOutput.rotationAngle = newAngle
+        videoDataOutput.rotationAngle = newAngle
 //        photoOutput.rotationAngle = newAngle
     }
     
