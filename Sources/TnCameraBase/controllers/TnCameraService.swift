@@ -631,11 +631,11 @@ extension TnCameraService {
 //        videoDataOutput.rotationAngle = angle
 //        photoOutput.rotationAngle = angle
         var newAngle = angle
-        if settings.cameraPosition == .front {
-            if angle != 90 {
-                newAngle += 180
-            }
-        }
+//        if settings.cameraPosition == .front {
+//            if angle != 90 {
+//                newAngle += 180
+//            }
+//        }
         videoDataOutput.rotationAngle = newAngle
     }
     
