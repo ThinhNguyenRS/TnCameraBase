@@ -161,6 +161,7 @@ extension TnCameraAppViewSlaver: TnCameraAppViewDelegate {
 }
 
 
+// MARK: TnCameraAppView
 public struct TnCameraAppView: View, TnLoggable {
     @State private var showToolbar = false
     @State private var toolbarType: TnCameraToolbarViewType = .main
@@ -180,36 +181,34 @@ public struct TnCameraAppView: View, TnLoggable {
     }
     
     public var body: some View {
-        Group {
-            ZStack {
-                // background
-                Rectangle()
-                    .fill(.black)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+        ZStack {
+            // background
+            Rectangle()
+                .fill(.black)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-                if status == .started {
-                    // preview
-                    TnCameraPreviewViewMetal(imagePublisher: { await cameraProxy.currentCiImagePublisher })
-                        .onTapGesture {
-                            withAnimation {
-                                showToolbar.toggle()
-                            }
+            if status == .started {
+                // preview
+                TnCameraPreviewViewMetal(imagePublisher: { await cameraProxy.currentCiImagePublisher })
+                    .onTapGesture {
+                        withAnimation {
+                            showToolbar.toggle()
                         }
-                    // toolbar
-                    TnCameraToolbarView(
-                        showToolbar: $showToolbar,
-                        toolbarType: $toolbarType,
-                        settings: $settings,
-                        capturedImage: $capturedImage
-                    )
-                }
+                    }
+                // toolbar
+                TnCameraToolbarView(
+                    showToolbar: $showToolbar,
+                    toolbarType: $toolbarType,
+                    settings: $settings,
+                    capturedImage: $capturedImage
+                )
             }
-            .overlay(alignment: .top) {
-                TnCameraToolbarTopView()
-            }
-            .onAppear {
-                logDebug("appear")
-            }
+        }
+        .overlay(alignment: .top) {
+            TnCameraToolbarTopView()
+        }
+        .onAppear {
+            logDebug("appear")
         }
         .task {
             try? await tnDoCatchAsync(name: "TnCameraAppView setup") {
