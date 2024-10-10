@@ -50,19 +50,17 @@ extension AVCaptureOutput {
             self.connection(with: .video)?.orientation ?? .portrait
         }
         set {
-            if let connection = self.connection(with: .video) {
-                connection.orientation = newValue
-            }
+            self.connection(with: .video)?.orientation = newValue
         }
     }
     
     @available(iOS 17.0, *)
     public var rotationAngle: CGFloat {
         get {
-            self.connection(with: .video)?.videoRotationAngle ?? 0
+            self.connection(with: .video)?.rotationAngle ?? 0
         }
         set {
-            self.connection(with: .video)?.videoRotationAngle = newValue
+            self.connection(with: .video)?.rotationAngle = newValue
         }
     }
 }
