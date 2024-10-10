@@ -26,6 +26,11 @@ public struct TnCameraAppView: View, TnLoggable {
         self.serverMode = serverMode
         self.bleInfo = bleInfo
         self.transportingInfo = transportingInfo
+        logDebug("inited")
+    }
+    
+    func initCameraProxy() {
+        logDebug("init camera proxy ...")
 
         if serverMode {
             if #available(iOS 17.0, *) {
@@ -51,7 +56,14 @@ public struct TnCameraAppView: View, TnLoggable {
             globalCameraProxy = cameraProxy
         }
         globalCameraProxy.delegate = self
-        logDebug("inited")
+
+        logDebug("init camera proxy !")
+    }
+    
+    func setupCameraProxy() {
+        logDebug("setup camera proxy ...")
+        globalCameraProxy.setup()
+        logDebug("setup camera proxy !")
     }
     
     public var body: some View {
@@ -83,9 +95,8 @@ public struct TnCameraAppView: View, TnLoggable {
             TnCameraToolbarTopView()
         }
         .onAppear {
-            logDebug("setup ...")
-            globalCameraProxy.setup()
-            logDebug("appear")
+            initCameraProxy()
+            setupCameraProxy()
         }
 //        .task {
 //            try? await tnDoCatchAsync(name: "TnCameraAppView setup") {
