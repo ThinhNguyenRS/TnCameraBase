@@ -38,6 +38,7 @@ extension AVCaptureConnection {
         }
         set {
             if (self.videoRotationAngle != newValue) && self.isVideoRotationAngleSupported(newValue) {
+                TnLogger.debug("AVCaptureConnection", "rotationAngle", self.videoRotationAngle, newValue)
                 self.videoRotationAngle = newValue
             }
         }
