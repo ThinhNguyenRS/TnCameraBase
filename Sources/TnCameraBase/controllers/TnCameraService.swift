@@ -183,7 +183,8 @@ extension TnCameraService {
                     isSettingsChanging = false
                 }
             }
-
+        
+        createRotationCoordinator()
         self.logDebug("addSessionInputs !")
     }
     
@@ -590,11 +591,13 @@ extension TnCameraService: AVCaptureVideoDataOutputSampleBufferDelegate {
     }
 }
 
-// MARK: - Rotation handling
+// MARK: Rotation handling
 @available(iOS 17.0, *)
 extension TnCameraService {
     /// Create a new rotation coordinator for the specified device and observe its state to monitor rotation changes.
-    private func createRotationCoordinator(for device: AVCaptureDevice) {
+    private func createRotationCoordinator() {
+        guard let device = videoDeviceInput?.device else { return }
+        
         // Create a new rotation coordinator for this device.
         rotationCoordinator = AVCaptureDevice.RotationCoordinator(device: device, previewLayer: nil)
         
@@ -624,12 +627,14 @@ extension TnCameraService {
     }
     
     private func updateCaptureRotation(_ angle: CGFloat) {
-        videoDataOutput.connection(with: .video)?.videoRotationAngle = angle
-        photoOutput.connection(with: .video)?.videoRotationAngle = angle
+        logDebug("updateCaptureRotation", angle)
+        videoDataOutput.rotationAngle = angle
+        photoOutput.rotationAngle = angle
     }
     
     private func updatePreviewRotation(_ angle: CGFloat) {
-        videoDataOutput.connection(with: .video)?.videoRotationAngle = angle
-        photoOutput.connection(with: .video)?.videoRotationAngle = angle
+        logDebug("updatePreviewRotation", angle)
+        videoDataOutput.rotationAngle = angle
+        photoOutput.rotationAngle = angle
     }
 }

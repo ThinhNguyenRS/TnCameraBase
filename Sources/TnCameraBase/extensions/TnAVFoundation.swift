@@ -10,13 +10,6 @@ import AVFoundation
 import TnIosBase
 
 extension AVCaptureConnection {
-//    func setRotationAngle(_ v: CGFloat) {
-//        if self.isVideoRotationAngleSupported(v) {
-//            self.videoRotationAngle = v
-//        }
-//    }
-    
-    
     public var orientation: TnCameraOrientation {
         get {
             if #available(iOS 17.0, *) {
@@ -37,6 +30,18 @@ extension AVCaptureConnection {
             }
         }
     }
+    
+    @available(iOS 17.0, *)
+    public var rotationAngle: CGFloat {
+        get {
+            self.videoRotationAngle
+        }
+        set {
+            if (self.videoRotationAngle != newValue) && self.isVideoRotationAngleSupported(newValue) {
+                self.videoRotationAngle = newValue
+            }
+        }
+    }
 }
 
 extension AVCaptureOutput {
@@ -48,6 +53,16 @@ extension AVCaptureOutput {
             if let connection = self.connection(with: .video) {
                 connection.orientation = newValue
             }
+        }
+    }
+    
+    @available(iOS 17.0, *)
+    public var rotationAngle: CGFloat {
+        get {
+            self.connection(with: .video)?.videoRotationAngle ?? 0
+        }
+        set {
+            self.connection(with: .video)?.videoRotationAngle = newValue
         }
     }
 }
