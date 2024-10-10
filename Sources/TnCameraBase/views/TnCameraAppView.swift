@@ -51,8 +51,6 @@ public struct TnCameraAppView: View, TnLoggable {
             globalCameraProxy = cameraProxy
         }
         globalCameraProxy.delegate = self
-        globalCameraProxy.setup()
-
         logDebug("inited")
     }
     
@@ -85,6 +83,7 @@ public struct TnCameraAppView: View, TnLoggable {
             TnCameraToolbarTopView()
         }
         .onAppear {
+            globalCameraProxy.setup()
             logDebug("appear")
         }
 //        .task {
