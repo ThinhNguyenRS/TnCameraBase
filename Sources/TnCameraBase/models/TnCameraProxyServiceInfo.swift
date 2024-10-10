@@ -25,7 +25,7 @@ public struct TnCameraProxyServiceInfo {
     {
         TnNetworkTransportingInfo(
             EOM: (EOM ?? "$$$EOM$$$").data(using: .utf8)!,
-            MTU: MTU ?? 1024*1024,
+            MTU: MTU ?? 8*1024*1024,
             encoder: encoder,
             decoder: decoder
         )
