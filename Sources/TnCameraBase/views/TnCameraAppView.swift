@@ -64,7 +64,8 @@ public struct TnCameraAppView: View, TnLoggable {
             try? await tnDoCatchAsync(name: "TnCameraAppView setup") {
                 if serverMode {
                     if #available(iOS 17.0, *) {
-                        let settingsPair = try await TnCodablePersistenceController.shared.fetch(defaultObject: { TnCameraSettings.init() })
+//                        let settingsPair = try await TnCodablePersistenceController.shared.fetch(defaultObject: { TnCameraSettings.init() })
+                        let settingsPair = try TnCodablePersistenceController.shared.fetch(defaultObject: { TnCameraSettings.init() })
                         globalCameraSettingsID = settingsPair.objectID
                         let cameraService = TnCameraService(settings: settingsPair.object)
                         let cameraProxy = TnCameraProxyServerAsync(
