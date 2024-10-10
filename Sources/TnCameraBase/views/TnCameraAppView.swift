@@ -29,43 +29,6 @@ public struct TnCameraAppView: View, TnLoggable {
         logDebug("inited")
     }
     
-    func initCameraProxy() {
-        logDebug("init camera proxy ...")
-
-        if serverMode {
-            if #available(iOS 17.0, *) {
-                try? tnDoCatch(name: "TnCameraAppView init camera proxy") {
-                    let settingsPair = try TnCodablePersistenceController.shared.fetch(defaultObject: { TnCameraSettings.init() })
-                    globalCameraSettingsID = settingsPair.objectID
-                    let cameraService = TnCameraService(settings: settingsPair.object)
-                    let cameraProxy = TnCameraProxyServerAsync(
-                        cameraService,
-                        bleInfo: bleInfo,
-                        transportingInfo: transportingInfo
-                    )
-                    cameraProxy.bleDelegate = cameraProxy
-                    globalCameraProxy = cameraProxy
-                }
-            }
-        } else {
-            let cameraProxy = TnCameraProxyClient(
-                bleInfo: bleInfo,
-                transportingInfo: transportingInfo
-            )
-            cameraProxy.bleDelegate = cameraProxy
-            globalCameraProxy = cameraProxy
-        }
-        globalCameraProxy.delegate = self
-
-        logDebug("init camera proxy !")
-    }
-    
-    func setupCameraProxy() {
-        logDebug("setup camera proxy ...")
-        globalCameraProxy.setup()
-        logDebug("setup camera proxy !")
-    }
-    
     public var body: some View {
         ZStack {
             // background
@@ -95,36 +58,15 @@ public struct TnCameraAppView: View, TnLoggable {
             TnCameraToolbarTopView()
         }
         .onAppear {
-            initCameraProxy()
-            setupCameraProxy()
+            if serverMode {
+                if #available(iOS 17.0, *) {
+                    try? TnCameraProxyLoader.shared.loadMaster(bleInfo: bleInfo, transportingInfo: transportingInfo, delegate: self)
+                }
+            } else {
+                TnCameraProxyLoader.shared.loadSlaver(bleInfo: bleInfo, transportingInfo: transportingInfo, delegate: self)
+            }
+            TnCameraProxyLoader.shared.setupProxy()
         }
-//        .task {
-//            try? await tnDoCatchAsync(name: "TnCameraAppView setup") {
-//                if serverMode {
-//                    if #available(iOS 17.0, *) {
-//                        let settingsPair = try TnCodablePersistenceController.shared.fetch(defaultObject: { TnCameraSettings.init() })
-//                        globalCameraSettingsID = settingsPair.objectID
-//                        let cameraService = TnCameraService(settings: settingsPair.object)
-//                        let cameraProxy = TnCameraProxyServerAsync(
-//                            cameraService,
-//                            bleInfo: bleInfo,
-//                            transportingInfo: transportingInfo
-//                        )
-//                        cameraProxy.bleDelegate = cameraProxy
-//                        globalCameraProxy = cameraProxy
-//                    }
-//                } else {
-//                    let cameraProxy = TnCameraProxyClient(
-//                        bleInfo: bleInfo,
-//                        transportingInfo: transportingInfo
-//                    )
-//                    cameraProxy.bleDelegate = cameraProxy
-//                    globalCameraProxy = cameraProxy
-//                }
-//                globalCameraProxy.delegate = self
-//                globalCameraProxy.setup()
-//            }
-//        }
     }
 }
 
@@ -155,15 +97,10 @@ extension TnCameraAppView: TnCameraDelegate {
                 logDebug("send settings")
                 cameraProxy.send(.getSettingsResponse, TnCameraSettingsValue(settings: settings, status: status))
 
-                Task {
-                    logDebug("save settings")
-                    try? TnCodablePersistenceController.shared.update(
-                        objectID: globalCameraSettingsID,
-                        object: settings
-                    )
+                Task.detached {
+                    try? TnCameraProxyLoader.shared.saveSettings(settings)
                 }
             }
         }
     }
 }
-
