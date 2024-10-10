@@ -83,7 +83,8 @@ public struct TnCameraAppView: View, TnLoggable {
             TnCameraToolbarTopView()
         }
         .onAppear {
-//            globalCameraProxy.setup()
+            logDebug("setup ...")
+            globalCameraProxy.setup()
             logDebug("appear")
         }
 //        .task {
