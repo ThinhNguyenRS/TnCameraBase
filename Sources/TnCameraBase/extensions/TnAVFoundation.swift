@@ -20,11 +20,7 @@ extension AVCaptureConnection {
         }
         set {
             if #available(iOS 17.0, *) {
-                let newAngle = newValue.toAngle()
-                if (self.videoRotationAngle != newAngle) && self.isVideoRotationAngleSupported(newAngle) {
-                    TnLogger.debug("AVCaptureConnection", "rotationAngle", self.videoRotationAngle, newAngle)
-                    self.videoRotationAngle = newAngle
-                }
+                self.rotationAngle = newValue.toAngle()
             } else {
                 self.videoOrientation = newValue.toVideoOrientation()
             }
