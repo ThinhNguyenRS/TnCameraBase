@@ -26,6 +26,33 @@ public struct TnCameraAppView: View, TnLoggable {
         self.serverMode = serverMode
         self.bleInfo = bleInfo
         self.transportingInfo = transportingInfo
+
+        if serverMode {
+            if #available(iOS 17.0, *) {
+                try? tnDoCatch(name: "TnCameraAppView init camera proxy") {
+                    let settingsPair = try TnCodablePersistenceController.shared.fetch(defaultObject: { TnCameraSettings.init() })
+                    globalCameraSettingsID = settingsPair.objectID
+                    let cameraService = TnCameraService(settings: settingsPair.object)
+                    let cameraProxy = TnCameraProxyServerAsync(
+                        cameraService,
+                        bleInfo: bleInfo,
+                        transportingInfo: transportingInfo
+                    )
+                    cameraProxy.bleDelegate = cameraProxy
+                    globalCameraProxy = cameraProxy
+                }
+            }
+        } else {
+            let cameraProxy = TnCameraProxyClient(
+                bleInfo: bleInfo,
+                transportingInfo: transportingInfo
+            )
+            cameraProxy.bleDelegate = cameraProxy
+            globalCameraProxy = cameraProxy
+        }
+        globalCameraProxy.delegate = self
+        globalCameraProxy.setup()
+
         logDebug("inited")
     }
     
@@ -60,34 +87,33 @@ public struct TnCameraAppView: View, TnLoggable {
         .onAppear {
             logDebug("appear")
         }
-        .task {
-            try? await tnDoCatchAsync(name: "TnCameraAppView setup") {
-                if serverMode {
-                    if #available(iOS 17.0, *) {
-//                        let settingsPair = try await TnCodablePersistenceController.shared.fetch(defaultObject: { TnCameraSettings.init() })
-                        let settingsPair = try TnCodablePersistenceController.shared.fetch(defaultObject: { TnCameraSettings.init() })
-                        globalCameraSettingsID = settingsPair.objectID
-                        let cameraService = TnCameraService(settings: settingsPair.object)
-                        let cameraProxy = TnCameraProxyServerAsync(
-                            cameraService,
-                            bleInfo: bleInfo,
-                            transportingInfo: transportingInfo
-                        )
-                        cameraProxy.bleDelegate = cameraProxy
-                        globalCameraProxy = cameraProxy
-                    }
-                } else {
-                    let cameraProxy = TnCameraProxyClient(
-                        bleInfo: bleInfo,
-                        transportingInfo: transportingInfo
-                    )
-                    cameraProxy.bleDelegate = cameraProxy
-                    globalCameraProxy = cameraProxy
-                }
-                globalCameraProxy.delegate = self
-                globalCameraProxy.setup()
-            }
-        }
+//        .task {
+//            try? await tnDoCatchAsync(name: "TnCameraAppView setup") {
+//                if serverMode {
+//                    if #available(iOS 17.0, *) {
+//                        let settingsPair = try TnCodablePersistenceController.shared.fetch(defaultObject: { TnCameraSettings.init() })
+//                        globalCameraSettingsID = settingsPair.objectID
+//                        let cameraService = TnCameraService(settings: settingsPair.object)
+//                        let cameraProxy = TnCameraProxyServerAsync(
+//                            cameraService,
+//                            bleInfo: bleInfo,
+//                            transportingInfo: transportingInfo
+//                        )
+//                        cameraProxy.bleDelegate = cameraProxy
+//                        globalCameraProxy = cameraProxy
+//                    }
+//                } else {
+//                    let cameraProxy = TnCameraProxyClient(
+//                        bleInfo: bleInfo,
+//                        transportingInfo: transportingInfo
+//                    )
+//                    cameraProxy.bleDelegate = cameraProxy
+//                    globalCameraProxy = cameraProxy
+//                }
+//                globalCameraProxy.delegate = self
+//                globalCameraProxy.setup()
+//            }
+//        }
     }
 }
 
