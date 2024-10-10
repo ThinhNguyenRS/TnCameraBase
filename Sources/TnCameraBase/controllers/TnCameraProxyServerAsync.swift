@@ -34,17 +34,19 @@ public class TnCameraProxyServerAsync: TnLoggable {
             self.albums = await cameraService.library.getAlbums()
             
             await cameraService.$isSettingsChanging.onReceive { v in
-                if !v {
-                    Task {
-                        self.logDebug("settings changed", "zoom: ", await cameraService.settings.zoomFactor)
+                Task {
+                    if await cameraService.status != .none && !v {
+                        self.logDebug("settings changed")
                         self.delegate?.tnCamera(settings: await cameraService.settings)
                     }
                 }
             }
 
             await cameraService.$status.onReceive { v in
-                self.logDebug("status changed", v)
-                self.delegate?.tnCamera(status: v)
+                if v != .none {
+                    self.logDebug("status changed", v)
+                    self.delegate?.tnCamera(status: v)
+                }
             }
         }
         
