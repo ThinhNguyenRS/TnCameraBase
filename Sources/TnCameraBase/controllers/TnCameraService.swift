@@ -16,13 +16,10 @@ import CoreData
 
 @available(iOS 17.0, *)
 public actor TnCameraService: NSObject, TnLoggable {
-    public static let shared: TnCameraService = .init()
-
+//    public static let shared: TnCameraService = .init()
     typealias DoDeviceHandler = (AVCaptureDeviceInput, AVCaptureDevice) throws -> Void
     
-
-    //    @Published public var settings: TnCameraSettings = .init()
-    public var settings: TnCameraSettings = .init()
+    public private(set) var settings: TnCameraSettings
     @Published public var status: TnCameraStatus = .none
     @Published public var currentCiImage: CIImage?
     
@@ -41,7 +38,8 @@ public actor TnCameraService: NSObject, TnLoggable {
     private var rotationObservers = [AnyObject]()
     private var rotationCoordinator: AVCaptureDevice.RotationCoordinator!
 
-    private override init() {
+    public init(settings: TnCameraSettings? = nil) {
+        self.settings = settings ?? .init()
     }
     
     var currentImageData: Data? {
@@ -54,10 +52,6 @@ public actor TnCameraService: NSObject, TnLoggable {
 // MARK: config misc
 @available(iOS 17.0, *)
 extension TnCameraService {
-    func setSettings(settings: TnCameraSettings) {
-        self.settings = settings
-    }
-    
     private func fetchSettings() {
         isSettingsChanging = true
         

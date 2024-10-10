@@ -26,8 +26,6 @@ public struct TnCameraAppView: View, TnLoggable {
         self.serverMode = serverMode
         self.bleInfo = bleInfo
         self.transportingInfo = transportingInfo
-//        bleInfo = TnCameraProxyServiceInfo.getBle()
-//        transportingInfo = TnCameraProxyServiceInfo.getTransporting(EOM: EOM, MTU: MTU, encoder: encoder, decoder: decoder)
         logDebug("inited")
     }
     
@@ -68,9 +66,9 @@ public struct TnCameraAppView: View, TnLoggable {
                     if #available(iOS 17.0, *) {
                         let settingsPair = try await TnCodablePersistenceController.shared.fetch(defaultObject: { TnCameraSettings.init() })
                         globalCameraSettingsID = settingsPair.objectID
-                        await TnCameraService.shared.setSettings(settings: settingsPair.object)
+                        let cameraService = TnCameraService(settings: settingsPair.object)
                         let cameraProxy = TnCameraProxyServerAsync(
-                            TnCameraService.shared,
+                            cameraService,
                             bleInfo: bleInfo,
                             transportingInfo: transportingInfo
                         )
