@@ -539,8 +539,6 @@ extension TnCameraService {
             captureDelegate = nil
         }
         return try await withCheckedThrowingContinuation { continuation in
-            photoOutput.orientation = .fromUI(DeviceMotionOrientationListener.shared.orientation)
-
             let p = createPhotoSettings()
             captureDelegate = TnCameraCaptureDelegate(continuation: continuation)
             photoOutput.capturePhoto(with: p, delegate: captureDelegate!)
