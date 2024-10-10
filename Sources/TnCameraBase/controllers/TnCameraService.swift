@@ -633,7 +633,7 @@ extension TnCameraService {
         var newAngle = angle
         if settings.cameraPosition == .front {
             if angle != 90 {
-                newAngle = -angle
+                newAngle += 180
             }
         }
         videoDataOutput.rotationAngle = newAngle
