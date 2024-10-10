@@ -146,7 +146,7 @@ extension TnCameraAppView: TnCameraDelegate {
 
                 Task {
                     logDebug("save settings")
-                    try? await TnCodablePersistenceController.shared.update(
+                    try? TnCodablePersistenceController.shared.update(
                         objectID: globalCameraSettingsID,
                         object: settings
                     )
