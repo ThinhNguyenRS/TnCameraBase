@@ -18,12 +18,12 @@ public struct TnCameraAppView: View, TnLoggable {
     @State private var status: TnCameraStatus = .none
     @State private var capturedImage: UIImage? = nil
 
-    private let serverMode: Bool
+    private let master: Bool
     private let bleInfo: TnNetworkBleInfo
     private let transportingInfo: TnNetworkTransportingInfo
 
-    public init(serverMode: Bool, bleInfo: TnNetworkBleInfo, transportingInfo: TnNetworkTransportingInfo) {
-        self.serverMode = serverMode
+    public init(master: Bool, bleInfo: TnNetworkBleInfo, transportingInfo: TnNetworkTransportingInfo) {
+        self.master = master
         self.bleInfo = bleInfo
         self.transportingInfo = transportingInfo
         logDebug("inited")
@@ -58,7 +58,7 @@ public struct TnCameraAppView: View, TnLoggable {
             TnCameraToolbarTopView()
         }
         .onAppear {
-            if serverMode {
+            if master {
                 if #available(iOS 17.0, *) {
                     try? TnCameraProxyLoader.shared.loadMaster(bleInfo: bleInfo, transportingInfo: transportingInfo, delegate: self)
                 }
@@ -81,10 +81,11 @@ extension TnCameraAppView: TnCameraDelegate {
         DispatchQueue.main.async {
             logDebug("status changed", status)
             self.status = status
+        }
 
-            if serverMode {
-                cameraProxy.send(.getSettingsResponse, TnCameraSettingsValue(settings: settings, status: status))
-            }
+        if master {
+            logDebug("send status")
+            cameraProxy.send(.getSettingsResponse, TnCameraSettingsValue(settings: nil, status: status, network: nil))
         }
     }
     
@@ -92,15 +93,13 @@ extension TnCameraAppView: TnCameraDelegate {
         DispatchQueue.main.async {
             logDebug("settings changed")
             self.settings = settings
+        }
 
-            if serverMode {
-                logDebug("send settings")
-                cameraProxy.send(.getSettingsResponse, TnCameraSettingsValue(settings: settings, status: status))
+        if master {
+            logDebug("send settings")
+            cameraProxy.send(.getSettingsResponse, TnCameraSettingsValue(settings: settings, status: nil, network: nil))
 
-                Task.detached {
-                    try? TnCameraProxyLoader.shared.saveSettings(settings)
-                }
-            }
+            try? TnCameraProxyLoader.shared.saveSettings(settings)
         }
     }
 }

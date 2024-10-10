@@ -151,11 +151,11 @@ public struct TnCameraCapturingValue: Codable {
 
 // MARK: TnCameraSettingsValue
 public struct TnCameraSettingsValue: Codable {
-    public let settings: TnCameraSettings
-    public let status: TnCameraStatus
+    public let settings: TnCameraSettings?
+    public let status: TnCameraStatus?
     public let network: TnNetworkHostInfo?
     
-    public init(settings: TnCameraSettings, status: TnCameraStatus, network: TnNetworkHostInfo? = nil) {
+    public init(settings: TnCameraSettings?, status: TnCameraStatus?, network: TnNetworkHostInfo?) {
         self.settings = settings
         self.status = status
         self.network = network

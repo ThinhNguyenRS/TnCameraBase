@@ -55,12 +55,14 @@ public struct TnCameraProxyLoader: TnLoggable {
     
     public func saveSettings(_ settings: TnCameraSettings) throws {
         if let settingsID = globalCamera.cameraSettingsID {
-            logDebug("save settings ...")
-            try TnCodablePersistenceController.shared.update(
-                objectID: settingsID,
-                object: settings
-            )
-            logDebug("save settings !")
+            Task.detached {
+                logDebug("save settings ...")
+                try TnCodablePersistenceController.shared.update(
+                    objectID: settingsID,
+                    object: settings
+                )
+                logDebug("save settings !")
+            }
         }
     }
     
