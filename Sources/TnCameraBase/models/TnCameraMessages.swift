@@ -54,50 +54,7 @@ public enum TnCameraMessageType: UInt8, Codable {
     case createAlbum
 }
 
-//// MARK: TnCameraMessageProtocol
-//public protocol TnCameraMessageProtocol: TnMessageProtocol {
-//    var messageType: TnCameraMessageType { get }
-//}
-//
-//extension TnCameraMessageProtocol {
-//    public var typeCode: UInt8 {
-//        messageType.rawValue
-//    }
-//}
-//
-//// MARK: TnCameraMessage
-//public struct TnCameraMessage: TnCameraMessageProtocol {
-//    public let messageType: TnCameraMessageType
-//    
-//    public init(_ messageType: TnCameraMessageType) {
-//        self.messageType = messageType
-//    }
-//}
-
-//// MARK: TnCameraProxyProtocol
-//public protocol TnCameraProxyProtocol: TnCameraProtocol {
-//    var decoder: TnDecoder { get }
-//
-//    func send(_ object: TnCameraMessageProtocol, useBle: Bool)
-//    func sendImage()
-//}
-//
-//extension TnCameraProxyProtocol {
-//    public func send(_ messageType: TnCameraMessageType, useBle: Bool = false) {
-//        self.send(TnCameraMessage(messageType), useBle: useBle)
-//    }
-//
-//    public func send<T: Codable>(_ messageType: TnCameraMessageType, _ value: T, useBle: Bool = false) {
-//        self.send(TnCameraMessageValue(messageType, value), useBle: useBle)
-//    }
-//
-//    public func solveMsgValue<TMessageValue: Codable>(_ receivedMsg: TnMessage, handler: (TMessageValue) -> Void) {
-//        if let msg: TnCameraMessageValue<TMessageValue> = receivedMsg.toObject(decoder: decoder) {
-//            handler(msg.value)
-//        }
-//    }
-//}
-
+// MARK: TnMessageData
 extension TnMessageData {
     var cameraMsgType: TnCameraMessageType? {
         TnCameraMessageType(rawValue: self.typeCode)
@@ -106,13 +63,13 @@ extension TnMessageData {
 
 // MARK: TnTransportableProtocol
 extension TnTransportableProtocol {
-    public func send(msgType: TnCameraMessageType, to: [String]? = nil) {
+    public func send(msgType: TnCameraMessageType, to: [String]?) {
         Task.detached {
             try await self.send(typeCode: msgType.rawValue, to: to)
         }
     }
 
-    public func send<T: Codable>(msgType: TnCameraMessageType, value: T, to: [String]? = nil) {
+    public func send<T: Codable>(msgType: TnCameraMessageType, value: T, to: [String]?) {
         Task.detached {
             try await self.send(typeCode: msgType.rawValue, value: value, to: to)
         }

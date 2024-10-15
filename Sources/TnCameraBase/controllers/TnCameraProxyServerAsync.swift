@@ -94,7 +94,8 @@ extension TnCameraProxyServerAsync {
             // response settings
             Task {
                 send(msgType: .getSettingsResponse,
-                     value: TnCameraSettingsValue(settings: await cameraService.settings, status: await cameraService.status, network: network.hostInfo)
+                     value: TnCameraSettingsValue(settings: await cameraService.settings, status: await cameraService.status, network: network.hostInfo),
+                     to: ["common"]
                 )
             }
 
@@ -147,7 +148,7 @@ extension TnCameraProxyServerAsync {
             }
             
         case .getAlbums:
-            send(msgType: .getAlbumsResponse, value: albums)
+            send(msgType: .getAlbumsResponse, value: albums, to: ["common"])
         default:
             return
         }
@@ -338,7 +339,7 @@ extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
         Task {
             try await cameraService.library.getOrCreateAlbum(name: v)
             albums = await cameraService.library.getAlbums()
-            send(msgType: .getAlbumsResponse, value: albums)
+            send(msgType: .getAlbumsResponse, value: albums, to: ["common"])
         }
     }
 
