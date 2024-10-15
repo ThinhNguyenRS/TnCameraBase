@@ -46,32 +46,13 @@ public protocol TnCameraProtocol {
     func createAlbum(_ v: String)
 }
 
-// MARK: TnCameraProxyProtocol
-public protocol TnCameraProxyProtocol: TnCameraProtocol {
-    var decoder: TnDecoder { get }
-    func send(_ object: TnCameraMessageProtocol, useBle: Bool)
-    func sendImage()
-}
-
-extension TnCameraProxyProtocol {
-    public func send(_ messageType: TnCameraMessageType, useBle: Bool = false) {
-        self.send(TnCameraMessage(messageType), useBle: useBle)
-    }
-
-    public func send<T: Codable>(_ messageType: TnCameraMessageType, _ value: T, useBle: Bool = false) {
-        self.send(TnCameraMessageValue(messageType, value), useBle: useBle)
-    }
-    
-    public func solveMsgValue<TMessageValue: Codable>(_ receivedMsg: TnMessage, handler: (TMessageValue) -> Void) {
-        if let msg: TnCameraMessageValue<TMessageValue> = receivedMsg.toObject(decoder: decoder) {
-            handler(msg.value)
-        }
-    }
-}
-
 // MARK: TnCameraDelegate
 public protocol TnCameraDelegate {
     func tnCamera(captured: TnCameraPhotoOutput)
     func tnCamera(status: TnCameraStatus)
     func tnCamera(settings: TnCameraSettings)
+}
+
+public protocol TnCameraProxyProtocol: TnCameraProtocol, TnTransportableProtocol {
+    
 }

@@ -12,6 +12,8 @@ import AVFoundation
 import TnIosBase
 
 public enum TnCameraMessageType: UInt8, Codable {
+    case reserve_0, reserve_1, reserve_2
+    
     case getSettings
     case getSettingsResponse
     
@@ -52,34 +54,81 @@ public enum TnCameraMessageType: UInt8, Codable {
     case createAlbum
 }
 
-// MARK: TnCameraMessageProtocol
-public protocol TnCameraMessageProtocol: TnMessageProtocol {
-    var messageType: TnCameraMessageType { get }
-}
+//// MARK: TnCameraMessageProtocol
+//public protocol TnCameraMessageProtocol: TnMessageProtocol {
+//    var messageType: TnCameraMessageType { get }
+//}
+//
+//extension TnCameraMessageProtocol {
+//    public var typeCode: UInt8 {
+//        messageType.rawValue
+//    }
+//}
+//
+//// MARK: TnCameraMessage
+//public struct TnCameraMessage: TnCameraMessageProtocol {
+//    public let messageType: TnCameraMessageType
+//    
+//    public init(_ messageType: TnCameraMessageType) {
+//        self.messageType = messageType
+//    }
+//}
 
-extension TnCameraMessageProtocol {
-    public var typeCode: UInt8 {
-        messageType.rawValue
+//// MARK: TnCameraProxyProtocol
+//public protocol TnCameraProxyProtocol: TnCameraProtocol {
+//    var decoder: TnDecoder { get }
+//
+//    func send(_ object: TnCameraMessageProtocol, useBle: Bool)
+//    func sendImage()
+//}
+//
+//extension TnCameraProxyProtocol {
+//    public func send(_ messageType: TnCameraMessageType, useBle: Bool = false) {
+//        self.send(TnCameraMessage(messageType), useBle: useBle)
+//    }
+//
+//    public func send<T: Codable>(_ messageType: TnCameraMessageType, _ value: T, useBle: Bool = false) {
+//        self.send(TnCameraMessageValue(messageType, value), useBle: useBle)
+//    }
+//
+//    public func solveMsgValue<TMessageValue: Codable>(_ receivedMsg: TnMessage, handler: (TMessageValue) -> Void) {
+//        if let msg: TnCameraMessageValue<TMessageValue> = receivedMsg.toObject(decoder: decoder) {
+//            handler(msg.value)
+//        }
+//    }
+//}
+
+extension TnMessageData {
+    var cameraMsgType: TnCameraMessageType? {
+        TnCameraMessageType(rawValue: self.typeCode)
     }
 }
 
-// MARK: TnCameraMessage
-public struct TnCameraMessage: TnCameraMessageProtocol {
-    public let messageType: TnCameraMessageType
+// MARK: TnTransportableProtocol
+extension TnTransportableProtocol {
+    public func send(msgType: TnCameraMessageType, to: [String]? = nil) {
+        Task.detached {
+            try await self.send(typeCode: msgType.rawValue, to: to)
+        }
+    }
+
+    public func send<T: Codable>(msgType: TnCameraMessageType, value: T, to: [String]? = nil) {
+        Task.detached {
+            try await self.send(typeCode: msgType.rawValue, value: value, to: to)
+        }
+    }
     
-    public init(_ messageType: TnCameraMessageType) {
-        self.messageType = messageType
+    public func solveMsgValue<TMessageValue: Codable>(msgData: TnMessageData, handler: (TMessageValue) -> Void) {
+        if let msg: TnMessageValue<TMessageValue> = msgData.toObject(decoder: decoder) {
+            handler(msg.value)
+        }
     }
 }
 
-// MARK: TnCameraMessageValue
-public struct TnCameraMessageValue<T: Codable>: TnCameraMessageProtocol {
-    public let messageType: TnCameraMessageType
-    public let value: T
-    
+// MARK: TnMessageValue
+extension TnMessageValue {
     public init(_ messageType: TnCameraMessageType, _ value: T) {
-        self.messageType = messageType
-        self.value = value
+        self.init(messageType.rawValue, value)
     }
 }
 

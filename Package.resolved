@@ -1,13 +1,13 @@
 {
-  "originHash" : "f57e9f7ec9de50f39f05a4b6efc0ffee0fa6d7f131008037c2be7ec3d0d062a4",
+  "originHash" : "643d965fe02107272b3176626c8e9d141ee323f2d414a15a16c6c50d352d210b",
   "pins" : [
     {
       "identity" : "tniosbase",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ThinhNguyenRS/TnIosBase",
       "state" : {
-        "revision" : "e3beb04e629d03c643742822a07c231c8016ac4c",
-        "version" : "1.0.0"
+        "branch" : "main",
+        "revision" : "d6e3f819786a3bbd326cc926a1060316bfa19bee"
       }
     }
   ],

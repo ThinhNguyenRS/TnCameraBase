@@ -70,8 +70,8 @@ public class TnCameraProxyServerAsync: TnLoggable {
 @available(iOS 17.0, *)
 extension TnCameraProxyServerAsync {
     private func solveData(data: Data) {
-        let receivedMsg = TnMessage(data: data)
-        guard let messageType: TnCameraMessageType = .init(rawValue: receivedMsg.typeCode) else { return }
+        let msgData = TnMessageData(data: data)
+        guard let messageType = msgData.cameraMsgType else { return }
         logDebug("receive", messageType)
 
         switch messageType {
@@ -93,9 +93,8 @@ extension TnCameraProxyServerAsync {
         case .getSettings:
             // response settings
             Task {
-                send(.getSettingsResponse,
-                     TnCameraSettingsValue(settings: await cameraService.settings, status: await cameraService.status, network: network.hostInfo),
-                     useBle: true
+                send(msgType: .getSettingsResponse,
+                     value: TnCameraSettingsValue(settings: await cameraService.settings, status: await cameraService.status, network: network.hostInfo)
                 )
             }
 
@@ -103,52 +102,52 @@ extension TnCameraProxyServerAsync {
             sendImage()
             
         case .setZoomFactor:
-            solveMsgValue(receivedMsg) { (v: TnCameraZoomFactorValue) in
+            solveMsgValue(msgData: msgData) { (v: TnCameraZoomFactorValue) in
                 setZoomFactor(v)
             }
 
         case .setLivephoto:
-            solveMsgValue(receivedMsg) { (v: Bool) in
+            solveMsgValue(msgData: msgData) { (v: Bool) in
                 setLivephoto(v)
             }
             
         case .setFlash:
-            solveMsgValue(receivedMsg) { (v: AVCaptureDevice.FlashMode) in
+            solveMsgValue(msgData: msgData) { (v: AVCaptureDevice.FlashMode) in
                 setFlash(v)
             }
 
         case .setHDR:
-            solveMsgValue(receivedMsg) { (v: TnTripleState) in
+            solveMsgValue(msgData: msgData) { (v: TnTripleState) in
                 setHDR(v)
             }
 
         case .setPreset:
-            solveMsgValue(receivedMsg) { (v: AVCaptureSession.Preset) in
+            solveMsgValue(msgData: msgData) { (v: AVCaptureSession.Preset) in
                 setPreset(v)
             }
             
         case .setCameraType:
-            solveMsgValue(receivedMsg) { (v: AVCaptureDevice.DeviceType) in
+            solveMsgValue(msgData: msgData) { (v: AVCaptureDevice.DeviceType) in
                 setCameraType(v)
             }
             
         case .setQuality:
-            solveMsgValue(receivedMsg) { (v: AVCapturePhotoOutput.QualityPrioritization) in
+            solveMsgValue(msgData: msgData) { (v: AVCapturePhotoOutput.QualityPrioritization) in
                 setPriority(v)
             }
             
         case .setFocusMode:
-            solveMsgValue(receivedMsg) { (v: AVCaptureDevice.FocusMode) in
+            solveMsgValue(msgData: msgData) { (v: AVCaptureDevice.FocusMode) in
                 setFocusMode(v)
             }
 
         case .setTransporting:
-            solveMsgValue(receivedMsg) { (v: TnCameraTransportingValue) in
+            solveMsgValue(msgData: msgData) { (v: TnCameraTransportingValue) in
                 setTransporting(v)
             }
             
         case .getAlbums:
-            send(.getAlbumsResponse, albums)
+            send(msgType: .getAlbumsResponse, value: albums)
         default:
             return
         }
@@ -179,32 +178,35 @@ extension TnCameraProxyServerAsync: TnBluetoothServerDelegate {
     }
 }
 
-
 // MARK: TnCameraProxyProtocol
 @available(iOS 17.0, *)
 extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
     public var decoder: TnDecoder {
         ble.decoder
     }
-
-    public func send(_ object: TnCameraMessageProtocol, useBle: Bool = false) {
-        Task {
-            if useBle {
-                try? await ble.send(object: object)
-            } else {
-                try? await network.send(object: object)
+    
+    public var encoder: TnEncoder {
+        ble.encoder
+    }
+    
+    public func send(data: Data, to: [String]?) async throws {
+        if network.hasConnections {
+            Task {
+                try? await network.send(data: data, to: to)
             }
+        } else {
+            ble.send(data: data, to: to)
         }
     }
     
     public func sendImage() {
         Task {
             if let currentImageData = await cameraService.currentImageData {
-                send(.getImageResponse, currentImageData)
+                network.send(msgType: .getImageResponse, value: currentImageData, to: ["image"])
             }
         }
     }
-    
+
     public func setup() {
         ble.setupBle()
     }
@@ -336,7 +338,7 @@ extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
         Task {
             try await cameraService.library.getOrCreateAlbum(name: v)
             albums = await cameraService.library.getAlbums()
-            send(.getAlbumsResponse, albums)
+            send(msgType: .getAlbumsResponse, value: albums)
         }
     }
 

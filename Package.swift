@@ -15,8 +15,8 @@ let package = Package(
             targets: ["TnCameraBase"]),
     ],
     dependencies: [
-//        .package(name: "TnIosBase", url: "https://github.com/ThinhNguyenRS/TnIosBase", .upToNextMajor(from: "v.1.0.0"))
-        .package(url: "https://github.com/ThinhNguyenRS/TnIosBase", .upToNextMajor(from: "1.0.0"))
+//        .package(url: "https://github.com/ThinhNguyenRS/TnIosBase", .upToNextMajor(from: "1.0.0"))
+        .package(url: "https://github.com/ThinhNguyenRS/TnIosBase", branch: "main"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
