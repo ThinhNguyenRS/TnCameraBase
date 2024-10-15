@@ -205,7 +205,7 @@ extension TnCameraProxyClient: TnCameraProxyProtocol {
     }
     
     public func send(data: Data, to: [String]?) async throws {
-        Task.detached { [self] in
+        Task { [self] in
             if networkCommon == nil {
                 ble.send(data: data, to: to)
             } else {
@@ -256,7 +256,7 @@ extension TnCameraProxyClient: TnNetworkDelegate {
     }
 
     public func tnNetworkReceived(_ connection: TnNetworkConnection, data: Data) {
-        Task.detached {
+        Task {
             self.solveData(data: data)
         }
     }

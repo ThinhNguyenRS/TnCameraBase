@@ -64,13 +64,13 @@ extension TnMessageData {
 // MARK: TnTransportableProtocol
 extension TnTransportableProtocol {
     public func send(msgType: TnCameraMessageType, to: [String]?) {
-        Task.detached {
+        Task {
             try await self.send(typeCode: msgType.rawValue, to: to)
         }
     }
 
     public func send<T: Codable>(msgType: TnCameraMessageType, value: T, to: [String]?) {
-        Task.detached {
+        Task {
             try await self.send(typeCode: msgType.rawValue, value: value, to: to)
         }
     }
