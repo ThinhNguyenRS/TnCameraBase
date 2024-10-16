@@ -29,29 +29,10 @@ public class TnCameraProxyServerAsync: TnLoggable {
         }
         
         self.network = .init(hostInfo: .init(host: address.address, port: 1234), delegate: nil, transportingInfo: transportingInfo)
-
-        Task {
-            self.albums = await cameraService.library.getAlbums()
-            
-            await cameraService.$isSettingsChanging.onReceive { v in
-                Task {
-                    if await cameraService.status != .none && !v {
-                        self.logDebug("settings changed")
-                        self.delegate?.tnCamera(settings: await cameraService.settings)
-                    }
-                }
-            }
-
-            await cameraService.$status.onReceive { v in
-                if v != .none {
-                    self.logDebug("status changed", v)
-                    self.delegate?.tnCamera(status: v)
-                }
-            }
-        }
-        
         self.network.delegate = self
         self.network.start()
+        
+        self.listenService()
 
         logDebug("inited")
     }
@@ -62,6 +43,37 @@ public class TnCameraProxyServerAsync: TnLoggable {
         }
         set {
             ble.delegate = newValue
+        }
+    }
+    
+}
+
+// MARK: listen service
+@available(iOS 17.0, *)
+extension TnCameraProxyServerAsync {
+    private func listenService() {
+        Task {
+            self.albums = await cameraService.library.getAlbums()
+            
+            await cameraService.$isSettingsChanging.onReceive { [self] v in
+                Task {
+                    if await cameraService.status != .none && !v {
+                        logDebug("settings changed")
+                        delegate?.tnCamera(self, settings: await cameraService.settings)
+                    }
+                }
+            }
+
+            await cameraService.$status.onReceive { [self] v in
+                if v != .none {
+                    logDebug("status changed", v)
+                    delegate?.tnCamera(self, status: v)
+                }
+            }
+            
+            await cameraService.$currentCiImage.onReceive { [self] v in
+                delegate?.tnCamera(self, output: v)
+            }
         }
     }
 }
@@ -246,7 +258,7 @@ extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
     public func captureImage() {
         Task {
             if let output = try? await cameraService.captureImage() {
-                delegate?.tnCamera(captured: output)
+                delegate?.tnCamera(self, captured: output)
             }
         }
     }

@@ -16,7 +16,6 @@ import TnIosBase
 public protocol TnCameraProtocol {
     var currentCiImagePublisher: Published<CIImage?>.Publisher { get async }
     var albums: [String] { get }
-    var delegate: TnCameraDelegate? { get set }
     
     func setup()
 
@@ -46,13 +45,6 @@ public protocol TnCameraProtocol {
     func createAlbum(_ v: String)
 }
 
-// MARK: TnCameraDelegate
-public protocol TnCameraDelegate {
-    func tnCamera(captured: TnCameraPhotoOutput)
-    func tnCamera(status: TnCameraStatus)
-    func tnCamera(settings: TnCameraSettings)
-}
-
 public protocol TnCameraProxyProtocol: TnCameraProtocol, TnTransportableProtocol {
-    
+    var delegate: TnCameraDelegate? { get set }
 }

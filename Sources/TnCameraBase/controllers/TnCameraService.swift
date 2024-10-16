@@ -580,11 +580,11 @@ extension TnCameraService: AVCaptureVideoDataOutputSampleBufferDelegate {
     }
     
     nonisolated public func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
-        guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
+        guard let imageBuffer = sampleBuffer.imageBuffer else {
             return
         }
         Task {
-            await setImage(CIImage(cvImageBuffer: pixelBuffer))
+            await setImage(CIImage(cvImageBuffer: imageBuffer))
         }
     }
 }

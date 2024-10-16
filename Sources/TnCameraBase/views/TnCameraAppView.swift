@@ -21,11 +21,13 @@ public struct TnCameraAppView: View, TnLoggable {
     private let master: Bool
     private let bleInfo: TnNetworkBleInfo
     private let transportingInfo: TnNetworkTransportingInfo
+    private let delegate: TnCameraDelegate?
 
-    public init(master: Bool, bleInfo: TnNetworkBleInfo, transportingInfo: TnNetworkTransportingInfo) {
+    public init(master: Bool, bleInfo: TnNetworkBleInfo, transportingInfo: TnNetworkTransportingInfo, delegate: TnCameraDelegate?) {
         self.master = master
         self.bleInfo = bleInfo
         self.transportingInfo = transportingInfo
+        self.delegate = delegate
         logDebug("inited")
     }
     
@@ -71,35 +73,48 @@ public struct TnCameraAppView: View, TnLoggable {
 }
 
 extension TnCameraAppView: TnCameraDelegate {
-    public func tnCamera(captured: TnCameraPhotoOutput) {
-        capturedImage = UIImage(data: captured.photoData)
+    public func tnCamera(_ cameraProxy: TnCameraProxyProtocol, captured: TnCameraPhotoOutput) {
+        DispatchQueue.main.async {
+            capturedImage = UIImage(data: captured.photoData)
+        }
+        delegate?.tnCamera(cameraProxy, captured: captured)
     }
     
-    public func tnCamera(status: TnCameraStatus) {
+    public func tnCamera(_ cameraProxy: TnCameraProxyProtocol, status: TnCameraStatus) {
         guard self.status != status else { return }
         
         DispatchQueue.main.async {
             logDebug("status changed", status)
             self.status = status
         }
-
+        
         if master {
             logDebug("send status")
             cameraProxy.send(msgType: .getSettingsResponse, value: TnCameraSettingsValue(settings: nil, status: status, network: nil), to: ["common"])
         }
+
+        delegate?.tnCamera(cameraProxy, status: status)
     }
     
-    public func tnCamera(settings: TnCameraSettings) {
+    public func tnCamera(_ cameraProxy: TnCameraProxyProtocol, settings: TnCameraSettings) {
         DispatchQueue.main.async {
             logDebug("settings changed")
             self.settings = settings
         }
-
+        
         if master {
-            logDebug("send settings")
-            cameraProxy.send(msgType: .getSettingsResponse, value: TnCameraSettingsValue(settings: settings, status: nil, network: nil), to: ["common"])
-
-            try? TnCameraProxyLoader.shared.saveSettings(settings)
+            Task {
+                logDebug("send settings")
+                cameraProxy.send(msgType: .getSettingsResponse, value: TnCameraSettingsValue(settings: settings, status: nil, network: nil), to: ["common"])
+                
+                try? TnCameraProxyLoader.shared.saveSettings(settings)
+            }
         }
+
+        delegate?.tnCamera(cameraProxy, settings: settings)
+    }
+    
+    public func tnCamera(_ cameraProxy: TnCameraProxyProtocol, output: CIImage?) {
+        delegate?.tnCamera(cameraProxy, output: output)
     }
 }

@@ -56,12 +56,12 @@ extension TnCameraProxyClient {
             solveMsgValue(msgData: msgData) { (v: TnCameraSettingsValue) in
                 if let settings = v.settings {
                     self.settings = settings
-                    delegate?.tnCamera(settings: settings)
+                    delegate?.tnCamera(self, settings: settings)
                 }
 
                 if let status = v.status, self.status != status {
                     self.status = status
-                    delegate?.tnCamera(status: status)
+                    delegate?.tnCamera(self, status: status)
                 }
 
                 if status == .started && networkImage != nil {
