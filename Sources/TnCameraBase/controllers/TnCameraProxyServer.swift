@@ -64,7 +64,7 @@ extension TnCameraProxyServer {
             
             await cameraService.$isSettingsChanging.onReceive { [self] v in
                 Task {
-                    if await cameraService.status != .none && !v {
+                    if await cameraService.status == .started && !v {
                         logDebug("settings changed")
                         delegate?.tnCamera(self, settings: await cameraService.settings)
                     }
@@ -77,12 +77,14 @@ extension TnCameraProxyServer {
                     delegate?.tnCamera(self, status: v)
                 }
             }
-            
-            await cameraService.$currentCiImage.onReceive { [self] v in
-                if network.hasConnection(name: "streaming") {
-                    videoEncoder.encode(v)
+        }
+        
+        Task {
+            while true {
+                if await cameraService.status != .started && network.hasConnection(name: "streaming"), let ciImage = await cameraService.currentCiImage {
+                    videoEncoder.encode(ciImage)
                 }
-//                delegate?.tnCamera(self, output: v)
+                try? await Task.sleep(nanoseconds: 50_000_000)
             }
         }
     }
