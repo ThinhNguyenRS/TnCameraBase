@@ -20,7 +20,6 @@ public class TnCameraProxyClient: NSObject, ObservableObject, TnLoggable {
 
     private let ble: TnBluetoothClient
     private var networkCommon: TnNetworkConnection?
-    private var networkImage: TnNetworkConnection?
     private var networkStreaming: TnNetworkConnection?
 
     private let transportingInfo: TnNetworkTransportingInfo
@@ -70,17 +69,10 @@ extension TnCameraProxyClient {
                     delegate?.tnCamera(self, status: status)
                 }
 
-                if status == .started && networkImage != nil {
-                    networkImage?.send(msgType: .getImage, to: nil)
-                }
-
                 if networkCommon == nil, let hostInfo = v.network {
                     networkCommon = .init(hostInfo: hostInfo, name: "common", delegate: self, transportingInfo: transportingInfo)
                     networkCommon!.start()
                     
-//                    networkImage = .init(hostInfo: hostInfo, name: "image", delegate: self, transportingInfo: transportingInfo)
-//                    networkImage!.start()
-
                     networkStreaming = .init(hostInfo: hostInfo, name: "streaming", delegate: self, transportingInfo: transportingInfo)
                     networkStreaming!.start()
                 }
@@ -254,21 +246,18 @@ extension TnCameraProxyClient: TnBluetoothClientDelegate {
 // MARK: TnNetworkDelegate
 extension TnCameraProxyClient: TnNetworkDelegate {
     public func tnNetworkReady(_ connection: TnNetworkConnection) {
-        if connection.name == networkImage?.name {
-            networkImage?.send(msgType: .getImage, to: nil)
-        }
     }
     
     public func tnNetworkStop(_ connection: TnNetworkConnection, error: (any Error)?) {
         networkCommon = nil
-        networkImage = nil
+        networkStreaming = nil
     }
 
     public func tnNetworkReceived(_ connection: TnNetworkConnection, data: Data) {
-        if connection.name == "streaming" {
-            videoDecoder.decode(packet: data)
-        } else {
-            Task {
+        Task {
+            if connection.name == "streaming" {
+                videoDecoder.decode(packet: data)
+            } else {
                 self.solveData(data: data)
             }
         }
