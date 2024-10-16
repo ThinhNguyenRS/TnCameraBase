@@ -42,7 +42,7 @@ public struct TnCameraProxyLoader: TnLoggable {
         logDebug("load master ...")
         let settingsPair = try TnCodablePersistenceController.shared.fetch(defaultObject: { TnCameraSettings.init() })
         let cameraService = TnCameraService(settings: settingsPair.object)
-        let cameraProxy = TnCameraProxyServerAsync(
+        let cameraProxy = TnCameraProxyServer(
             cameraService,
             bleInfo: bleInfo,
             transportingInfo: transportingInfo

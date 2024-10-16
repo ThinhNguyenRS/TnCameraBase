@@ -13,7 +13,7 @@ import CoreImage
 import TnIosBase
 
 @available(iOS 17.0, *)
-public class TnCameraProxyServerAsync: TnLoggable {
+public class TnCameraProxyServer: TnLoggable {
     private let cameraService: TnCameraService
     private let network: TnNetworkServer
     private let ble: TnBluetoothServer
@@ -50,7 +50,7 @@ public class TnCameraProxyServerAsync: TnLoggable {
 
 // MARK: listen service
 @available(iOS 17.0, *)
-extension TnCameraProxyServerAsync {
+extension TnCameraProxyServer {
     private func listenService() {
         Task {
             self.albums = await cameraService.library.getAlbums()
@@ -80,7 +80,7 @@ extension TnCameraProxyServerAsync {
 
 // MARK: solve messages
 @available(iOS 17.0, *)
-extension TnCameraProxyServerAsync {
+extension TnCameraProxyServer {
     private func solveData(data: Data) {
         let msgData = TnMessageData(data: data)
         guard let messageType = msgData.cameraMsgType else { return }
@@ -169,7 +169,7 @@ extension TnCameraProxyServerAsync {
 
 // MARK: TnBluetoothServerDelegate
 @available(iOS 17.0, *)
-extension TnCameraProxyServerAsync: TnBluetoothServerDelegate {
+extension TnCameraProxyServer: TnBluetoothServerDelegate {
     public func tnBluetoothServer(ble: TnBluetoothServer, statusChanged: TnBluetoothServer.Status) {
         switch statusChanged {
         case .inited:
@@ -193,7 +193,7 @@ extension TnCameraProxyServerAsync: TnBluetoothServerDelegate {
 
 // MARK: TnCameraProxyProtocol
 @available(iOS 17.0, *)
-extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
+extension TnCameraProxyServer: TnCameraProxyProtocol {
     public var decoder: TnDecoder {
         ble.decoder
     }
@@ -359,7 +359,7 @@ extension TnCameraProxyServerAsync: TnCameraProxyProtocol {
 
 // MARK: TnNetworkDelegateServer
 @available(iOS 17.0, *)
-extension TnCameraProxyServerAsync: TnNetworkDelegateServer {
+extension TnCameraProxyServer: TnNetworkDelegateServer {
     public func tnNetworkReady(_ server: TnNetworkServer) {
     }
     

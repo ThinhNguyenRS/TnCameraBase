@@ -21,6 +21,7 @@ public class TnCameraProxyClient: NSObject, ObservableObject, TnLoggable {
     private let ble: TnBluetoothClient
     private var networkCommon: TnNetworkConnection?
     private var networkImage: TnNetworkConnection?
+    private var networkStreaming: TnNetworkConnection?
 
     private let transportingInfo: TnNetworkTransportingInfo
     private var settings: TnCameraSettings? = nil
@@ -74,6 +75,9 @@ extension TnCameraProxyClient {
                     
                     networkImage = .init(hostInfo: hostInfo, name: "image", delegate: self, transportingInfo: transportingInfo)
                     networkImage!.start()
+
+                    networkStreaming = .init(hostInfo: hostInfo, name: "streaming", delegate: self, transportingInfo: transportingInfo)
+                    networkStreaming!.start()
                 }
             }
             
@@ -256,8 +260,12 @@ extension TnCameraProxyClient: TnNetworkDelegate {
     }
 
     public func tnNetworkReceived(_ connection: TnNetworkConnection, data: Data) {
-        Task {
-            self.solveData(data: data)
+        if connection.name == "streaming" {
+            
+        } else {
+            Task {
+                self.solveData(data: data)
+            }
         }
     }
 
