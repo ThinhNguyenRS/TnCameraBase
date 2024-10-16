@@ -20,6 +20,7 @@ public class TnCameraProxyServer: TnLoggable {
     @Published public private(set) var albums: [String] = []
 
     public var delegate: TnCameraDelegate? = nil
+    private let videoEncoder: TnTranscodingEncoder = TnTranscodingEncoder()
 
     public init(_ cameraService: TnCameraService, bleInfo: TnNetworkBleInfo, transportingInfo: TnNetworkTransportingInfo) {
         self.cameraService = cameraService
@@ -31,6 +32,12 @@ public class TnCameraProxyServer: TnLoggable {
         self.network = .init(hostInfo: .init(host: address.address, port: 1234), delegate: nil, transportingInfo: transportingInfo)
         self.network.delegate = self
         self.network.start()
+        
+        self.videoEncoder.listen(packetHandler: { packet in
+            Task {
+                try? await self.send(data: packet, to: ["streaming"])
+            }
+        })
         
         self.listenService()
 
@@ -111,8 +118,8 @@ extension TnCameraProxyServer {
                 )
             }
 
-        case .getImage:
-            sendImage()
+//        case .getImage:
+//            sendImage()
             
         case .setZoomFactor:
             solveMsgValue(msgData: msgData) { (v: TnCameraZoomFactorValue) in
@@ -212,13 +219,13 @@ extension TnCameraProxyServer: TnCameraProxyProtocol {
         }
     }
     
-    public func sendImage() {
-//        Task {
-//            if let currentImageData = await cameraService.currentImageData {
-//                network.send(msgType: .getImageResponse, value: currentImageData, to: ["image"])
-//            }
-//        }
-    }
+//    public func sendImage() {
+////        Task {
+////            if let currentImageData = await cameraService.currentImageData {
+////                network.send(msgType: .getImageResponse, value: currentImageData, to: ["image"])
+////            }
+////        }
+//    }
 
     public func setup() {
         ble.setupBle()

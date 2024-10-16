@@ -27,10 +27,16 @@ public class TnCameraProxyClient: NSObject, ObservableObject, TnLoggable {
     private var settings: TnCameraSettings? = nil
     private var status: TnCameraStatus = .none
     
+    private let videoDecoder: TnTranscodingDecoder = TnTranscodingDecoder()
+    
     public init(bleInfo: TnNetworkBleInfo, transportingInfo: TnNetworkTransportingInfo) {
         self.transportingInfo = transportingInfo
         self.ble = .init(info: bleInfo, transportingInfo: transportingInfo)
         super.init()
+        
+        videoDecoder.listen(sampleHandler: { ciImage in
+            self.currentCiImage = ciImage
+        })
         
         logDebug("inited")
     }
@@ -81,18 +87,18 @@ extension TnCameraProxyClient {
                 }
             }
             
-        case .getImageResponse:
-            solveMsgValue(msgData: msgData) { (v: Data) in
-                let uiImage: UIImage = .init(data: v)!
-                logDebug("image", uiImage.size.width, uiImage.size.height, uiImage.scale)
-
-                let ciImage = CIImage(image: uiImage)!
-                self.currentCiImage = ciImage
-                
-                if status == .started && networkImage != nil && (settings?.transporting.continuous ?? false) {
-                    networkImage?.send(msgType: .getImage, to: nil)
-                }
-            }
+//        case .getImageResponse:
+//            solveMsgValue(msgData: msgData) { (v: Data) in
+//                let uiImage: UIImage = .init(data: v)!
+//                logDebug("image", uiImage.size.width, uiImage.size.height, uiImage.scale)
+//
+//                let ciImage = CIImage(image: uiImage)!
+//                self.currentCiImage = ciImage
+//                
+//                if status == .started && networkImage != nil && (settings?.transporting.continuous ?? false) {
+//                    networkImage?.send(msgType: .getImage, to: nil)
+//                }
+//            }
 
         case .getAlbumsResponse:
             solveMsgValue(msgData: msgData) { (v: [String]) in
