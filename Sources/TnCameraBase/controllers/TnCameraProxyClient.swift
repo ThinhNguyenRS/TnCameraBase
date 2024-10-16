@@ -73,8 +73,8 @@ extension TnCameraProxyClient {
                     networkCommon = .init(hostInfo: hostInfo, name: "common", delegate: self, transportingInfo: transportingInfo)
                     networkCommon!.start()
                     
-//                    networkImage = .init(hostInfo: hostInfo, name: "image", delegate: self, transportingInfo: transportingInfo)
-//                    networkImage!.start()
+                    networkImage = .init(hostInfo: hostInfo, name: "image", delegate: self, transportingInfo: transportingInfo)
+                    networkImage!.start()
 
                     networkStreaming = .init(hostInfo: hostInfo, name: "streaming", delegate: self, transportingInfo: transportingInfo)
                     networkStreaming!.start()
