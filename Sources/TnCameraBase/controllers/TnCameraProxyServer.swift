@@ -207,7 +207,7 @@ extension TnCameraProxyServer: TnCameraProxyProtocol {
             Task {
                 try? await network.send(data: data, to: to)
             }
-        } else {
+        } else if data.count < 1000 {
             ble.send(data: data, to: to)
         }
     }
