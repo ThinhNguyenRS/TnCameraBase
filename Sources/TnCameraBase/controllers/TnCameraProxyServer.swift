@@ -213,11 +213,11 @@ extension TnCameraProxyServer: TnCameraProxyProtocol {
     }
     
     public func sendImage() {
-        Task {
-            if let currentImageData = await cameraService.currentImageData {
-                network.send(msgType: .getImageResponse, value: currentImageData, to: ["image"])
-            }
-        }
+//        Task {
+//            if let currentImageData = await cameraService.currentImageData {
+//                network.send(msgType: .getImageResponse, value: currentImageData, to: ["image"])
+//            }
+//        }
     }
 
     public func setup() {
