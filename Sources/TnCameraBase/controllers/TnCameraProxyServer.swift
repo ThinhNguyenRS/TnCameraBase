@@ -382,6 +382,9 @@ extension TnCameraProxyServer: TnNetworkDelegateServer {
     }
 
     public func tnNetworkAccepted(_ server: TnNetworkServer, connection: TnNetworkConnection) {
+        if connection.name == "streaming" {
+            videoEncoder.invalidate()
+        }
     }
     
     public func tnNetworkReceived(_ server: TnNetworkServer, connection: TnNetworkConnection, data: Data) {

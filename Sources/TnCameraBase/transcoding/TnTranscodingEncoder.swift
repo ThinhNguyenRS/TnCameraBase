@@ -15,9 +15,6 @@ public class TnTranscodingEncoder: TnLoggable {
     private let adaptor: VideoEncoderAnnexBAdaptor
     private var stream: AsyncStream<Data>.Iterator
     
-    private var inCounter = 0
-    private var outCounter = 0
-    
     private let encodingQueue = DispatchQueue(label: "TnTranscodingEncoder.encoding", qos: .background)
     private var transportingTask: Task<Void, Never>?
 
@@ -29,29 +26,28 @@ public class TnTranscodingEncoder: TnLoggable {
     }
     
     public func listen(packetHandler: @escaping (Data) -> Void) {
-        self.transportingTask = Task { [weak self] in
+        self.transportingTask = Task { [self] in
             while true {
-                guard let self else { return }
                 guard let packet = await stream.next() else {
                     try? await Task.sleep(nanoseconds: 1_000_000)
                     continue
                 }
                 packetHandler(packet)
-                outCounter += 1
-                logDebug("out", outCounter, packet.count)
             }
         }
     }
     
     public func encode(_ ciImage: CIImage?) {
-        encodingQueue.async { [weak self] in
-            guard let self else { return }
-            
+        encodingQueue.async { [self] in
             if let pixelBuffer = ciImage?.pixelBuffer {
-                inCounter += 1
                 encoder.encode(pixelBuffer)
-                logDebug("in", inCounter)
             }
+        }
+    }
+    
+    public func invalidate() {
+        encodingQueue.async { [self] in
+            encoder.invalidate()
         }
     }
 }
