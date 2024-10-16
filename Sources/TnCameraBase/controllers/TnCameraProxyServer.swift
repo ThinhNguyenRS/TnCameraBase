@@ -96,7 +96,6 @@ extension TnCameraProxyServer {
     private func solveData(data: Data) {
         let msgData = TnMessageData(data: data)
         guard let messageType = msgData.cameraMsgType else { return }
-        logDebug("receive", messageType)
 
         switch messageType {
         case .toggleCapturing:
