@@ -23,7 +23,7 @@ public struct TnCameraAppView: View, TnLoggable {
     private let transportingInfo: TnNetworkTransportingInfo
     private let delegate: TnCameraDelegate?
 
-    public init(master: Bool, bleInfo: TnNetworkBleInfo, transportingInfo: TnNetworkTransportingInfo, delegate: TnCameraDelegate?) {
+    public init(master: Bool, bleInfo: TnNetworkBleInfo, transportingInfo: TnNetworkTransportingInfo, delegate: TnCameraDelegate? = nil) {
         self.master = master
         self.bleInfo = bleInfo
         self.transportingInfo = transportingInfo
