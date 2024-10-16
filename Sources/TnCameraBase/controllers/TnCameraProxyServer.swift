@@ -79,7 +79,8 @@ extension TnCameraProxyServer {
             }
             
             await cameraService.$currentCiImage.onReceive { [self] v in
-                delegate?.tnCamera(self, output: v)
+                videoEncoder.encode(v)
+//                delegate?.tnCamera(self, output: v)
             }
         }
     }
