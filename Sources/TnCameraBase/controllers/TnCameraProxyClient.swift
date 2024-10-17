@@ -256,7 +256,7 @@ extension TnCameraProxyClient: TnNetworkDelegate {
     public func tnNetworkReceived(_ connection: TnNetworkConnection, data: Data) {
         Task {
             if connection.name == "streaming" {
-                videoDecoder.decode(packet: data)
+                try await videoDecoder.decode(packet: data)
             } else {
                 self.solveData(data: data)
             }

@@ -32,14 +32,25 @@ public class TnTranscodingDecoderInternal: TnLoggable {
         }
     }
 
-    public var decodedSampleBuffers: AsyncStream<CMSampleBuffer> {
-        .init { continuation in
+//    public var decodedSampleBuffers: AsyncStream<CMSampleBuffer> {
+//        .init { continuation in
+//            let id = UUID()
+//            continuations[id] = continuation
+//            continuation.onTermination = { [weak self] _ in
+//                self?.continuations[id] = nil
+//            }
+//        }
+//    }
+//    
+    public func makeStreamIterator() -> AsyncStream<CMSampleBuffer>.Iterator {
+        let stream: AsyncStream<CMSampleBuffer> = .init { continuation in
             let id = UUID()
             continuations[id] = continuation
             continuation.onTermination = { [weak self] _ in
                 self?.continuations[id] = nil
             }
         }
+        return stream.makeAsyncIterator()
     }
 
     public func invalidate() {

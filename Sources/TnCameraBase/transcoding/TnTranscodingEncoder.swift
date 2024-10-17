@@ -7,26 +7,65 @@
 
 import Foundation
 import CoreImage
-import Transcoding
 import TnIosBase
 
+//import Transcoding
+//public class TnTranscodingEncoder: TnLoggable {
+//    private let encoder: VideoEncoder
+//    private let adaptor: VideoEncoderAnnexBAdaptor
+//    private var stream: AsyncStream<Data>.Iterator
+//    
+//    private let encodingQueue = DispatchQueue(label: "TnTranscodingEncoder.encoding", qos: .background)
+//    private var transportingTask: Task<Void, Never>?
+//
+//    public init(sendingName: [String] = ["streaming"]) {
+//        self.encoder = VideoEncoder(config: .ultraLowLatency)
+//        self.adaptor = VideoEncoderAnnexBAdaptor(videoEncoder: encoder)
+//        self.stream = adaptor.annexBData.makeAsyncIterator()
+//
+//    }
+//    
+//    public func listen(packetHandler: @escaping (Data) -> Void) {
+//        self.transportingTask = Task { [self] in
+//            while true {
+//                guard let packet = await stream.next() else {
+//                    try? await Task.sleep(nanoseconds: 1_000_000)
+//                    continue
+//                }
+//                packetHandler(packet)
+//            }
+//        }
+//    }
+//    
+//    public func encode(_ ciImage: CIImage?) {
+//        encodingQueue.async { [self] in
+//            if let pixelBuffer = ciImage?.pixelBuffer {
+//                encoder.encode(pixelBuffer)
+//            }
+//        }
+//    }
+//    
+//    public func invalidate() {
+//        encodingQueue.async { [self] in
+//            encoder.invalidate()
+//        }
+//    }
+//}
+
 public class TnTranscodingEncoder: TnLoggable {
-    private let encoder: VideoEncoder
-    private let adaptor: VideoEncoderAnnexBAdaptor
+    private let encoder: TnTranscodingEncoderInternal
+    private let adaptor: TnTranscodingEncoderAdaptor
     private var stream: AsyncStream<Data>.Iterator
     
-    private let encodingQueue = DispatchQueue(label: "TnTranscodingEncoder.encoding", qos: .background)
-    private var transportingTask: Task<Void, Never>?
-
     public init(sendingName: [String] = ["streaming"]) {
-        self.encoder = VideoEncoder(config: .ultraLowLatency)
-        self.adaptor = VideoEncoderAnnexBAdaptor(videoEncoder: encoder)
-        self.stream = adaptor.annexBData.makeAsyncIterator()
+        self.encoder = TnTranscodingEncoderInternal(config: .ultraLowLatency)
+        self.adaptor = TnTranscodingEncoderAdaptor(encoder: encoder)
+        self.stream = adaptor.makeStreamIterator()
 
     }
     
     public func listen(packetHandler: @escaping (Data) -> Void) {
-        self.transportingTask = Task { [self] in
+        Task { [self] in
             while true {
                 guard let packet = await stream.next() else {
                     try? await Task.sleep(nanoseconds: 1_000_000)
@@ -37,17 +76,13 @@ public class TnTranscodingEncoder: TnLoggable {
         }
     }
     
-    public func encode(_ ciImage: CIImage?) {
-        encodingQueue.async { [self] in
-            if let pixelBuffer = ciImage?.pixelBuffer {
-                encoder.encode(pixelBuffer)
-            }
+    public func encode(_ ciImage: CIImage?) async throws {
+        if let pixelBuffer = ciImage?.pixelBuffer {
+            try await encoder.encode(pixelBuffer)
         }
     }
     
     public func invalidate() {
-        encodingQueue.async { [self] in
-            encoder.invalidate()
-        }
+        encoder.invalidate()
     }
 }
