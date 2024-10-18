@@ -26,14 +26,14 @@ public class TnCameraProxyClient: NSObject, ObservableObject, TnLoggable {
     private var settings: TnCameraSettings? = nil
     private var status: TnCameraStatus = .none
     
-    private let videoDecoder: TnTranscodingDecoderProtocol = TnTranscodingDecoderImpl() //TnTranscodingDecoderWrapper()
+    private let videoDecoder: TnTranscodingDecoderImpl = TnTranscodingDecoderImpl() //TnTranscodingDecoderWrapper()
     
     public init(bleInfo: TnNetworkBleInfo, transportingInfo: TnNetworkTransportingInfo) {
         self.transportingInfo = transportingInfo
         self.ble = .init(info: bleInfo, transportingInfo: transportingInfo)
         super.init()
         
-        self.listenEncoding()
+//        self.listenEncoding()
         
         logDebug("inited")
     }
@@ -50,11 +50,11 @@ public class TnCameraProxyClient: NSObject, ObservableObject, TnLoggable {
 
 // MARK: encoding
 extension TnCameraProxyClient {
-    private func listenEncoding() {
-        videoDecoder.listen(sampleHandler: { ciImage in
-            self.currentCiImage = ciImage
-        })
-    }
+//    private func listenEncoding() {
+//        videoDecoder.listen(sampleHandler: { ciImage in
+//            self.currentCiImage = ciImage
+//        })
+//    }
 }
 
 // MARK: solve messages
@@ -261,12 +261,14 @@ extension TnCameraProxyClient: TnNetworkDelegate {
     }
 
     public func tnNetworkReceived(_ connection: TnNetworkConnection, data: Data) {
-        Task {
-            if connection.name == "streaming" {
-                try await videoDecoder.decode(packet: data)
-            } else {
-                self.solveData(data: data)
+        if connection.name == "streaming" {
+            Task {
+                try await videoDecoder.decode(packet: data, imageHandler: { ciImage in
+                    self.currentCiImage = ciImage
+                })
             }
+        } else {
+            self.solveData(data: data)
         }
     }
 

@@ -64,38 +64,32 @@ public class TnTranscodingDecoderImpl {
         adaptor = TnTranscodingDecoderAdaptor(decoder: decoder, isH264: false)
     }
     
-    public func listen(sampleHandler: @escaping (CIImage) -> Void) {
-        Task { [weak self] in
-            while true {
-                guard let self else { return }
-                guard let sampleBuffer = await stream.next() else {
-                    try? await Task.sleep(nanoseconds: 1_000_000)
-                    continue
-                }
-                
-                if let imageBuffer = sampleBuffer.imageBuffer {
-                    let ciImage = CIImage(cvImageBuffer: imageBuffer)
-                    sampleHandler(ciImage)
-                }
+//    public func listen(sampleHandler: @escaping TnTranscodingImageHandler) {
+//        Task { [weak self] in
+//            while true {
+//                guard let self else { return }
+//                guard let sampleBuffer = await stream.next() else {
+//                    try? await Task.sleep(nanoseconds: 1_000_000)
+//                    continue
+//                }
+//                
+//                if let imageBuffer = sampleBuffer.imageBuffer {
+//                    let ciImage = CIImage(cvImageBuffer: imageBuffer)
+//                    await sampleHandler(ciImage)
+//                }
+//            }
+//        }
+//    }
+    
+    public func decode(packet: Data, imageHandler: TnTranscodingImageHandler?) async throws {
+        try await adaptor.decode(packet)
+        if let imageHandler {
+            while let sampleBuffer = await stream.next(), let imageBuffer = sampleBuffer.imageBuffer {
+                let ciImage = CIImage(cvImageBuffer: imageBuffer)
+                await imageHandler(ciImage)
             }
         }
     }
-    
-    public func decode(packet: Data) async throws {
-        try await adaptor.decode(packet)
-    }
 }
 
-// MARK: TnTranscodingDecoderProtocol
-public protocol TnTranscodingDecoderProtocol {
-    func listen(sampleHandler: @escaping (CIImage) -> Void)
-    func decode(packet: Data) async throws
-}
-
-extension TnTranscodingDecoderWrapper: TnTranscodingDecoderProtocol {
-    
-}
-
-extension TnTranscodingDecoderImpl: TnTranscodingDecoderProtocol {
-    
-}
+public typealias TnTranscodingImageHandler = (CIImage) async -> Void
