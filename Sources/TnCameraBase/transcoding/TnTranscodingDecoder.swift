@@ -51,7 +51,7 @@ public class TnTranscodingDecoderWrapper {
 }
 
 
-public class TnTranscodingDecoderImpl {
+public class TnTranscodingDecoderImpl: TnLoggable {
     private let decoder: TnTranscodingDecoderInternal
     private var stream: AsyncStream<CMSampleBuffer>.Iterator
     private let adaptor: TnTranscodingDecoderAdaptor
@@ -81,13 +81,13 @@ public class TnTranscodingDecoderImpl {
 //        }
 //    }
     
-    public func decode(packet: Data, imageHandler: TnTranscodingImageHandler?) async throws {
+    public func decode(packet: Data, imageHandler: @escaping TnTranscodingImageHandler) async throws {
+        logDebug("decode")
         try await adaptor.decode(packet)
-        if let imageHandler {
-            while let sampleBuffer = await stream.next(), let imageBuffer = sampleBuffer.imageBuffer {
-                let ciImage = CIImage(cvImageBuffer: imageBuffer)
-                await imageHandler(ciImage)
-            }
+        while let sampleBuffer = await stream.next(), let imageBuffer = sampleBuffer.imageBuffer {
+            logDebug("deliver image")
+            let ciImage = CIImage(cvImageBuffer: imageBuffer)
+            await imageHandler(ciImage)
         }
     }
 }

@@ -75,15 +75,15 @@ class TnTranscodingEncoderImpl: TnLoggable {
 //        }
 //    }
     
-    public func encode(_ ciImage: CIImage?, packetHandler: TnTranscodingPacketHandler?) async throws {
+    public func encode(_ ciImage: CIImage?, packetHandler: @escaping TnTranscodingPacketHandler) async throws {
         if let pixelBuffer = ciImage?.pixelBuffer {
+            logDebug("encode")
             try await encoder.encode(pixelBuffer)
             
             // solve packets too
-            if let packetHandler {
-                while let packet = await stream.next() {
-                    try await packetHandler(packet)
-                }
+            while let packet = await stream.next() {
+                logDebug("deliver packet")
+                try await packetHandler(packet)
             }
         }
     }
