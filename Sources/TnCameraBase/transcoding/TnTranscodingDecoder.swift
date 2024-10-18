@@ -84,10 +84,13 @@ public class TnTranscodingDecoderImpl: TnLoggable {
     public func decode(packet: Data, imageHandler: @escaping TnTranscodingImageHandler) async throws {
         logDebug("decode")
         try await adaptor.decode(packet)
-        while let sampleBuffer = await stream.next(), let imageBuffer = sampleBuffer.imageBuffer {
-            logDebug("deliver image")
-            let ciImage = CIImage(cvImageBuffer: imageBuffer)
-            await imageHandler(ciImage)
+        
+        Task {
+            while let sampleBuffer = await stream.next(), let imageBuffer = sampleBuffer.imageBuffer {
+                logDebug("deliver image")
+                let ciImage = CIImage(cvImageBuffer: imageBuffer)
+                await imageHandler(ciImage)
+            }
         }
     }
 }
