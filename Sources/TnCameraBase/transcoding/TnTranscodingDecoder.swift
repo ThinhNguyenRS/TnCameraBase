@@ -69,7 +69,9 @@ public class TnTranscodingDecoderImpl: TnLoggable {
     }
     
     public func decode(packet: Data) async throws {
-        try await adaptor.decode(packet)
+        Task {
+            try await adaptor.decode(packet)
+        }
     }
 }
 
