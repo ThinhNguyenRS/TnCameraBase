@@ -17,6 +17,10 @@ public class TnCameraProxyServer: TnLoggable {
     private let cameraService: TnCameraService
     private let network: TnNetworkServer
     private let ble: TnBluetoothServer
+    
+    private var status: TnCameraStatus = .none
+    private var settings: TnCameraSettings? = nil
+    
     @Published public private(set) var albums: [String] = []
 
     public var delegate: TnCameraDelegate? = nil
@@ -32,13 +36,7 @@ public class TnCameraProxyServer: TnLoggable {
         self.network = .init(hostInfo: .init(host: address.address, port: 1234), delegate: nil, transportingInfo: transportingInfo)
         self.network.delegate = self
         self.network.start()
-        
-        self.videoEncoder.listen(packetHandler: { packet in
-            Task {
-                try? await self.send(data: packet, to: ["streaming"])
-            }
-        })
-        
+                
         self.listenService()
 
         logDebug("inited")
@@ -64,24 +62,47 @@ extension TnCameraProxyServer {
             
             await cameraService.$isSettingsChanging.onReceive { [self] v in
                 Task {
-                    if await cameraService.status == .started && !v {
+                    if status == .started && !v {
                         logDebug("settings changed")
-                        delegate?.tnCamera(self, settings: await cameraService.settings)
+                        self.settings = await cameraService.settings
+                        delegate?.tnCamera(self, settings: self.settings!)
                     }
                 }
             }
 
             await cameraService.$status.onReceive { [self] v in
-                if v != .none {
+                if self.status != v {
                     logDebug("status changed", v)
+                    self.status = v
                     delegate?.tnCamera(self, status: v)
                 }
             }
         }
         
+    }
+}
+
+// MARK: encoding
+@available(iOS 17.0, *)
+extension TnCameraProxyServer {
+    private var canEncoding: Bool {
+        // TODO: just for test
+        true
+//        status == .started && network.hasConnection(name: "streaming")
+    }
+    
+    private func listenEncoding() {
+        Task {
+            try self.videoEncoder.listen(packetHandler: { packet in
+                if self.canEncoding {
+                    try await self.send(data: packet, to: ["streaming"])
+                }
+            })
+        }
+
         Task {
             while true {
-                if await cameraService.status == .started && network.hasConnection(name: "streaming"), let ciImage = await cameraService.currentCiImage {
+                if canEncoding, let ciImage = await cameraService.currentCiImage {
                     do {
                         try await videoEncoder.encode(ciImage)
                     } catch {
@@ -120,12 +141,10 @@ extension TnCameraProxyServer {
 
         case .getSettings:
             // response settings
-            Task {
-                send(msgType: .getSettingsResponse,
-                     value: TnCameraSettingsValue(settings: await cameraService.settings, status: await cameraService.status, network: network.hostInfo),
-                     to: ["common"]
-                )
-            }
+            send(msgType: .getSettingsResponse,
+                 value: TnCameraSettingsValue(settings: settings, status: status, network: network.hostInfo),
+                 to: ["common"]
+            )
 
 //        case .getImage:
 //            sendImage()

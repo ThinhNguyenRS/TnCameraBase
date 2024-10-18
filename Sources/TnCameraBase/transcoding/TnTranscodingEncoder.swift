@@ -16,7 +16,6 @@ class TnTranscodingEncoderWrapper: TnLoggable {
     private var stream: AsyncStream<Data>.Iterator
     
     private let encodingQueue = DispatchQueue(label: "TnTranscodingEncoder.encoding", qos: .background)
-    private var transportingTask: Task<Void, Never>?
 
     public init(sendingName: [String] = ["streaming"]) {
         self.encoder = VideoEncoder(config: .ultraLowLatency)
@@ -25,14 +24,14 @@ class TnTranscodingEncoderWrapper: TnLoggable {
 
     }
     
-    public func listen(packetHandler: @escaping (Data) -> Void) {
-        self.transportingTask = Task { [self] in
+    public func listen(packetHandler: @escaping (Data) async throws -> Void) throws {
+        Task { [self] in
             while true {
                 guard let packet = await stream.next() else {
                     try? await Task.sleep(nanoseconds: 1_000_000)
                     continue
                 }
-                packetHandler(packet)
+                try await packetHandler(packet)
             }
         }
     }
@@ -64,14 +63,14 @@ class TnTranscodingEncoderImpl: TnLoggable {
 
     }
     
-    public func listen(packetHandler: @escaping (Data) -> Void) {
+    public func listen(packetHandler: @escaping (Data) async throws -> Void) throws {
         Task { [self] in
             while true {
                 guard let packet = await stream.next() else {
                     try? await Task.sleep(nanoseconds: 1_000_000)
                     continue
                 }
-                packetHandler(packet)
+                try await packetHandler(packet)
             }
         }
     }
@@ -91,7 +90,7 @@ class TnTranscodingEncoderImpl: TnLoggable {
 // MARK: TnTranscodingEncoderProtocol
 public protocol TnTranscodingEncoderProtocol {
     func encode(_ ciImage: CIImage?) async throws
-    func listen(packetHandler: @escaping (Data) -> Void)
+    func listen(packetHandler: @escaping (Data) async throws -> Void) throws 
     func invalidate()
 }
 
