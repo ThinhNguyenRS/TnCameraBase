@@ -16,8 +16,7 @@ public class TnTranscodingDecoderWrapper {
     private var stream: AsyncStream<CMSampleBuffer>.Iterator
     private let adaptor: VideoDecoderAnnexBAdaptor
 
-    private let decodingQueue = DispatchQueue(label: "TnTranscodingEncoder.decoding", qos: .background)
-    private var decodingTask: Task<Void, Never>?
+    private let mainQueue = DispatchQueue(label: "TnTranscodingDecoderWrapper.main", qos: .background)
 
     public init() {
         decoder = VideoDecoder(config: .init(enableHardwareAcceleratedVideoDecoder: true, requireHardwareAcceleratedVideoDecoder: true))
@@ -26,14 +25,8 @@ public class TnTranscodingDecoderWrapper {
     }
     
     public func listen(sampleHandler: @escaping (CIImage) -> Void) {
-        decodingTask = Task { [weak self] in
-            while true {
-                guard let self else { return }
-                guard let sampleBuffer = await stream.next() else {
-                    try? await Task.sleep(nanoseconds: 1_000_000)
-                    continue
-                }
-                
+        Task { [self] in
+            while let sampleBuffer = await stream.next() {
                 if let imageBuffer = sampleBuffer.imageBuffer {
                     let ciImage = CIImage(cvImageBuffer: imageBuffer)
                     sampleHandler(ciImage)
@@ -43,8 +36,7 @@ public class TnTranscodingDecoderWrapper {
     }
     
     public func decode(packet: Data) async throws {
-        decodingQueue.async { [weak self] in
-            guard let self else { return }
+        mainQueue.async { [self] in
             adaptor.decode(packet)
         }
     }
