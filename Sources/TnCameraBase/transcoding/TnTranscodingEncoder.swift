@@ -77,36 +77,18 @@ class TnTranscodingEncoderImpl: TnLoggable {
         self.outputQueue = DispatchQueue(label: "\(Self.self).output", qos: .background)
     }
     
-//    public func listen(packetHandler: @escaping TnTranscodingPacketHandler) throws {
-//        Task { [self] in
-//            while true {
-//                guard let packet = await stream.next() else {
-//                    try? await Task.sleep(nanoseconds: 1_000_000)
-//                    continue
-//                }
-//                try await packetHandler(packet)
-//            }
-//        }
-//    }
-    
-    public func encode(_ ciImage: CIImage?, packetHandler: @escaping TnTranscodingPacketHandler) async throws {
-        mainQueue.async { [self] in
-            Task {
-                if let pixelBuffer = ciImage?.pixelBuffer {
-                    logDebug("encode")
-                    try await encoder.encode(pixelBuffer)
-                }
+    public func listen(packetHandler: @escaping TnTranscodingPacketHandler) throws {
+        Task { [self] in
+            while let packet = await stream.next() {
+                try await packetHandler(packet)
             }
         }
-        
-        outputQueue.async { [self] in
-            Task {
-                // solve packets too
-                while let packet = await stream.next() {
-                    logDebug("deliver packet")
-                    try await packetHandler(packet)
-                }
-            }
+    }
+    
+    public func encode(_ ciImage: CIImage?) async throws {
+        if let pixelBuffer = ciImage?.pixelBuffer {
+            logDebug("encode")
+            try await encoder.encode(pixelBuffer)
         }
     }
     

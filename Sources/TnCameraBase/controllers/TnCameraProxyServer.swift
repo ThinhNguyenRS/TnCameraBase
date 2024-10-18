@@ -21,7 +21,7 @@ public class TnCameraProxyServer: TnLoggable {
     private var status: TnCameraStatus = .none
     private var settings: TnCameraSettings? = nil
     
-    @Published public private(set) var albums: [String] = []
+    public private(set) var albums: [String] = []
 
     public var delegate: TnCameraDelegate? = nil
     private let videoEncoder = TnTranscodingEncoderImpl()
@@ -91,22 +91,20 @@ extension TnCameraProxyServer {
     }
     
     private func listenEncoding() {
-//        Task {
-//            try self.videoEncoder.listen(packetHandler: { packet in
-//                if self.canEncoding {
-//                    try await self.send(data: packet, to: ["streaming"])
-//                }
-//            })
-//        }
+        Task {
+            try self.videoEncoder.listen(packetHandler: { packet in
+                if self.canEncoding {
+                    try await self.send(data: packet, to: ["streaming"])
+                }
+            })
+        }
 
         Task {
             while true {
                 if canEncoding, let ciImage = await cameraService.currentCiImage {
                     do {
                         logDebug("encode ...")
-                        try await videoEncoder.encode(ciImage, packetHandler: { packet in
-                            try await self.send(data: packet, to: ["streaming"])
-                        })
+                        try await videoEncoder.encode(ciImage)
                     } catch {
                         logError("Cannot encode: ", error)
                         break
