@@ -37,21 +37,21 @@ class TnTranscodingEncoderWrapper: TnLoggable {
 //    }
     
     public func encode(_ ciImage: CIImage?, packetHandler: @escaping TnTranscodingPacketHandler) async throws {
-        if let pixelBuffer = ciImage?.pixelBuffer {
-            logDebug("encode")
-            try await encoder.encode(pixelBuffer)
-            
-            // solve packets too
-            while let packet = await stream.next() {
-                logDebug("deliver packet")
-                try await packetHandler(packet)
-            }
-        }
-//        encodingQueue.async { [self] in
-//            if let pixelBuffer = ciImage?.pixelBuffer {
-//                encoder.encode(pixelBuffer)
+//        if let pixelBuffer = ciImage?.pixelBuffer {
+//            logDebug("encode")
+//            try await encoder.encode(pixelBuffer)
+//            
+//            // solve packets too
+//            while let packet = await stream.next() {
+//                logDebug("deliver packet")
+//                try await packetHandler(packet)
 //            }
 //        }
+        encodingQueue.async { [self] in
+            if let pixelBuffer = ciImage?.pixelBuffer {
+                encoder.encode(pixelBuffer)
+            }
+        }
     }
     
     public func invalidate() {
@@ -66,11 +66,15 @@ class TnTranscodingEncoderImpl: TnLoggable {
     private let adaptor: TnTranscodingEncoderAdaptor
     private var stream: AsyncStream<Data>.Iterator
     
+    private let encodingQueue: DispatchQueue
+    private let outputQueue: DispatchQueue
+
     public init(sendingName: [String] = ["streaming"]) {
         self.encoder = TnTranscodingEncoderInternal(config: .ultraLowLatency)
         self.adaptor = TnTranscodingEncoderAdaptor(encoder: encoder)
         self.stream = adaptor.makeStreamIterator()
-
+        self.encodingQueue = DispatchQueue(label: "\(Self.self).encoding", qos: .background)
+        self.outputQueue = DispatchQueue(label: "\(Self.self).output", qos: .background)
     }
     
 //    public func listen(packetHandler: @escaping TnTranscodingPacketHandler) throws {
@@ -86,14 +90,22 @@ class TnTranscodingEncoderImpl: TnLoggable {
 //    }
     
     public func encode(_ ciImage: CIImage?, packetHandler: @escaping TnTranscodingPacketHandler) async throws {
-        if let pixelBuffer = ciImage?.pixelBuffer {
-            logDebug("encode")
-            try await encoder.encode(pixelBuffer)
-            
-            // solve packets too
-            while let packet = await stream.next() {
-                logDebug("deliver packet")
-                try await packetHandler(packet)
+        encodingQueue.async { [self] in
+            Task {
+                if let pixelBuffer = ciImage?.pixelBuffer {
+                    logDebug("encode")
+                    try await encoder.encode(pixelBuffer)
+                }
+            }
+        }
+        
+        outputQueue.async { [self] in
+            Task {
+                // solve packets too
+                while let packet = await stream.next() {
+                    logDebug("deliver packet")
+                    try await packetHandler(packet)
+                }
             }
         }
     }
