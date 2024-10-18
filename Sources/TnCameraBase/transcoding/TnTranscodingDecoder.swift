@@ -42,7 +42,7 @@ public class TnTranscodingDecoderWrapper {
         }
     }
     
-    public func decode(packet: Data) {
+    public func decode(packet: Data) async throws {
         decodingQueue.async { [weak self] in
             guard let self else { return }
             adaptor.decode(packet)
