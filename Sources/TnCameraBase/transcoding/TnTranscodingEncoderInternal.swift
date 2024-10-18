@@ -152,7 +152,7 @@ extension VTCompressionSession {
                         if let sampleBuffer {
                             continuation.resume(returning: sampleBuffer)
                         } else {
-                            continuation.resume(throwing: TnTranscodingError.general(message: "Output sample buffer is nil", error: nil))
+//                            continuation.resume(throwing: TnTranscodingError.general(message: "Output sample buffer is nil", error: nil))
                         }
                     }
                 }
