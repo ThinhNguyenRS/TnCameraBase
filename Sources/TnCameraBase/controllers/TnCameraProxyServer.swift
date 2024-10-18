@@ -103,6 +103,7 @@ extension TnCameraProxyServer {
             while true {
                 if canEncoding, let ciImage = await cameraService.currentCiImage {
                     do {
+                        logDebug("encode ...")
                         try await videoEncoder.encode(ciImage, packetHandler: { packet in
                             try await self.send(data: packet, to: ["streaming"])
                         })
@@ -111,6 +112,8 @@ extension TnCameraProxyServer {
                         break
                     }
                 }
+
+                logDebug("sleep ...")
                 try await Task.sleep(nanoseconds: 50_000_000)
             }
         }
