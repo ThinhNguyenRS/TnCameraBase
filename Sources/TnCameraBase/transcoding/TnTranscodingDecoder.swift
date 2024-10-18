@@ -20,7 +20,7 @@ public class TnTranscodingDecoderWrapper {
     private var decodingTask: Task<Void, Never>?
 
     public init() {
-        decoder = VideoDecoder(config: .init())
+        decoder = VideoDecoder(config: .init(enableHardwareAcceleratedVideoDecoder: true, requireHardwareAcceleratedVideoDecoder: true))
         stream = decoder.decodedSampleBuffers.makeAsyncIterator()
         adaptor = VideoDecoderAnnexBAdaptor(videoDecoder: decoder, codec: .hevc)
     }

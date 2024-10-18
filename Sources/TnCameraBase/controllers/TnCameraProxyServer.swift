@@ -82,7 +82,12 @@ extension TnCameraProxyServer {
         Task {
             while true {
                 if await cameraService.status == .started && network.hasConnection(name: "streaming"), let ciImage = await cameraService.currentCiImage {
-                    try await videoEncoder.encode(ciImage)
+                    do {
+                        try await videoEncoder.encode(ciImage)
+                    } catch {
+                        logError("Cannot encode: ", error)
+                        break
+                    }
                 }
                 try await Task.sleep(nanoseconds: 70_000_000)
             }
