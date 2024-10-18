@@ -20,7 +20,7 @@ public class TnCameraProxyServer: TnLoggable {
     @Published public private(set) var albums: [String] = []
 
     public var delegate: TnCameraDelegate? = nil
-    private let videoEncoder: TnTranscodingEncoderProtocol = TnTranscodingEncoderWrapper()
+    private let videoEncoder: TnTranscodingEncoderProtocol = TnTranscodingEncoderImpl() //TnTranscodingEncoderWrapper()
 
     public init(_ cameraService: TnCameraService, bleInfo: TnNetworkBleInfo, transportingInfo: TnNetworkTransportingInfo) {
         self.cameraService = cameraService
