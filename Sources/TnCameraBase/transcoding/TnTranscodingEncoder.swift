@@ -12,10 +12,10 @@ import TnIosBase
 
 public class TnTranscodingEncoder: TnLoggable {
     private var continuations: [UUID: AsyncStream<CMSampleBuffer>.Continuation] = [:]
-    private lazy var outputQueue = DispatchQueue(
-        label: "\(String(describing: Self.self)).output",
-        qos: .userInitiated
-    )
+//    private lazy var outputQueue = DispatchQueue(
+//        label: "\(String(describing: Self.self)).output",
+//        qos: .userInitiated
+//    )
     private var compressionSession: VTCompressionSession? = nil
     private var outputSize: CGSize? = nil
     private let config: TnTranscodingEncoderConfig
@@ -85,11 +85,14 @@ public class TnTranscodingEncoder: TnLoggable {
         }
         
         if let sampleBuffer = try await compressionSession.encodeFrame(pixelBuffer, presentationTimeStamp: presentationTimeStamp, duration: duration) {
-            outputQueue.sync {
-                for continuation in self.continuations.values {
-                    continuation.yield(sampleBuffer)
-                }
+            for continuation in self.continuations.values {
+                continuation.yield(sampleBuffer)
             }
+//            outputQueue.sync {
+//                for continuation in self.continuations.values {
+//                    continuation.yield(sampleBuffer)
+//                }
+//            }
         }
     }
     
