@@ -24,24 +24,34 @@ class TnTranscodingEncoderWrapper: TnLoggable {
 
     }
     
-    public func listen(packetHandler: @escaping (Data) async throws -> Void) throws {
-        Task { [self] in
-            while true {
-                guard let packet = await stream.next() else {
-                    try? await Task.sleep(nanoseconds: 1_000_000)
-                    continue
-                }
+//    public func listen(packetHandler: @escaping (Data) async throws -> Void) throws {
+//        Task { [self] in
+//            while true {
+//                guard let packet = await stream.next() else {
+//                    try? await Task.sleep(nanoseconds: 1_000_000)
+//                    continue
+//                }
+//                try await packetHandler(packet)
+//            }
+//        }
+//    }
+    
+    public func encode(_ ciImage: CIImage?, packetHandler: @escaping TnTranscodingPacketHandler) async throws {
+        if let pixelBuffer = ciImage?.pixelBuffer {
+            logDebug("encode")
+            try await encoder.encode(pixelBuffer)
+            
+            // solve packets too
+            while let packet = await stream.next() {
+                logDebug("deliver packet")
                 try await packetHandler(packet)
             }
         }
-    }
-    
-    public func encode(_ ciImage: CIImage?) {
-        encodingQueue.async { [self] in
-            if let pixelBuffer = ciImage?.pixelBuffer {
-                encoder.encode(pixelBuffer)
-            }
-        }
+//        encodingQueue.async { [self] in
+//            if let pixelBuffer = ciImage?.pixelBuffer {
+//                encoder.encode(pixelBuffer)
+//            }
+//        }
     }
     
     public func invalidate() {
