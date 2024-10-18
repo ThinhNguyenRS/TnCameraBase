@@ -24,7 +24,7 @@ public class TnCameraProxyServer: TnLoggable {
     @Published public private(set) var albums: [String] = []
 
     public var delegate: TnCameraDelegate? = nil
-    private let videoEncoder: TnTranscodingEncoderProtocol = TnTranscodingEncoderImpl() //TnTranscodingEncoderWrapper()
+    private let videoEncoder: TnTranscodingEncoderImpl = TnTranscodingEncoderImpl() //TnTranscodingEncoderWrapper()
 
     public init(_ cameraService: TnCameraService, bleInfo: TnNetworkBleInfo, transportingInfo: TnNetworkTransportingInfo) {
         self.cameraService = cameraService
@@ -87,31 +87,31 @@ extension TnCameraProxyServer {
 @available(iOS 17.0, *)
 extension TnCameraProxyServer {
     private var canEncoding: Bool {
-        // TODO: just for test
-        true
-//        status == .started && network.hasConnection(name: "streaming")
+        status == .started && network.hasConnection(name: "streaming")
     }
     
     private func listenEncoding() {
-        Task {
-            try self.videoEncoder.listen(packetHandler: { packet in
-                if self.canEncoding {
-                    try await self.send(data: packet, to: ["streaming"])
-                }
-            })
-        }
+//        Task {
+//            try self.videoEncoder.listen(packetHandler: { packet in
+//                if self.canEncoding {
+//                    try await self.send(data: packet, to: ["streaming"])
+//                }
+//            })
+//        }
 
         Task {
             while true {
                 if canEncoding, let ciImage = await cameraService.currentCiImage {
                     do {
-                        try await videoEncoder.encode(ciImage)
+                        try await videoEncoder.encode(ciImage, packetHandler: { packet in
+                            try await self.send(data: packet, to: ["streaming"])
+                        })
                     } catch {
                         logError("Cannot encode: ", error)
                         break
                     }
                 }
-                try await Task.sleep(nanoseconds: 70_000_000)
+                try await Task.sleep(nanoseconds: 50_000_000)
             }
         }
     }

@@ -26,16 +26,14 @@ public class TnCameraProxyClient: NSObject, ObservableObject, TnLoggable {
     private var settings: TnCameraSettings? = nil
     private var status: TnCameraStatus = .none
     
-    private let videoDecoder: TnTranscodingDecoderProtocol = TnTranscodingDecoderWrapper()
+    private let videoDecoder: TnTranscodingDecoderProtocol = TnTranscodingDecoderImpl() //TnTranscodingDecoderWrapper()
     
     public init(bleInfo: TnNetworkBleInfo, transportingInfo: TnNetworkTransportingInfo) {
         self.transportingInfo = transportingInfo
         self.ble = .init(info: bleInfo, transportingInfo: transportingInfo)
         super.init()
         
-        videoDecoder.listen(sampleHandler: { ciImage in
-            self.currentCiImage = ciImage
-        })
+        self.listenEncoding()
         
         logDebug("inited")
     }
@@ -47,6 +45,15 @@ public class TnCameraProxyClient: NSObject, ObservableObject, TnLoggable {
         set {
             ble.delegate = newValue
         }
+    }
+}
+
+// MARK: encoding
+extension TnCameraProxyClient {
+    private func listenEncoding() {
+        videoDecoder.listen(sampleHandler: { ciImage in
+            self.currentCiImage = ciImage
+        })
     }
 }
 

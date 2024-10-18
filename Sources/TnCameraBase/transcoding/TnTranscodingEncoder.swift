@@ -63,7 +63,7 @@ class TnTranscodingEncoderImpl: TnLoggable {
 
     }
     
-    public func listen(packetHandler: @escaping (Data) async throws -> Void) throws {
+    public func listen(packetHandler: @escaping TnTranscodingPacketHandler) throws {
         Task { [self] in
             while true {
                 guard let packet = await stream.next() else {
@@ -75,9 +75,16 @@ class TnTranscodingEncoderImpl: TnLoggable {
         }
     }
     
-    public func encode(_ ciImage: CIImage?) async throws {
+    public func encode(_ ciImage: CIImage?, packetHandler: TnTranscodingPacketHandler?) async throws {
         if let pixelBuffer = ciImage?.pixelBuffer {
             try await encoder.encode(pixelBuffer)
+            
+            // solve packets too
+            if let packetHandler {
+                while let packet = await stream.next() {
+                    try await packetHandler(packet)
+                }
+            }
         }
     }
     
@@ -86,16 +93,5 @@ class TnTranscodingEncoderImpl: TnLoggable {
     }
 }
 
+typealias TnTranscodingPacketHandler = (Data) async throws -> Void
 
-// MARK: TnTranscodingEncoderProtocol
-public protocol TnTranscodingEncoderProtocol {
-    func encode(_ ciImage: CIImage?) async throws
-    func listen(packetHandler: @escaping (Data) async throws -> Void) throws 
-    func invalidate()
-}
-
-extension TnTranscodingEncoderWrapper: TnTranscodingEncoderProtocol {
-}
-
-extension TnTranscodingEncoderImpl: TnTranscodingEncoderProtocol {
-}
