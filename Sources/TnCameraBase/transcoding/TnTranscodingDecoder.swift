@@ -56,15 +56,10 @@ public class TnTranscodingDecoderImpl: TnLoggable {
     private var stream: AsyncStream<CMSampleBuffer>.Iterator
     private let adaptor: TnTranscodingDecoderAdaptor
 
-    private let mainQueue: DispatchQueue
-    private let outputQueue: DispatchQueue
-
     public init() {
-        self.decoder = TnTranscodingDecoderInternal(config: .init())
+        self.decoder = TnTranscodingDecoderInternal(config: .init(realTime: true, maximizePowerEfficiency: true))
         self.stream = decoder.makeStreamIterator()
         self.adaptor = TnTranscodingDecoderAdaptor(decoder: decoder, isH264: false)
-        self.mainQueue = DispatchQueue(label: "\(Self.self).main", qos: .background)
-        self.outputQueue = DispatchQueue(label: "\(Self.self).output", qos: .background)
     }
     
     public func listen(sampleHandler: @escaping TnTranscodingImageHandler) {
@@ -79,7 +74,6 @@ public class TnTranscodingDecoderImpl: TnLoggable {
     }
     
     public func decode(packet: Data) async throws {
-        logDebug("decode")
         try await adaptor.decode(packet)
     }
 }

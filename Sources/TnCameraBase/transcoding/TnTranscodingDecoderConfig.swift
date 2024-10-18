@@ -11,12 +11,12 @@ import TnIosBase
 public struct TnTranscodingDecoderConfig {
     public let realTime: Bool
     public let maximizePowerEfficiency: Bool
-    public let enableHardware: Bool
+    public let enableHardware: Bool?
 
     public init(
         realTime: Bool = false,
         maximizePowerEfficiency: Bool = false,
-        enableHardware: Bool = true
+        enableHardware: Bool? = nil
     ) {
         self.realTime = realTime
         self.maximizePowerEfficiency = maximizePowerEfficiency
@@ -26,13 +26,15 @@ public struct TnTranscodingDecoderConfig {
     var decoderSpecification: CFDictionary {
         var decoderSpecification: [CFString: CFTypeRef] = [:]
         if #available(iOS 17.0, *) {
-            decoderSpecification[
-                kVTVideoDecoderSpecification_EnableHardwareAcceleratedVideoDecoder
-            ] = enableHardware as CFBoolean
+            if let enableHardware {
+                decoderSpecification[
+                    kVTVideoDecoderSpecification_EnableHardwareAcceleratedVideoDecoder
+                ] = enableHardware as CFBoolean
 
-            decoderSpecification[
-                kVTVideoDecoderSpecification_RequireHardwareAcceleratedVideoDecoder
-            ] = enableHardware as CFBoolean
+                decoderSpecification[
+                    kVTVideoDecoderSpecification_RequireHardwareAcceleratedVideoDecoder
+                ] = enableHardware as CFBoolean
+            }
         }
         
         return decoderSpecification as CFDictionary
