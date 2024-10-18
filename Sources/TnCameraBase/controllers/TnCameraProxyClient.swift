@@ -26,7 +26,7 @@ public class TnCameraProxyClient: NSObject, ObservableObject, TnLoggable {
     private var settings: TnCameraSettings? = nil
     private var status: TnCameraStatus = .none
     
-    private let videoDecoder: TnTranscodingDecoder = TnTranscodingDecoder()
+    private let videoDecoder: TnTranscodingDecoderProtocol = TnTranscodingDecoderWrapper()
     
     public init(bleInfo: TnNetworkBleInfo, transportingInfo: TnNetworkTransportingInfo) {
         self.transportingInfo = transportingInfo
