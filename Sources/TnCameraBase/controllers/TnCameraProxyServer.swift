@@ -38,6 +38,7 @@ public class TnCameraProxyServer: TnLoggable {
         self.network.start()
                 
         self.listenService()
+        self.listenEncoding()
 
         logDebug("inited")
     }
