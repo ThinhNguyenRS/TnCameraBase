@@ -84,10 +84,11 @@ public class TnTranscodingEncoderInternal: TnLoggable {
             CVPixelBufferUnlockBaseAddress(pixelBuffer, CVPixelBufferLockFlags(rawValue: 0))
         }
         
-        let sampleBuffer = try await compressionSession.encodeFrame(pixelBuffer, presentationTimeStamp: presentationTimeStamp, duration: duration)
-        outputQueue.sync {
-            for continuation in self.continuations.values {
-                continuation.yield(sampleBuffer)
+        if let sampleBuffer = try await compressionSession.encodeFrame(pixelBuffer, presentationTimeStamp: presentationTimeStamp, duration: duration) {
+            outputQueue.sync {
+                for continuation in self.continuations.values {
+                    continuation.yield(sampleBuffer)
+                }
             }
         }
     }
@@ -135,7 +136,7 @@ extension VTCompressionSession {
         _ pixelBuffer: CVPixelBuffer,
         presentationTimeStamp: CMTime,
         duration: CMTime
-    ) async throws -> CMSampleBuffer {
+    ) async throws -> CMSampleBuffer? {
         var infoFlagsOut = VTEncodeInfoFlags()
         return try await withCheckedThrowingContinuation { continuation in
             let status = VTCompressionSessionEncodeFrame(
@@ -149,11 +150,12 @@ extension VTCompressionSession {
                     if let error = TnTranscodingError(status: status) {
                         continuation.resume(throwing: error)
                     } else {
-                        if let sampleBuffer {
-                            continuation.resume(returning: sampleBuffer)
-                        } else {
+                        continuation.resume(returning: sampleBuffer)
+//                        if let sampleBuffer {
+//                            continuation.resume(returning: sampleBuffer)
+//                        } else {
 //                            continuation.resume(throwing: TnTranscodingError.general(message: "Output sample buffer is nil", error: nil))
-                        }
+//                        }
                     }
                 }
             )
