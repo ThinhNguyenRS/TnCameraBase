@@ -36,7 +36,9 @@ public class TnTranscodingDecoderWrapper {
     }
     
     public func decode(packet: Data) async throws {
-        adaptor.decode(packet)
+        Task {
+            adaptor.decode(packet)
+        }
 //        mainQueue.async { [self] in
 //            adaptor.decode(packet)
 //        }
