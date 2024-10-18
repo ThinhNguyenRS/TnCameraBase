@@ -217,7 +217,7 @@ extension TnCameraProxyServer: TnBluetoothServerDelegate {
             ble.start()
         case .started:
             Task {
-                try? await cameraService.startCapturing()
+                try await cameraService.startCapturing()
             }
         default:
             return
@@ -246,7 +246,7 @@ extension TnCameraProxyServer: TnCameraProxyProtocol {
     public func send(data: Data, to: [String]?) async throws {
         if network.hasConnections {
             Task {
-                try? await network.send(data: data, to: to)
+                try await network.send(data: data, to: to)
             }
         } else if data.count < 2000 {
             ble.send(data: data, to: to)
@@ -285,28 +285,27 @@ extension TnCameraProxyServer: TnCameraProxyProtocol {
     
     public func toggleCapturing() {
         Task {
-            try? await cameraService.toggleCapturing()
+            try await cameraService.toggleCapturing()
         }
     }
     
     public func switchCamera() {
         Task {
-            try? await cameraService.switchCamera()
+            try await cameraService.switchCamera()
         }
     }
     
     // MARK: captureImage
     public func captureImage() {
         Task {
-            if let output = try? await cameraService.captureImage() {
-                delegate?.tnCamera(self, captured: output)
-            }
+            let output = try await cameraService.captureImage()
+            delegate?.tnCamera(self, captured: output)
         }
     }
     
     public func setLivephoto(_ v: Bool) {
         Task {
-            try? await cameraService.setLivephoto(v)
+            try await cameraService.setLivephoto(v)
         }
     }
     
@@ -318,61 +317,62 @@ extension TnCameraProxyServer: TnCameraProxyProtocol {
     
     public func setHDR(_ v: TnTripleState) {
         Task {
-            try? await cameraService.setHDR(v)
+            try await cameraService.setHDR(v)
         }
     }
     
     public func setPreset(_ v: AVCaptureSession.Preset) {
         Task {
-            try? await cameraService.setPreset(v)
+            try await cameraService.setPreset(v)
+            videoEncoder.invalidate()
         }
     }
     
     public func setCameraType(_ v: AVCaptureDevice.DeviceType) {
         Task {
-            try? await cameraService.setCameraType(v)
+            try await cameraService.setCameraType(v)
         }
     }
     
     public func setWideColor(_ v: Bool) {
         Task {
-            try? await cameraService.setWideColor(v)
+            try await cameraService.setWideColor(v)
         }
     }
     
     public func setExposure(_ v: TnCameraExposureValue) {
         Task {
-            try? await cameraService.setExposure(v)
+            try await cameraService.setExposure(v)
         }
     }
     
     public func setZoomFactor(_ v: TnCameraZoomFactorValue) {
         Task {
-            try? await cameraService.setZoomFactor(v)
+            try await cameraService.setZoomFactor(v)
         }
     }
     
     public func setDepth(_ v: Bool) {
         Task {
-            try? await cameraService.setDepth(v)
+            try await cameraService.setDepth(v)
         }
     }
     
     public func setPortrait(_ v: Bool) {
         Task {
-            try? await cameraService.setPortrait(v)
+            try await cameraService.setPortrait(v)
         }
     }
     
     public func setPriority(_ v: AVCapturePhotoOutput.QualityPrioritization) {
         Task {
-            try? await cameraService.setPriority(v)
+            try await cameraService.setPriority(v)
         }
     }
     
     public func setFocusMode(_ v: AVCaptureDevice.FocusMode) {
         Task {
-            try? await cameraService.setFocusMode(v)
+            try await cameraService.setFocusMode(v)
         }
     }
     
