@@ -1,78 +1,151 @@
 //
-//  TnTranscodingDecoder.swift
+//  TnTranscodingDecoderInternal.swift
 //  TnCameraBase
 //
-//  Created by Thinh Nguyen on 10/16/24.
+//  Created by Thinh Nguyen on 10/17/24.
 //
 
 import Foundation
-import CoreImage
-import CoreMedia
+import VideoToolbox
+import UIKit
 import TnIosBase
 
-import Transcoding
-public class TnTranscodingDecoderWrapper {
-    private let decoder: VideoDecoder
-    private var stream: AsyncStream<CMSampleBuffer>.Iterator
-    private let adaptor: VideoDecoderAnnexBAdaptor
 
-    private let mainQueue = DispatchQueue(label: "TnTranscodingDecoderWrapper.main", qos: .background)
+public class TnTranscodingDecoder: TnLoggable {
+    private let config: TnTranscodingDecoderConfig
+    private var continuations: [UUID: AsyncStream<CMSampleBuffer>.Continuation] = [:]
+    private var decompressionSession: VTDecompressionSession? = nil
+    public private(set) var formatDescription: CMFormatDescription? = nil
+    private lazy var outputQueue = DispatchQueue(
+        label: "\(String(describing: Self.self)).output",
+        qos: .userInitiated
+    )
 
-    public init() {
-        decoder = VideoDecoder(config: .init(enableHardwareAcceleratedVideoDecoder: true, requireHardwareAcceleratedVideoDecoder: true))
-        stream = decoder.decodedSampleBuffers.makeAsyncIterator()
-        adaptor = VideoDecoderAnnexBAdaptor(videoDecoder: decoder, codec: .hevc)
-    }
-    
-    public func listen(sampleHandler: @escaping (CIImage) -> Void) {
-        Task { [self] in
-            while let sampleBuffer = await stream.next() {
-                if let imageBuffer = sampleBuffer.imageBuffer {
-                    let ciImage = CIImage(cvImageBuffer: imageBuffer)
-                    sampleHandler(ciImage)
-                }
+    public init(config: TnTranscodingDecoderConfig) {
+        self.config = config
+        Task { [weak self] in
+            for await _ in NotificationCenter.default.notifications(
+                named: UIApplication.willEnterForegroundNotification
+            ) {
+                self?.invalidate()
             }
         }
     }
-    
-    public func decode(packet: Data) async throws {
-        Task {
-            adaptor.decode(packet)
+
+    public func makeStreamIterator() -> AsyncStream<CMSampleBuffer>.Iterator {
+        let stream: AsyncStream<CMSampleBuffer> = .init { continuation in
+            let id = UUID()
+            continuations[id] = continuation
+            continuation.onTermination = { [weak self] _ in
+                self?.continuations[id] = nil
+            }
         }
-//        mainQueue.async { [self] in
-//            adaptor.decode(packet)
-//        }
+        return stream.makeAsyncIterator()
     }
-}
 
-
-public class TnTranscodingDecoderImpl: TnLoggable {
-    private let decoder: TnTranscodingDecoderInternal
-    private var stream: AsyncStream<CMSampleBuffer>.Iterator
-    private let adaptor: TnTranscodingDecoderAdaptor
-
-    public init() {
-        self.decoder = TnTranscodingDecoderInternal(config: .init(realTime: true, maximizePowerEfficiency: true))
-        self.stream = decoder.makeStreamIterator()
-        self.adaptor = TnTranscodingDecoderAdaptor(decoder: decoder, isH264: false)
+    public func invalidate() {
+        if let decompressionSession {
+            VTDecompressionSessionInvalidate(decompressionSession)
+        }
+        decompressionSession = nil
     }
-    
-    public func listen(sampleHandler: @escaping TnTranscodingImageHandler) {
-        Task { [self] in
-            while let sampleBuffer = await stream.next() {
-                if let imageBuffer = sampleBuffer.imageBuffer {
-                    let ciImage = CIImage(cvImageBuffer: imageBuffer)
-                    await sampleHandler(ciImage)
-                }
+
+    public func setFormatDescription(_ v: CMFormatDescription) throws {
+        if let decompressionSession {
+            if !VTDecompressionSessionCanAcceptFormatDescription(decompressionSession, formatDescription: v) {
+                throw TnTranscodingError.general(message: "Invalid format description")
+            }
+        }
+        self.formatDescription = v
+    }
+
+    public func decode(_ sampleBuffer: CMSampleBuffer) async throws {
+        if decompressionSession == nil {
+            decompressionSession = try createDecompressionSession()
+        }        
+        let sampleBufferOut = try await decompressionSession!.decodeFrame(sampleBuffer)
+        outputQueue.sync {
+            for continuation in self.continuations.values {
+                continuation.yield(sampleBufferOut)
             }
         }
     }
-    
-    public func decode(packet: Data) async throws {
-        Task {
-            try await adaptor.decode(packet)
+
+    private func createDecompressionSession() throws -> VTDecompressionSession {
+        guard let formatDescription else {
+            throw TnTranscodingError.general(message: "Format description is nil")
         }
+        let session = try VTDecompressionSession.create(
+            formatDescription: formatDescription,
+            decoderSpecification: config.decoderSpecification,
+            imageBufferAttributes: nil
+        )
+        config.apply(to: session)
+        return session
     }
 }
 
-public typealias TnTranscodingImageHandler = (CIImage) async -> Void
+extension VTDecompressionSession {
+    static func create(formatDescription: CMVideoFormatDescription, decoderSpecification: CFDictionary, imageBufferAttributes: CFDictionary?) throws -> VTDecompressionSession {
+        var session: VTDecompressionSession?
+        try tnOsExecThrow("VTDecompressionSessionCreate") {
+            VTDecompressionSessionCreate(
+                allocator: nil,
+                formatDescription: formatDescription,
+                decoderSpecification: decoderSpecification,
+                imageBufferAttributes: imageBufferAttributes,
+                outputCallback: nil,
+                decompressionSessionOut: &session
+            )
+        }
+        guard let session else {
+            throw TnTranscodingError.general(message: "Cannot create decompression session")
+        }
+        return session
+    }
+    
+    func decodeFrame(_ sampleBuffer: CMSampleBuffer, flags decodeFlags: VTDecodeFrameFlags = [._1xRealTimePlayback]) async throws -> CMSampleBuffer {
+        let decodeTimeStamp = sampleBuffer.decodeTimeStamp
+        
+        return try await withCheckedThrowingContinuation { continuation in
+            var infoFlagsOut = VTDecodeInfoFlags()
+            
+            let status = VTDecompressionSessionDecodeFrame(
+                self,
+                sampleBuffer: sampleBuffer,
+                flags: decodeFlags,
+                infoFlagsOut: &infoFlagsOut,
+                outputHandler: { status, _, imageBuffer, presentationTimeStamp, presentationDuration in
+                    if let error = TnTranscodingError(status: status) {
+                        continuation.resume(throwing: error)
+                    } else {
+                        if let imageBuffer {
+                            do {
+                                let formatDescription = try CMVideoFormatDescription(imageBuffer: imageBuffer)
+                                let sampleTiming = CMSampleTimingInfo(
+                                    duration: presentationDuration,
+                                    presentationTimeStamp: presentationTimeStamp,
+                                    decodeTimeStamp: decodeTimeStamp
+                                )
+                                let sampleBufferRet = try CMSampleBuffer(
+                                    imageBuffer: imageBuffer,
+                                    formatDescription: formatDescription,
+                                    sampleTiming: sampleTiming
+                                )
+                                continuation.resume(returning: sampleBufferRet)
+                            } catch {
+                                continuation.resume(throwing: TnTranscodingError.general(message: "Cannot decode franme", error: error))
+                            }
+                        } else {
+                            continuation.resume(throwing: TnTranscodingError.general(message: "Output image buffer is null"))
+                        }
+                    }
+                }
+            )
+            
+            if let error = TnTranscodingError(status: status) {
+                continuation.resume(throwing: error)
+            }
+        }
+    }
+}

@@ -1,5 +1,5 @@
 {
-  "originHash" : "9ef607838965944b84014b23c3bf314e3720d986ca3269f901831b60dbb80307",
+  "originHash" : "4b024bcdb2902368409b5a2fab1c9b6eda1986886545bb640d4ab65dfd7f5ea0",
   "pins" : [
     {
       "identity" : "tniosbase",
@@ -8,15 +8,6 @@
       "state" : {
         "branch" : "main",
         "revision" : "2e1f0a7d252011067dd82ec03b1a5ec54d126023"
-      }
-    },
-    {
-      "identity" : "transcoding",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/finnvoor/Transcoding",
-      "state" : {
-        "revision" : "72fe5ef3054eb0e1639ae9a9b49a92811fb251b2",
-        "version" : "0.0.1"
       }
     }
   ],

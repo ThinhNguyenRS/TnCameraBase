@@ -10,14 +10,13 @@ import VideoToolbox
 import TnIosBase
 
 public class TnTranscodingEncoderAdaptor: TnLoggable {
-    private let encoder: TnTranscodingEncoderInternal
-    private var conversionTask: Task<Void, Never>?
+    private let encoder: TnTranscodingEncoder
     private var continuations: [UUID: AsyncStream<Data>.Continuation] = [:]
 
-    public init(encoder: TnTranscodingEncoderInternal) {
+    public init(encoder: TnTranscodingEncoder) {
         self.encoder = encoder
         
-        conversionTask = Task { [weak self] in
+        Task { [weak self] in
             for await sampleBuffer in encoder.encodedSampleBuffers {
                 guard let self else { return }
                 let sampleAttachments = CMSampleBufferGetSampleAttachmentsArray(

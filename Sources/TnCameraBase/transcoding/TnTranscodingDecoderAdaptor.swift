@@ -10,13 +10,13 @@ import VideoToolbox
 import TnIosBase
 
 public final class TnTranscodingDecoderAdaptor {
-    private let decoder: TnTranscodingDecoderInternal
+    private let decoder: TnTranscodingDecoder
     private let isH264: Bool
     private var vps: Data?
     private var sps: Data?
     private var pps: Data?
 
-    public init(decoder: TnTranscodingDecoderInternal, isH264: Bool = false) {
+    public init(decoder: TnTranscodingDecoder, isH264: Bool = false) {
         self.decoder = decoder
         self.isH264 = isH264
     }
