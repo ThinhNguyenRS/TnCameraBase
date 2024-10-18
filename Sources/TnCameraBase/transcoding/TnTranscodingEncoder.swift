@@ -66,14 +66,14 @@ class TnTranscodingEncoderImpl: TnLoggable {
     private let adaptor: TnTranscodingEncoderAdaptor
     private var stream: AsyncStream<Data>.Iterator
     
-    private let encodingQueue: DispatchQueue
+    private let mainQueue: DispatchQueue
     private let outputQueue: DispatchQueue
 
     public init(sendingName: [String] = ["streaming"]) {
         self.encoder = TnTranscodingEncoderInternal(config: .ultraLowLatency)
         self.adaptor = TnTranscodingEncoderAdaptor(encoder: encoder)
         self.stream = adaptor.makeStreamIterator()
-        self.encodingQueue = DispatchQueue(label: "\(Self.self).encoding", qos: .background)
+        self.mainQueue = DispatchQueue(label: "\(Self.self).main", qos: .background)
         self.outputQueue = DispatchQueue(label: "\(Self.self).output", qos: .background)
     }
     
@@ -90,7 +90,7 @@ class TnTranscodingEncoderImpl: TnLoggable {
 //    }
     
     public func encode(_ ciImage: CIImage?, packetHandler: @escaping TnTranscodingPacketHandler) async throws {
-        encodingQueue.async { [self] in
+        mainQueue.async { [self] in
             Task {
                 if let pixelBuffer = ciImage?.pixelBuffer {
                     logDebug("encode")

@@ -56,12 +56,15 @@ public class TnTranscodingDecoderImpl: TnLoggable {
     private var stream: AsyncStream<CMSampleBuffer>.Iterator
     private let adaptor: TnTranscodingDecoderAdaptor
 
-    private let decodingQueue = DispatchQueue(label: "TnTranscodingEncoder.decoding", qos: .background)
+    private let mainQueue: DispatchQueue
+    private let outputQueue: DispatchQueue
 
     public init() {
-        decoder = TnTranscodingDecoderInternal(config: .init())
-        stream = decoder.makeStreamIterator()
-        adaptor = TnTranscodingDecoderAdaptor(decoder: decoder, isH264: false)
+        self.decoder = TnTranscodingDecoderInternal(config: .init())
+        self.stream = decoder.makeStreamIterator()
+        self.adaptor = TnTranscodingDecoderAdaptor(decoder: decoder, isH264: false)
+        self.mainQueue = DispatchQueue(label: "\(Self.self).main", qos: .background)
+        self.outputQueue = DispatchQueue(label: "\(Self.self).output", qos: .background)
     }
     
 //    public func listen(sampleHandler: @escaping TnTranscodingImageHandler) {
@@ -82,14 +85,20 @@ public class TnTranscodingDecoderImpl: TnLoggable {
 //    }
     
     public func decode(packet: Data, imageHandler: @escaping TnTranscodingImageHandler) async throws {
-        logDebug("decode")
-        try await adaptor.decode(packet)
+        mainQueue.async { [self] in
+            Task {
+                logDebug("decode")
+                try await adaptor.decode(packet)
+            }
+        }
         
-        Task {
-            while let sampleBuffer = await stream.next(), let imageBuffer = sampleBuffer.imageBuffer {
-                logDebug("deliver image")
-                let ciImage = CIImage(cvImageBuffer: imageBuffer)
-                await imageHandler(ciImage)
+        outputQueue.async { [self] in
+            Task {
+                while let sampleBuffer = await stream.next(), let imageBuffer = sampleBuffer.imageBuffer {
+                    logDebug("deliver image")
+                    let ciImage = CIImage(cvImageBuffer: imageBuffer)
+                    await imageHandler(ciImage)
+                }
             }
         }
     }
