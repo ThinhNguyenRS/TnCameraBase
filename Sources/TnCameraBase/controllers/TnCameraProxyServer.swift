@@ -99,17 +99,25 @@ extension TnCameraProxyServer {
             })
         }
 
+        
         Task {
-            while true {
-                if canEncoding, let ciImage = await cameraService.currentCiImage {
-                    do {
+            await cameraService.$currentCiImage.onReceive(handler: { [self] ciImage in
+                if let ciImage {
+                    Task {
                         try await videoEncoder.encode(ciImage)
-                    } catch TnTranscodingError.invalidSession {
-                        videoEncoder.invalidate()
                     }
                 }
-                try await Task.sleep(nanoseconds: 30_000_000)
-            }
+            })
+//            while true {
+//                if canEncoding, let ciImage = await cameraService.currentCiImage {
+//                    do {
+//                        try await videoEncoder.encode(ciImage)
+//                    } catch TnTranscodingError.invalidSession {
+//                        videoEncoder.invalidate()
+//                    }
+//                }
+//                try await Task.sleep(nanoseconds: 30_000_000)
+//            }
         }
     }
 }

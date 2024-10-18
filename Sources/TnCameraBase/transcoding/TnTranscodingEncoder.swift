@@ -48,6 +48,7 @@ public class TnTranscodingEncoder: TnLoggable {
             VTCompressionSessionInvalidate(compressionSession)
         }
         compressionSession = nil
+        outputSize = nil
     }
 
     public func encode(_ sampleBuffer: CMSampleBuffer) async throws {
