@@ -59,8 +59,12 @@ extension TnCameraProxyClient {
     
     private func decodePacket(packet: Data) {
         Task {
-            try await videoDecoder.decode(packet: packet)
-            logDebug("video decode packet")
+            do {
+                try await videoDecoder.decode(packet: packet)
+                logDebug("video decoded")
+            } catch {
+                logError("video decode error", error)
+            }
         }
     }
 }
