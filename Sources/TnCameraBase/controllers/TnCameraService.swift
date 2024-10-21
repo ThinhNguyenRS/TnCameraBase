@@ -20,8 +20,8 @@ public actor TnCameraService: NSObject, TnLoggable {
     typealias DoDeviceHandler = (AVCaptureDeviceInput, AVCaptureDevice) throws -> Void
     
     public private(set) var settings: TnCameraSettings
-    @Published public var status: TnCameraStatus = .none
-    @Published public var currentCiImage: CIImage?
+    @Published public private(set) var status: TnCameraStatus = .none
+    @Published private var currentCiImage: CIImage?
     
     @Published private(set) var isSettingsChanging = false
 
@@ -40,11 +40,6 @@ public actor TnCameraService: NSObject, TnLoggable {
 
     public init(settings: TnCameraSettings? = nil) {
         self.settings = settings ?? .init()
-    }
-    
-    var currentImageData: Data? {
-        guard let currentCiImage, status == .started, !isSettingsChanging else { return nil }
-        return currentCiImage.jpegData(scale: settings.transporting.scale, compressionQuality: settings.transporting.compressQuality)
     }
 }
 
@@ -572,13 +567,32 @@ extension TnCameraService {
     }
 }
 
-// MARK: AVCaptureVideoDataOutputSampleBufferDelegate
+// MARK: current image
 @available(iOS 17.0, *)
-extension TnCameraService: AVCaptureVideoDataOutputSampleBufferDelegate {
+extension TnCameraService {
+    var currentCiImagePublisher: Published<CIImage?>.Publisher {
+        $currentCiImage
+    }
+    
+    var currentImageData: Data? {
+        guard let currentCiImage, status == .started, !isSettingsChanging else { return nil }
+        return currentCiImage.jpegData(scale: settings.transporting.scale, compressionQuality: settings.transporting.compressQuality)
+    }
+
     private func setImage(_ ciImage: CIImage) async {
         self.currentCiImage = ciImage
     }
     
+    public func listenImage(handler: @escaping (CIImage) async throws -> Void ) async throws {
+        for await ciImage in $currentCiImage.filter({ $0 != nil}).values {
+            try await handler(ciImage!)
+        }
+    }
+}
+
+// MARK: AVCaptureVideoDataOutputSampleBufferDelegate
+@available(iOS 17.0, *)
+extension TnCameraService: AVCaptureVideoDataOutputSampleBufferDelegate {
     nonisolated public func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         guard let imageBuffer = sampleBuffer.imageBuffer else {
             return

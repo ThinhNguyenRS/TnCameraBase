@@ -91,6 +91,7 @@ extension TnCameraProxyServer {
     }
     
     private func listenEncoding() {
+        // listen encoding packet
         Task {
             try self.videoEncoder?.listen(packetHandler: { packet in
                 if self.canEncoding {
@@ -99,26 +100,41 @@ extension TnCameraProxyServer {
             })
         }
 
-        
+//        // listen image to encoding, passive just encode
+//        Task {
+//            await cameraService.$currentCiImage
+//                .filter({ v in v != nil })
+//                .onReceive(handler: { [self] ciImage in
+//                    if canEncoding {
+//                        Task {
+//                            try await videoEncoder?.encode(ciImage!)
+//                        }
+//                    }
+//            })
+//        }
+
+        // listen image to encoding, passive just encode, async
         Task {
-            await cameraService.$currentCiImage.onReceive(handler: { [self] ciImage in
-                if let ciImage {
-                    Task {
-                        try await videoEncoder?.encode(ciImage)
-                    }
+            try await cameraService.listenImage { [self] ciImage in
+                if canEncoding {
+                    try await videoEncoder?.encode(ciImage)
                 }
-            })
+            }
+        }
+
+//        // listen image to encoding, active and wait
+//        Task {
 //            while true {
 //                if canEncoding, let ciImage = await cameraService.currentCiImage {
 //                    do {
-//                        try await videoEncoder.encode(ciImage)
+//                        try await videoEncoder?.encode(ciImage)
 //                    } catch TnTranscodingError.invalidSession {
-//                        videoEncoder.invalidate()
+//                        videoEncoder?.invalidate()
 //                    }
 //                }
 //                try await Task.sleep(nanoseconds: 30_000_000)
 //            }
-        }
+//        }
     }
 }
 
@@ -267,7 +283,7 @@ extension TnCameraProxyServer: TnCameraProxyProtocol {
     
     public var currentCiImagePublisher: Published<CIImage?>.Publisher {
         get async {
-            await cameraService.$currentCiImage
+            await cameraService.currentCiImagePublisher
         }
     }
     
