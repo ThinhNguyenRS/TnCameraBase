@@ -53,12 +53,14 @@ extension TnCameraProxyClient {
     private func listenEncoding() {
         videoDecoder.listen(sampleHandler: { ciImage in
             self.currentCiImage = ciImage
+            logDebug("video got decoded image")
         })
     }
     
     private func decodePacket(packet: Data) {
         Task {
             try await videoDecoder.decode(packet: packet)
+            logDebug("video decode packet")
         }
     }
 }
