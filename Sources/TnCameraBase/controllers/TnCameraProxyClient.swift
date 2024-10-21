@@ -51,10 +51,10 @@ public class TnCameraProxyClient: NSObject, ObservableObject, TnLoggable {
 // MARK: encoding
 extension TnCameraProxyClient {
     private func listenEncoding() {
-        videoDecoder.listen(sampleHandler: { ciImage in
-            self.currentCiImage = ciImage
+        videoDecoder.listen{ [self] ciImage in
+            currentCiImage = ciImage
             logDebug("video got decoded image")
-        })
+        }
     }
     
     private func decodePacket(packet: Data) {
