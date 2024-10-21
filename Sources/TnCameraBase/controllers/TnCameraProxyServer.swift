@@ -24,7 +24,7 @@ public class TnCameraProxyServer: TnLoggable {
     public private(set) var albums: [String] = []
 
     public var delegate: TnCameraDelegate? = nil
-    private let videoEncoder = TnTranscodingEncoderComposite()
+    private let videoEncoder: TnTranscodingEncoderComposite? = nil // TnTranscodingEncoderComposite()
 
     public init(_ cameraService: TnCameraService, bleInfo: TnNetworkBleInfo, transportingInfo: TnNetworkTransportingInfo) {
         self.cameraService = cameraService
@@ -92,7 +92,7 @@ extension TnCameraProxyServer {
     
     private func listenEncoding() {
         Task {
-            try self.videoEncoder.listen(packetHandler: { packet in
+            try self.videoEncoder?.listen(packetHandler: { packet in
                 if self.canEncoding {
                     try await self.send(data: packet, to: ["streaming"])
                 }
@@ -104,7 +104,7 @@ extension TnCameraProxyServer {
             await cameraService.$currentCiImage.onReceive(handler: { [self] ciImage in
                 if let ciImage {
                     Task {
-                        try await videoEncoder.encode(ciImage)
+                        try await videoEncoder?.encode(ciImage)
                     }
                 }
             })
@@ -324,7 +324,7 @@ extension TnCameraProxyServer: TnCameraProxyProtocol {
     public func setPreset(_ v: AVCaptureSession.Preset) {
         Task {
             try await cameraService.setPreset(v)
-            videoEncoder.invalidate()
+            videoEncoder?.invalidate()
         }
     }
     
@@ -412,7 +412,7 @@ extension TnCameraProxyServer: TnNetworkDelegateServer {
 
     public func tnNetworkAccepted(_ server: TnNetworkServer, connection: TnNetworkConnection) {
         if connection.name == "streaming" {
-            videoEncoder.invalidate()
+            videoEncoder?.invalidate()
         }
     }
     
