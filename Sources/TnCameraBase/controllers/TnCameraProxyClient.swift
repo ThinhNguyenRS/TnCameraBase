@@ -55,6 +55,12 @@ extension TnCameraProxyClient {
             self.currentCiImage = ciImage
         })
     }
+    
+    private func decodePacket(packet: Data) {
+        Task {
+            try await videoDecoder.decode(packet: packet)
+        }
+    }
 }
 
 // MARK: solve messages
@@ -262,9 +268,7 @@ extension TnCameraProxyClient: TnNetworkDelegate {
 
     public func tnNetworkReceived(_ connection: TnNetworkConnection, data: Data) {
         if connection.name == "streaming" {
-            Task {
-                try await videoDecoder.decode(packet: data)
-            }
+            self.decodePacket(packet: data)
         } else {
             self.solveData(data: data)
         }

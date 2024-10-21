@@ -33,9 +33,7 @@ public class TnTranscodingDecoderComposite: TnLoggable {
     }
     
     public func decode(packet: Data) async throws {
-        Task {
-            try await adaptor.decode(packet)
-        }
+        try await adaptor.decode(packet)
     }
 }
 
