@@ -24,7 +24,7 @@ public class TnCameraProxyServer: TnLoggable {
     public private(set) var albums: [String] = []
 
     public var delegate: TnCameraDelegate? = nil
-    private let videoEncoder: TnTranscodingEncoderComposite? = TnTranscodingEncoderComposite()
+    private let videoEncoder: TnTranscodingEncoderComposite = TnTranscodingEncoderComposite()
 
     public init(_ cameraService: TnCameraService, bleInfo: TnNetworkBleInfo, transportingInfo: TnNetworkTransportingInfo) {
         self.cameraService = cameraService
@@ -92,10 +92,11 @@ extension TnCameraProxyServer {
     
     private func listenEncoding() {
         // listen encoding packet
-        Task {
-            try self.videoEncoder?.listen(packetHandler: { packet in
-                if self.canEncoding {
-                    try await self.send(data: packet, to: ["streaming"])
+        Task { [self] in
+            try videoEncoder.listen(packetHandler: { [self] packet in
+                if canEncoding {
+                    try await send(data: packet, to: ["streaming"])
+                    logDebug("video sent encoded")
                 }
             })
         }
@@ -117,7 +118,8 @@ extension TnCameraProxyServer {
         Task {
             try await cameraService.listenImage { [self] ciImage in
                 if canEncoding {
-                    try await videoEncoder?.encode(ciImage)
+                    try await videoEncoder.encode(ciImage)
+                    logDebug("video encoded")
                 }
             }
         }
@@ -340,7 +342,7 @@ extension TnCameraProxyServer: TnCameraProxyProtocol {
     public func setPreset(_ v: AVCaptureSession.Preset) {
         Task {
             try await cameraService.setPreset(v)
-            videoEncoder?.invalidate()
+            videoEncoder.invalidate()
         }
     }
     
@@ -428,7 +430,7 @@ extension TnCameraProxyServer: TnNetworkDelegateServer {
 
     public func tnNetworkAccepted(_ server: TnNetworkServer, connection: TnNetworkConnection) {
         if connection.name == "streaming" {
-            videoEncoder?.invalidate()
+            videoEncoder.invalidate()
         }
     }
     
