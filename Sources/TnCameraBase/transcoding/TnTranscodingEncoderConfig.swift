@@ -25,14 +25,14 @@ public struct TnTranscodingEncoderConfig {
         self.enableLowLatencyRateControl = enableLowLatencyRateControl
     }
 
-    public let codecType: CMVideoCodecType
-    public let realTime: Bool
+    public var codecType: CMVideoCodecType
+    public var realTime: Bool
 
-    public let prioritizeSpeed: Bool
-    public let maximizePowerEfficiency: Bool
+    public var prioritizeSpeed: Bool
+    public var maximizePowerEfficiency: Bool
 
-    public let enableHardware: Bool
-    public let enableLowLatencyRateControl: Bool
+    public var enableHardware: Bool
+    public var enableLowLatencyRateControl: Bool
 
     var encoderSpecification: CFDictionary {
         var encoderSpecification: [CFString: CFTypeRef] = [:]

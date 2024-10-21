@@ -15,7 +15,9 @@ class TnTranscodingEncoderComposite: TnLoggable {
     private var stream: AsyncStream<Data>.Iterator
     
     public init(sendingName: [String] = ["streaming"]) {
-        self.encoder = TnTranscodingEncoder(config: .init(realTime: true, maximizePowerEfficiency: true, enableHardware: true))
+        var config = TnTranscodingEncoderConfig.ultraLowLatency
+        config.enableHardware = true
+        self.encoder = TnTranscodingEncoder(config: config)
         self.adaptor = TnTranscodingEncoderAdaptor(encoder: encoder)
         self.stream = adaptor.makeStreamIterator()
     }
