@@ -93,7 +93,7 @@ extension TnCameraProxyServer {
         videoEncoder.listen(packetHandler: { [self] packet in
             if canEncoding {
                 try await networkStreaming?.send(data: packet)
-                logDebug("video sent encoded")
+//                logDebug("video sent encoded")
             }
         })
 
@@ -103,7 +103,7 @@ extension TnCameraProxyServer {
                 if canEncoding {
                     do {
                         try await videoEncoder.encode(ciImage)
-                        logDebug("video encoded")
+//                        logDebug("video encoded")
                     } catch {
                         logError("video encoded error", error)
                     }
