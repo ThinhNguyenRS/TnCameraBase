@@ -15,7 +15,11 @@ import TnIosBase
 @available(iOS 17.0, *)
 public class TnCameraProxyServer: TnLoggable {
     private let cameraService: TnCameraService
+    
     private let network: TnNetworkServer
+    private var networkCommon: TnNetworkConnection? = nil
+    private var networkStreaming: TnNetworkConnection? = nil
+
     private let ble: TnBluetoothServer
     
     private var status: TnCameraStatus = .none
@@ -87,14 +91,14 @@ extension TnCameraProxyServer {
 @available(iOS 17.0, *)
 extension TnCameraProxyServer {
     private var canEncoding: Bool {
-        status == .started && network.hasConnection(name: "streaming")
+        status == .started && networkStreaming != nil
     }
     
     private func listenEncoding() {
         // listen encoding packet
         videoEncoder.listen(packetHandler: { [self] packet in
             if canEncoding {
-                try await send(data: packet, to: ["streaming"])
+                try await networkStreaming?.send(data: packet)
                 logDebug("video sent encoded")
             }
         })
@@ -141,8 +145,7 @@ extension TnCameraProxyServer {
         case .getSettings:
             // response settings
             send(msgType: .getSettingsResponse,
-                 value: TnCameraSettingsValue(settings: settings, status: status, network: network.hostInfo),
-                 to: ["common"]
+                 value: TnCameraSettingsValue(settings: settings, status: status, network: network.hostInfo)
             )
 
 //        case .getImage:
@@ -194,7 +197,7 @@ extension TnCameraProxyServer {
             }
             
         case .getAlbums:
-            send(msgType: .getAlbumsResponse, value: albums, to: ["common"])
+            send(msgType: .getAlbumsResponse, value: albums)
         default:
             return
         }
@@ -225,9 +228,9 @@ extension TnCameraProxyServer: TnBluetoothServerDelegate {
     }
 }
 
-// MARK: TnCameraProxyProtocol
+// MARK: TnTransportableProtocol
 @available(iOS 17.0, *)
-extension TnCameraProxyServer: TnCameraProxyProtocol {
+extension TnCameraProxyServer: TnTransportableProtocol {
     public var decoder: TnDecoder {
         ble.decoder
     }
@@ -236,24 +239,20 @@ extension TnCameraProxyServer: TnCameraProxyProtocol {
         ble.encoder
     }
     
-    public func send(data: Data, to: [String]?) async throws {
-        if network.hasConnections {
+    public func send(data: Data) async throws {
+        if let networkCommon {
             Task {
-                try await network.send(data: data, to: to)
+                try await networkCommon.send(data: data)
             }
         } else if data.count < 2000 {
-            ble.send(data: data, to: to)
+            ble.send(data: data)
         }
     }
-    
-//    public func sendImage() {
-////        Task {
-////            if let currentImageData = await cameraService.currentImageData {
-////                network.send(msgType: .getImageResponse, value: currentImageData, to: ["image"])
-////            }
-////        }
-//    }
+}
 
+// MARK: TnCameraProxyProtocol
+@available(iOS 17.0, *)
+extension TnCameraProxyServer: TnCameraProxyProtocol {
     public func setup() {
         ble.setupBle()
     }
@@ -385,7 +384,7 @@ extension TnCameraProxyServer: TnCameraProxyProtocol {
         Task {
             try await cameraService.library.getOrCreateAlbum(name: v)
             albums = await cameraService.library.getAlbums()
-            send(msgType: .getAlbumsResponse, value: albums, to: ["common"])
+            send(msgType: .getAlbumsResponse, value: albums)
         }
     }
 
@@ -400,19 +399,19 @@ extension TnCameraProxyServer: TnNetworkDelegateServer {
     public func tnNetworkStop(_ server: TnNetworkServer, error: Error?) {
     }
 
-    public func tnNetworkStop(_ server: TnNetworkServer, connection: TnNetworkConnection, error: Error?) {
+    public func tnNetworkDisconnected(_ server: TnNetworkServer, connection: TnNetworkConnection, error: Error?) {
+        if connection.name == "streaming" {
+            networkStreaming = nil
+        } else if connection.name == "common" {
+            networkCommon = nil
+        }
     }
 
     public func tnNetworkAccepted(_ server: TnNetworkServer, connection: TnNetworkConnection) {
         if connection.name == "streaming" {
-            videoEncoder.invalidate()
+            networkStreaming = connection
+        } else if connection.name == "common" {
+            networkCommon = connection
         }
-    }
-    
-    public func tnNetworkReceived(_ server: TnNetworkServer, connection: TnNetworkConnection, data: Data) {
-        self.solveData(data: data)
-    }
-
-    public func tnNetworkSent(_ server: TnNetworkServer, connection: TnNetworkConnection, count: Int) {
     }
 }

@@ -90,7 +90,7 @@ extension TnCameraAppView: TnCameraDelegate {
         
         if master {
             logDebug("send status")
-            cameraProxy.send(msgType: .getSettingsResponse, value: TnCameraSettingsValue(settings: nil, status: status, network: nil), to: ["common"])
+            cameraProxy.send(msgType: .getSettingsResponse, value: TnCameraSettingsValue(settings: nil, status: status, network: nil))
         }
 
         delegate?.tnCamera(cameraProxy, status: status)
@@ -105,7 +105,7 @@ extension TnCameraAppView: TnCameraDelegate {
         if master {
             Task {
                 logDebug("send settings")
-                cameraProxy.send(msgType: .getSettingsResponse, value: TnCameraSettingsValue(settings: settings, status: nil, network: nil), to: ["common"])
+                cameraProxy.send(msgType: .getSettingsResponse, value: TnCameraSettingsValue(settings: settings, status: nil, network: nil))
                 
                 try? TnCameraProxyLoader.shared.saveSettings(settings)
             }

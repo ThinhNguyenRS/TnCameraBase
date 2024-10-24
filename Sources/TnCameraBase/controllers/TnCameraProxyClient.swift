@@ -106,7 +106,7 @@ extension TnCameraProxyClient {
 //                self.currentCiImage = ciImage
 //                
 //                if status == .started && networkImage != nil && (settings?.transporting.continuous ?? false) {
-//                    networkImage?.send(msgType: .getImage, to: nil)
+//                    networkImage?.send(msgType: .getImage)
 //                }
 //            }
 
@@ -127,86 +127,86 @@ extension TnCameraProxyClient: TnCameraProtocol {
     }
     
     public func startCapturing() {
-        send(msgType: .startCapturing, to: nil)
+        send(msgType: .startCapturing)
     }
     
     public func stopCapturing() {
-        send(msgType: .stopCapturing, to: nil)
+        send(msgType: .stopCapturing)
     }
     
     public func toggleCapturing() {
-        send(msgType: .toggleCapturing, to: nil)
+        send(msgType: .toggleCapturing)
     }
     
     public func switchCamera() {
-        send(msgType: .switchCamera, to: nil)
+        send(msgType: .switchCamera)
     }
     
     public func captureImage() {
-        send(msgType: .captureImage, to: nil)
+        send(msgType: .captureImage)
     }
     
     public func setLivephoto(_ v: Bool) {
-        send(msgType: .setLivephoto, value: v, to: nil)
+        send(msgType: .setLivephoto, value: v)
     }
     
     public func setFlash(_ v: AVCaptureDevice.FlashMode) {
-        send(msgType: .setFlash, value: v, to: nil)
+        send(msgType: .setFlash, value: v)
     }
     
     public func setHDR(_ v: TnTripleState) {
-        send(msgType: .setHDR, value: v, to: nil)
+        send(msgType: .setHDR, value: v)
     }
     
     public func setPreset(_ v: AVCaptureSession.Preset) {
-        send(msgType: .setPreset, value: v, to: nil)
+        send(msgType: .setPreset, value: v)
     }
     
     public func setCameraType(_ v: AVCaptureDevice.DeviceType) {
-        send(msgType: .setCameraType, value: v, to: nil)
+        send(msgType: .setCameraType, value: v)
     }
     
     public func setWideColor(_ v: Bool) {
-        send(msgType: .setWideColor, value: v, to: nil)
+        send(msgType: .setWideColor, value: v)
     }
     
     public func setExposureMode(_ v: AVCaptureDevice.ExposureMode) {
-        send(msgType: .setExposureMode, value: v, to: nil)
+        send(msgType: .setExposureMode, value: v)
     }
     
     public func setExposure(_ v: TnCameraExposureValue) {
     }
     
     public func setZoomFactor(_ v: TnCameraZoomFactorValue) {
-        send(msgType: .setZoomFactor, value: v, to: nil)
+        send(msgType: .setZoomFactor, value: v)
     }
     
     public func setDepth(_ v: Bool) {
-        send(msgType: .setDepth, value: v, to: nil)
+        send(msgType: .setDepth, value: v)
     }
     
     public func setPortrait(_ v: Bool) {
-        send(msgType: .setPortrait, value: v, to: nil)
+        send(msgType: .setPortrait, value: v)
     }
     
     public func setPriority(_ v: AVCapturePhotoOutput.QualityPrioritization) {
-        send(msgType: .setQuality, value: v, to: nil)
+        send(msgType: .setQuality, value: v)
     }
     
     public func setFocusMode(_ v: AVCaptureDevice.FocusMode) {
-        send(msgType: .setFocusMode, value: v, to: nil)
+        send(msgType: .setFocusMode, value: v)
     }
     
     public func setTransporting(_ v: TnCameraTransportingValue) {
-        send(msgType: .setTransporting, value: v, to: nil)
+        send(msgType: .setTransporting, value: v)
     }
     
     public func setCapturing(_ v: TnCameraCapturingValue) {
-        send(msgType: .setCapturing, value: v, to: nil)
+        send(msgType: .setCapturing, value: v)
     }
     
     public func createAlbum(_ v: String) {
-        send(msgType: .createAlbum, value: v, to: nil)
+        send(msgType: .createAlbum, value: v)
     }
 }
 
@@ -224,12 +224,12 @@ extension TnCameraProxyClient: TnCameraProxyProtocol {
         ble.setupBle()
     }
     
-    public func send(data: Data, to: [String]?) async throws {
+    public func send(data: Data) async throws {
         Task { [self] in
             if networkCommon == nil {
-                ble.send(data: data, to: to)
+                ble.send(data: data)
             } else {
-                try? await networkCommon?.send(data: data, to: to)
+                try? await networkCommon?.send(data: data)
             }
         }
     }
@@ -248,7 +248,7 @@ extension TnCameraProxyClient: TnBluetoothClientDelegate {
     }
     
     public func tnBluetoothClient(ble: TnBluetoothClient, connectedID: String) {
-        send(msgType: .getSettings, to: nil)
+        send(msgType: .getSettings)
     }
     
     public func tnBluetoothClient(ble: TnBluetoothClient, disconnectedID: String) {
