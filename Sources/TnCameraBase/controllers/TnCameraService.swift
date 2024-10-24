@@ -19,11 +19,10 @@ public actor TnCameraService: NSObject, TnLoggable {
 //    public static let shared: TnCameraService = .init()
     typealias DoDeviceHandler = (AVCaptureDeviceInput, AVCaptureDevice) throws -> Void
     
-    public private(set) var settings: TnCameraSettings
-    @Published public private(set) var status: TnCameraStatus = .none
+    private var settings: TnCameraSettings
+    @Published private var status: TnCameraStatus = .none
     @Published private var currentCiImage: CIImage?
-    
-    @Published private(set) var isSettingsChanging = false
+    @Published private var isSettingsChanging = false
 
     private let session = AVCaptureSession()
     
@@ -40,6 +39,25 @@ public actor TnCameraService: NSObject, TnLoggable {
 
     public init(settings: TnCameraSettings? = nil) {
         self.settings = settings ?? .init()
+    }
+}
+
+// MARK: listen status, settings
+@available(iOS 17.0, *)
+extension TnCameraService {
+    public func listen(statusHandler: @escaping (TnCameraStatus) -> Void, settingsHandler: @escaping (TnCameraSettings) -> Void) {
+        // listen settings
+        $isSettingsChanging
+            .filter({[self] in !$0 && status == .started })
+            .onReceive { [self] _ in
+                settingsHandler(settings)
+            }
+        
+        $status
+            .filter({ $0 != .none })
+            .onReceive {
+                statusHandler($0)
+            }
     }
 }
 

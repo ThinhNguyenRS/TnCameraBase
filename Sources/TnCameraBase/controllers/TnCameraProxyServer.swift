@@ -65,25 +65,19 @@ extension TnCameraProxyServer {
         Task {
             self.albums = await cameraService.library.getAlbums()
             
-            await cameraService.$isSettingsChanging.onReceive { [self] v in
-                Task {
-                    if status == .started && !v {
-                        logDebug("settings changed")
-                        self.settings = await cameraService.settings
-                        delegate?.tnCamera(self, settings: self.settings!)
-                    }
+            await cameraService.listen(
+                statusHandler: { [self] status in
+                    logDebug("status changed", status)
+                    self.status = status
+                    delegate?.tnCamera(self, status: status)
+                },
+                settingsHandler: { [self] settings in
+                    logDebug("settings changed")
+                    self.settings = settings
+                    delegate?.tnCamera(self, settings: settings)
                 }
-            }
-
-            await cameraService.$status.onReceive { [self] v in
-                if self.status != v {
-                    logDebug("status changed", v)
-                    self.status = v
-                    delegate?.tnCamera(self, status: v)
-                }
-            }
+            )
         }
-        
     }
 }
 
