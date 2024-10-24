@@ -12,18 +12,17 @@ import TnIosBase
 
 public class TnTranscodingDecoderComposite: TnLoggable {
     private let decoder: TnTranscodingDecoder
-    private var stream: AsyncStream<CMSampleBuffer>.Iterator
     private let adaptor: TnTranscodingDecoderAdaptor
 
     public init() {
         self.decoder = TnTranscodingDecoder(config: .init(/*realTime: true, */ /*enableHardware: true*/))
-        self.stream = decoder.makeStreamIterator()
         self.adaptor = TnTranscodingDecoderAdaptor(decoder: decoder, isH264: false)
     }
     
-    public func listen(sampleHandler: @escaping TnTranscodingImageHandler) {
+    @discardableResult
+    public func listen(sampleHandler: @escaping TnTranscodingImageHandler) -> Task<Void, Error> {
         Task { [self] in
-            while let sampleBuffer = await stream.next() {
+            for await sampleBuffer in decoder.stream {
                 if let imageBuffer = sampleBuffer.imageBuffer {
                     let ciImage = CIImage(cvImageBuffer: imageBuffer)
                     await sampleHandler(ciImage)
@@ -34,6 +33,10 @@ public class TnTranscodingDecoderComposite: TnLoggable {
     
     public func decode(packet: Data) async throws {
         try await adaptor.decode(packet)
+    }
+    
+    public func invalidate() {
+        decoder.invalidate()
     }
 }
 

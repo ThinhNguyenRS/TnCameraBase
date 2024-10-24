@@ -42,9 +42,9 @@ public struct TnTranscodingEncoderConfig {
                 kVTVideoEncoderSpecification_EnableHardwareAcceleratedVideoEncoder
             ] = enableHardware as CFBoolean
 
-            encoderSpecification[
-                kVTVideoEncoderSpecification_RequireHardwareAcceleratedVideoEncoder
-            ] = enableHardware as CFBoolean
+//            encoderSpecification[
+//                kVTVideoEncoderSpecification_RequireHardwareAcceleratedVideoEncoder
+//            ] = enableHardware as CFBoolean
         }
         
         encoderSpecification[

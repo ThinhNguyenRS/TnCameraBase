@@ -71,7 +71,7 @@ extension TnCameraProxyClient {
 
 // MARK: solve messages
 extension TnCameraProxyClient {
-    func solveData(data: Data) {
+    func solveMsg(data: Data) {
         let msgData = TnMessageData(data: data)
         guard let messageType = msgData.cameraMsgType else { return }
 
@@ -258,28 +258,46 @@ extension TnCameraProxyClient: TnBluetoothClientDelegate {
     }
     
     public func tnBluetoothClient(ble: TnBluetoothClient, receivedID: String, receivedData: Data) {
-        solveData(data: receivedData)
+        solveMsg(data: receivedData)
     }
 }
 
 // MARK: TnNetworkDelegate
 extension TnCameraProxyClient: TnNetworkDelegate {
     public func tnNetworkReady(_ connection: TnNetworkConnection) {
+        switch connection.name {
+        case "common":
+            listenCommon()
+        case "streaming":
+            listenStreaming()
+        default:
+            break
+        }
     }
     
     public func tnNetworkStop(_ connection: TnNetworkConnection, error: (any Error)?) {
         networkCommon = nil
         networkStreaming = nil
     }
+}
 
-    public func tnNetworkReceived(_ connection: TnNetworkConnection, data: Data) {
-        if connection.name == "streaming" {
-            self.decodePacket(packet: data)
-        } else {
-            self.solveData(data: data)
+// MARK: receive msg
+extension TnCameraProxyClient {
+    private func listenCommon() {
+        guard let stream = networkCommon?.receiveStream.stream else { return }
+        Task {
+            for await data in stream {
+                self.solveMsg(data: data)
+            }
         }
     }
-
-    public func tnNetworkSent(_ connection: TnNetworkConnection, count: Int) {
+    
+    private func listenStreaming() {
+        guard let stream = networkStreaming?.receiveStream.stream else { return }
+        Task {
+            for await data in stream {
+                self.decodePacket(packet: data)
+            }
+        }
     }
 }

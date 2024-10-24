@@ -7,40 +7,21 @@
 
 import Foundation
 import VideoToolbox
-import UIKit
 import TnIosBase
 
 public class TnTranscodingEncoder: TnLoggable {
-    private var continuations: [UUID: AsyncStream<CMSampleBuffer>.Continuation] = [:]
-//    private lazy var outputQueue = DispatchQueue(
-//        label: "\(String(describing: Self.self)).output",
-//        qos: .userInitiated
-//    )
     private var compressionSession: VTCompressionSession? = nil
     private var outputSize: CGSize? = nil
     private let config: TnTranscodingEncoderConfig
+    private let streamer: TnAsyncStreamer<CMSampleBuffer>
 
-    init(config: TnTranscodingEncoderConfig) {
+    public init(config: TnTranscodingEncoderConfig) {
         self.config = config
-
-        Task { [weak self] in
-            for await _ in NotificationCenter.default.notifications(
-                named: UIApplication.willEnterForegroundNotification
-            ) {
-                self?.invalidate()
-            }
-        }
+        streamer = .init()
     }
 
-
-    public var encodedSampleBuffers: AsyncStream<CMSampleBuffer> {
-        .init { continuation in
-            let id = UUID()
-            continuations[id] = continuation
-            continuation.onTermination = { [weak self] _ in
-                self?.continuations.removeValue(forKey: id)
-            }
-        }
+    public var stream: AsyncStream<CMSampleBuffer> {
+        streamer.stream
     }
 
     public func invalidate() {
@@ -53,8 +34,7 @@ public class TnTranscodingEncoder: TnLoggable {
 
     public func encode(_ sampleBuffer: CMSampleBuffer) async throws {
         guard let imageBuffer = sampleBuffer.imageBuffer else {
-            logError("Invalid sample buffer passed to video encoder; missing imageBuffer")
-            return
+            throw TnTranscodingError.general(message: "Input sample buffer is invalid")
         }
         try await encode(
             imageBuffer,
@@ -86,14 +66,7 @@ public class TnTranscodingEncoder: TnLoggable {
         }
         
         if let sampleBuffer = try await compressionSession.encodeFrame(pixelBuffer, presentationTimeStamp: presentationTimeStamp, duration: duration) {
-            for continuation in self.continuations.values {
-                continuation.yield(sampleBuffer)
-            }
-//            outputQueue.sync {
-//                for continuation in self.continuations.values {
-//                    continuation.yield(sampleBuffer)
-//                }
-//            }
+            streamer.yield(sampleBuffer)
         }
     }
     

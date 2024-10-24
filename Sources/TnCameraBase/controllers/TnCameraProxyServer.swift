@@ -92,27 +92,12 @@ extension TnCameraProxyServer {
     
     private func listenEncoding() {
         // listen encoding packet
-        Task { [self] in
-            try videoEncoder.listen(packetHandler: { [self] packet in
-                if canEncoding {
-                    try await send(data: packet, to: ["streaming"])
-                    logDebug("video sent encoded")
-                }
-            })
-        }
-
-//        // listen image to encoding, passive just encode
-//        Task {
-//            await cameraService.$currentCiImage
-//                .filter({ v in v != nil })
-//                .onReceive(handler: { [self] ciImage in
-//                    if canEncoding {
-//                        Task {
-//                            try await videoEncoder?.encode(ciImage!)
-//                        }
-//                    }
-//            })
-//        }
+        videoEncoder.listen(packetHandler: { [self] packet in
+            if canEncoding {
+                try await send(data: packet, to: ["streaming"])
+                logDebug("video sent encoded")
+            }
+        })
 
         // listen image to encoding, passive just encode, async
         Task {
@@ -127,20 +112,6 @@ extension TnCameraProxyServer {
                 }
             }
         }
-
-//        // listen image to encoding, active and wait
-//        Task {
-//            while true {
-//                if canEncoding, let ciImage = await cameraService.currentCiImage {
-//                    do {
-//                        try await videoEncoder?.encode(ciImage)
-//                    } catch TnTranscodingError.invalidSession {
-//                        videoEncoder?.invalidate()
-//                    }
-//                }
-//                try await Task.sleep(nanoseconds: 30_000_000)
-//            }
-//        }
     }
 }
 

@@ -9,27 +9,26 @@ import Foundation
 import CoreImage
 import TnIosBase
 
-class TnTranscodingEncoderComposite: TnLoggable {
+public class TnTranscodingEncoderComposite: TnLoggable {
     private let encoder: TnTranscodingEncoder
     private let adaptor: TnTranscodingEncoderAdaptor
-    private var stream: AsyncStream<Data>.Iterator
     
-    public init(sendingName: [String] = ["streaming"]) {
+    public init() {
         var config = TnTranscodingEncoderConfig.ultraLowLatency
         config.enableHardware = true
         self.encoder = TnTranscodingEncoder(config: config)
         self.adaptor = TnTranscodingEncoderAdaptor(encoder: encoder)
-        self.stream = adaptor.makeStreamIterator()
     }
     
-    public func listen(packetHandler: @escaping TnTranscodingPacketHandler) throws {
+    @discardableResult
+    public func listen(packetHandler: @escaping TnTranscodingPacketHandler) -> Task<Void, Error> {
         Task { [self] in
-            while let packet = await stream.next() {
+            for await packet in adaptor.stream {
                 try await packetHandler(packet)
             }
         }
     }
-    
+
     public func encode(_ ciImage: CIImage?) async throws {
         if let pixelBuffer = ciImage?.pixelBuffer {
             try await encoder.encode(pixelBuffer)
@@ -41,5 +40,5 @@ class TnTranscodingEncoderComposite: TnLoggable {
     }
 }
 
-typealias TnTranscodingPacketHandler = (Data) async throws -> Void
+public typealias TnTranscodingPacketHandler = (Data) async throws -> Void
 

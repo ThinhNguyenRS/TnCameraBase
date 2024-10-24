@@ -11,22 +11,22 @@ import TnIosBase
 
 public class TnTranscodingEncoderAdaptor: TnLoggable {
     private let encoder: TnTranscodingEncoder
-    private var continuations: [UUID: AsyncStream<Data>.Continuation] = [:]
-
+    private let streamer: TnAsyncStreamer<Data> = .init()
+    
     public init(encoder: TnTranscodingEncoder) {
         self.encoder = encoder
         
         Task { [weak self] in
-            for await sampleBuffer in encoder.encodedSampleBuffers {
+            for await sampleBuffer in encoder.stream {
                 guard let self else { return }
                 let sampleAttachments = CMSampleBufferGetSampleAttachmentsArray(
                     sampleBuffer,
                     createIfNecessary: false
                 ) as? [[CFString: Any]]
                 let notSync = sampleAttachments?.first?[kCMSampleAttachmentKey_NotSync] as? Bool ?? false
-
+                
                 var elementaryStream = Data()
-
+                
                 if !notSync {
                     guard let formatDesciption = sampleBuffer.formatDescription else {
                         logError("Encoded sample buffer missing format description")
@@ -40,7 +40,7 @@ public class TnTranscodingEncoderAdaptor: TnLoggable {
                         }
                         elementaryStream += H264NALU(data: formatDesciption.parameterSets[0]).annexB
                         elementaryStream += H264NALU(data: formatDesciption.parameterSets[1]).annexB
-
+                        
                     case .hevc:
                         guard formatDesciption.parameterSets.count > 2 else {
                             logError("Encoded sample buffer missing parameter set")
@@ -71,13 +71,13 @@ public class TnTranscodingEncoderAdaptor: TnLoggable {
                     logError("CMBlockBufferGetDataPointer failed with status: \(status)")
                     continue
                 }
-
+                
                 var offset = 0
                 while offset < length {
                     var naluLength: UInt32 = 0
                     memcpy(&naluLength, dataPointer.advanced(by: offset), 4)
                     offset += 4
-
+                    
                     switch sampleBuffer.formatDescription?.mediaSubType {
                     case .some(.h264):
                         elementaryStream += H264NALU(data: Data(
@@ -92,25 +92,16 @@ public class TnTranscodingEncoderAdaptor: TnLoggable {
                     default:
                         break
                     }
-
+                    
                     offset += Int(naluLength.bigEndian)
                 }
-
-                for continuation in continuations.values {
-                    continuation.yield(elementaryStream)
-                }
+                
+                streamer.yield(elementaryStream)
             }
         }
     }
-    
-    public func makeStreamIterator() -> AsyncStream<Data>.Iterator {
-        let stream: AsyncStream<Data> = .init { continuation in
-            let id = UUID()
-            continuations[id] = continuation
-            continuation.onTermination = { [weak self] _ in
-                self?.continuations.removeValue(forKey: id)
-            }
-        }
-        return stream.makeAsyncIterator()
+
+    public var stream: AsyncStream<Data> {
+        streamer.stream
     }
 }

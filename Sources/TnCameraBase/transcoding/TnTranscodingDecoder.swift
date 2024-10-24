@@ -7,13 +7,12 @@
 
 import Foundation
 import VideoToolbox
-import UIKit
 import TnIosBase
 
 
 public class TnTranscodingDecoder: TnLoggable {
     private let config: TnTranscodingDecoderConfig
-    private var continuations: [UUID: AsyncStream<CMSampleBuffer>.Continuation] = [:]
+    private let streamer: TnAsyncStreamer<CMSampleBuffer>
     private var decompressionSession: VTDecompressionSession? = nil
     public private(set) var formatDescription: CMFormatDescription? = nil
     private lazy var outputQueue = DispatchQueue(
@@ -23,24 +22,11 @@ public class TnTranscodingDecoder: TnLoggable {
 
     public init(config: TnTranscodingDecoderConfig) {
         self.config = config
-        Task { [weak self] in
-            for await _ in NotificationCenter.default.notifications(
-                named: UIApplication.willEnterForegroundNotification
-            ) {
-                self?.invalidate()
-            }
-        }
+        streamer = .init()
     }
 
-    public func makeStreamIterator() -> AsyncStream<CMSampleBuffer>.Iterator {
-        let stream: AsyncStream<CMSampleBuffer> = .init { continuation in
-            let id = UUID()
-            continuations[id] = continuation
-            continuation.onTermination = { [weak self] _ in
-                self?.continuations[id] = nil
-            }
-        }
-        return stream.makeAsyncIterator()
+    public var stream: AsyncStream<CMSampleBuffer> {
+        streamer.stream
     }
 
     public func invalidate() {
@@ -65,9 +51,7 @@ public class TnTranscodingDecoder: TnLoggable {
         }        
         let sampleBufferOut = try await decompressionSession!.decodeFrame(sampleBuffer)
         outputQueue.sync {
-            for continuation in self.continuations.values {
-                continuation.yield(sampleBufferOut)
-            }
+            streamer.yield(sampleBufferOut)
         }
     }
 
