@@ -59,11 +59,8 @@ extension TnCameraProxyClient {
     
     private func decodePacket(packet: Data) {
         Task {
-            do {
-                try await videoDecoder.decode(packet: packet)
-                logDebug("video decoded")
-            } catch {
-                logError("video decode error", error)
+            try await tnDoCatchAsync(name: "decode image") {
+                try await self.videoDecoder.decode(packet: packet)
             }
         }
     }
@@ -97,19 +94,6 @@ extension TnCameraProxyClient {
                 }
             }
             
-//        case .getImageResponse:
-//            solveMsgValue(msgData: msgData) { (v: Data) in
-//                let uiImage: UIImage = .init(data: v)!
-//                logDebug("image", uiImage.size.width, uiImage.size.height, uiImage.scale)
-//
-//                let ciImage = CIImage(image: uiImage)!
-//                self.currentCiImage = ciImage
-//                
-//                if status == .started && networkImage != nil && (settings?.transporting.continuous ?? false) {
-//                    networkImage?.send(msgType: .getImage)
-//                }
-//            }
-
         case .getAlbumsResponse:
             solveMsgValue(msgData: msgData) { (v: [String]) in
                 self.albums = v
