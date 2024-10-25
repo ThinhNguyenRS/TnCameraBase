@@ -40,7 +40,10 @@ public final class TnTranscodingDecoderAdaptor {
                     let formatDescription = try CMVideoFormatDescription(h264ParameterSets: [sps, pps])
                     try decoder.setFormatDescription(formatDescription)
                 }
-                try await decodeAVCCFrame(nalu.avcc)
+                
+                if let formatDescription = decoder.formatDescription {
+                    try await decodeAVCCFrame(nalu.avcc)
+                }
             }
         }
     }
@@ -58,7 +61,9 @@ public final class TnTranscodingDecoderAdaptor {
                     let formatDescription = try CMVideoFormatDescription(hevcParameterSets: [vps, sps, pps])
                     try decoder.setFormatDescription(formatDescription)
                 }
-                try await decodeAVCCFrame(nalu.avcc)
+                if let formatDescription = decoder.formatDescription {
+                    try await decodeAVCCFrame(nalu.avcc)
+                }
             }
         }
     }
