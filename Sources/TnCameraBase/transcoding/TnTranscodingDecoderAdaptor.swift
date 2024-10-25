@@ -40,10 +40,7 @@ public final class TnTranscodingDecoderAdaptor: TnLoggable {
                     let formatDescription = try CMVideoFormatDescription(h264ParameterSets: [sps, pps])
                     try decoder.setFormatDescription(formatDescription)
                 }
-                
-                if let formatDescription = decoder.formatDescription {
-                    try await decodeAVCCFrame(nalu.avcc)
-                }
+                try await decodeAVCCFrame(nalu.avcc)
             }
         }
     }
@@ -65,16 +62,14 @@ public final class TnTranscodingDecoderAdaptor: TnLoggable {
                     let formatDescription = try CMVideoFormatDescription(hevcParameterSets: [vps, sps, pps])
                     try decoder.setFormatDescription(formatDescription)
                 }
-                if let formatDescription = decoder.formatDescription {
-                    try await decodeAVCCFrame(nalu.avcc)
-                }
+                try await decodeAVCCFrame(nalu.avcc)
             }
         }
     }
 
     private func decodeAVCCFrame(_ data: Data) async throws {
         guard let formatDescription = decoder.formatDescription else {
-            throw TnTranscodingError.general(message: "No format description")
+            throw TnTranscodingError.noFormatDescription
         }
         
         var data = data

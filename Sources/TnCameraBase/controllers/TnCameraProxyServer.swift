@@ -195,6 +195,10 @@ extension TnCameraProxyServer {
             
         case .getAlbums:
             send(msgType: .getAlbumsResponse, value: albums)
+            
+        case .invalidateVideoEncoder:
+            videoEncoder.invalidate()
+            
         default:
             return
         }

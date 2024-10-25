@@ -51,6 +51,7 @@ public enum TnTranscodingError: Error {
     case videoEncoderMVHEVCVideoLayerIDsMismatch
     case couldNotOutputTaggedBufferGroup
     
+    case noFormatDescription
     case unknown(OSStatus)
     case general(message: String, error: Error? = nil)
     

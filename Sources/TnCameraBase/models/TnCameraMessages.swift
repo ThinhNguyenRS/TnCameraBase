@@ -52,6 +52,8 @@ public enum TnCameraMessageType: UInt8, Codable {
     case setCapturing
     
     case createAlbum
+    
+    case invalidateVideoEncoder
 }
 
 // MARK: TnMessageData
