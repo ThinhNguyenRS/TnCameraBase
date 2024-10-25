@@ -101,8 +101,8 @@ extension TnCameraProxyServer {
 
         // listen image to encoding, passive just encode, async
         Task {
-            await cameraService.listenImage { [self] pixelBuffer in
-                videoEncoder.encode(pixelBuffer)
+            await cameraService.listenImage { [self] ciImage in
+                try? await videoEncoder.encode(ciImage.pixelBuffer!)
             }
         }
     }

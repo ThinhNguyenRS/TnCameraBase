@@ -12,22 +12,12 @@ import TnIosBase
 public class TnTranscodingEncoderComposite: TnLoggable {
     private let encoder: TnTranscodingEncoder
     private let adaptor: TnTranscodingEncoderAdaptor
-    
-    private let inputStreamer: TnAsyncStreamer<CVPixelBuffer>
-    
+        
     public init() {
         var config = TnTranscodingEncoderConfig.ultraLowLatency
         config.enableHardware = true
         self.encoder = TnTranscodingEncoder(config: config)
         self.adaptor = TnTranscodingEncoderAdaptor(encoder: encoder)
-        self.inputStreamer = .init(newest: 5)
-        
-        // listen the input CVPixelBuffer and send to encoder
-        Task {
-            for await pixelBuffer in inputStreamer.stream {
-                try await encoder.encode(pixelBuffer)
-            }
-        }
     }
     
     @discardableResult
@@ -39,11 +29,8 @@ public class TnTranscodingEncoderComposite: TnLoggable {
         }
     }
 
-    public func encode(_ pixelBuffer: CVPixelBuffer) {
-        // just queue to the stream
-        Task {
-            inputStreamer.yield(pixelBuffer)
-        }
+    public func encode(_ pixelBuffer: CVPixelBuffer) async throws {
+        try await encoder.encode(pixelBuffer)
     }
     
     public func invalidate() {

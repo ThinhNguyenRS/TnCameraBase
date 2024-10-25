@@ -601,15 +601,15 @@ extension TnCameraService {
         self.currentCiImage = ciImage
     }
     
-    public func listenImage(handler: @escaping (CIImage) async throws -> Void ) async throws {
-        for await ciImage in $currentCiImage.filter({ $0 != nil && self.status == .started }).values {
-            try await handler(ciImage!)
+    public func listenImage(handler: @escaping (CIImage) async throws -> Void ) async {
+        for await ciImage in $currentCiImage.filter({ self.status == .started && $0?.pixelBuffer != nil }).values {
+            try? await handler(ciImage!)
         }
     }
     
-    public func listenImage(handler: @escaping (CVPixelBuffer) -> Void ) async {
+    public func listenImage(handler: @escaping (CIImage) -> Void ) async {
         for await ciImage in $currentCiImage.filter({ self.status == .started && $0?.pixelBuffer != nil }).values {
-            handler(ciImage!.pixelBuffer!)
+            handler(ciImage!)
         }
     }
 }
