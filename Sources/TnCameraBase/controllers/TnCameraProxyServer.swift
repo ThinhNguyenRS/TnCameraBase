@@ -116,6 +116,18 @@ extension TnCameraProxyServer {
     }
 }
 
+// MARK: listen data
+@available(iOS 17.0, *)
+extension TnCameraProxyServer {
+    private func listenCommon(connection: TnNetworkConnection) {
+        Task {
+            for await data in connection.receiveStream.stream {
+                solveData(data: data)
+            }
+        }
+    }
+}
+
 // MARK: solve messages
 @available(iOS 17.0, *)
 extension TnCameraProxyServer {
@@ -420,5 +432,8 @@ extension TnCameraProxyServer: TnNetworkDelegateServer {
     }
 
     public func tnNetworkAccepted(_ server: TnNetworkServer, connection: TnNetworkConnection) {
+        if connection.name == "common" {
+            listenCommon(connection: connection)
+        }
     }
 }
