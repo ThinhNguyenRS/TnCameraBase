@@ -69,11 +69,19 @@ extension TnCameraProxyServer {
                 statusHandler: { [self] status in
                     logDebug("status changed", status)
                     self.status = status
+                    
+                    // send status
+                    self.send(msgType: .getSettingsResponse, value: TnCameraSettingsValue(settings: nil, status: status, network: nil))
+
                     delegate?.tnCamera(self, status: status)
                 },
                 settingsHandler: { [self] settings in
                     logDebug("settings changed")
                     self.settings = settings
+                    
+                    // send settings
+                    self.send(msgType: .getSettingsResponse, value: TnCameraSettingsValue(settings: settings, status: nil, network: nil))
+
                     delegate?.tnCamera(self, settings: settings)
                 }
             )
@@ -92,8 +100,9 @@ extension TnCameraProxyServer {
         // listen encoding packet
         videoEncoder.listen(packetHandler: { [self] packet in
             if canEncoding {
-                try await networkStreaming?.send(data: packet)
-//                logDebug("video sent encoded")
+                try await tnDoCatchAsync(name: "send encoded packet") { [self] in
+                    try await networkStreaming?.send(data: packet)
+                }
             }
         })
 
@@ -101,11 +110,8 @@ extension TnCameraProxyServer {
         Task {
             try await cameraService.listenImage { [self] ciImage in
                 if canEncoding {
-                    do {
+                    try await tnDoCatchAsync(name: "encode image") { [self] in
                         try await videoEncoder.encode(ciImage)
-//                        logDebug("video encoded")
-                    } catch {
-                        logError("video encoded error", error)
                     }
                 }
             }
@@ -222,18 +228,18 @@ extension TnCameraProxyServer: TnBluetoothServerDelegate {
     }
 }
 
-// MARK: TnTransportableProtocol
+// MARK: transportable
 @available(iOS 17.0, *)
-extension TnCameraProxyServer: TnTransportableProtocol {
-    public var decoder: TnDecoder {
+extension TnCameraProxyServer {
+    var decoder: TnDecoder {
         ble.decoder
     }
     
-    public var encoder: TnEncoder {
+    var encoder: TnEncoder {
         ble.encoder
     }
     
-    public func send(data: Data) async throws {
+    func send(data: Data) {
         if let networkCommon {
             Task {
                 try await networkCommon.send(data: data)
@@ -242,11 +248,27 @@ extension TnCameraProxyServer: TnTransportableProtocol {
             ble.send(data: data)
         }
     }
+    
+    func send(msgType: TnCameraMessageType) {
+        self.send(data: msgType.rawValue.toData())
+    }
+
+    func send<TMessageValue: Codable>(msgType: TnCameraMessageType, value: TMessageValue) {
+        if let data = try? TnMessageValue.from(msgType, value).toData(encoder: encoder) {
+            self.send(data: data)
+        }
+    }
+    
+    func solveMsgValue<TMessageValue: Codable>(msgData: TnMessageData, handler: (TMessageValue) -> Void) {
+        if let msg: TnMessageValue<TMessageValue> = msgData.toObject(decoder: decoder) {
+            handler(msg.value)
+        }
+    }
 }
 
 // MARK: TnCameraProxyProtocol
 @available(iOS 17.0, *)
-extension TnCameraProxyServer: TnCameraProxyProtocol {
+extension TnCameraProxyServer: TnCameraProtocol {
     public func setup() {
         ble.setupBle()
     }

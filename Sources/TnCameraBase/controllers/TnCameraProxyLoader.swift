@@ -11,10 +11,10 @@ import CoreData
 
 public struct TnCameraProxyParams {
     public let master: Bool
-    public let cameraProxy: TnCameraProxyProtocol
+    public let cameraProxy: TnCameraProtocol
     public let cameraSettingsID: NSManagedObjectID?
     
-    init(master: Bool, cameraProxy: TnCameraProxyProtocol, cameraSettingsID: NSManagedObjectID?) {
+    init(master: Bool, cameraProxy: TnCameraProtocol, cameraSettingsID: NSManagedObjectID?) {
         self.master = master
         self.cameraProxy = cameraProxy
         self.cameraSettingsID = cameraSettingsID

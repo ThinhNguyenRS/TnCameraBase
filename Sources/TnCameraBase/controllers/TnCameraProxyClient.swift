@@ -120,12 +120,16 @@ extension TnCameraProxyClient {
     }
 }
 
-// MARK: CameraManagerProxyProtocol
+// MARK: TnCameraProtocol
 extension TnCameraProxyClient: TnCameraProtocol {
     public var currentCiImagePublisher: Published<CIImage?>.Publisher {
         $currentCiImage
     }
     
+    public func setup() {
+        ble.setupBle()
+    }
+
     public func startCapturing() {
         send(msgType: .startCapturing)
     }
@@ -210,31 +214,40 @@ extension TnCameraProxyClient: TnCameraProtocol {
     }
 }
 
-// MARK: TnCameraProxyProtocol
-extension TnCameraProxyClient: TnCameraProxyProtocol {
-    public var encoder: TnEncoder {
+// MARK: transportable
+extension TnCameraProxyClient {
+    var encoder: TnEncoder {
         ble.encoder
     }
     
-    public var decoder: TnDecoder {
+    var decoder: TnDecoder {
         ble.decoder
     }
     
-    public func setup() {
-        ble.setupBle()
-    }
-    
-    public func send(data: Data) async throws {
-        Task { [self] in
-            if networkCommon == nil {
-                ble.send(data: data)
-            } else {
-                try? await networkCommon?.send(data: data)
+    func send(data: Data) {
+        if networkCommon == nil {
+            ble.send(data: data)
+        } else {
+            Task {
+                try await networkCommon?.send(data: data)
             }
         }
     }
 
-    public func sendImage() {
+    func send(msgType: TnCameraMessageType) {
+        self.send(data: msgType.rawValue.toData())
+    }
+
+    func send<TMessageValue: Codable>(msgType: TnCameraMessageType, value: TMessageValue) {
+        if let data = try? TnMessageValue.from(msgType, value).toData(encoder: encoder) {
+            self.send(data: data)
+        }
+    }
+    
+    func solveMsgValue<TMessageValue: Codable>(msgData: TnMessageData, handler: (TMessageValue) -> Void) {
+        if let msg: TnMessageValue<TMessageValue> = msgData.toObject(decoder: decoder) {
+            handler(msg.value)
+        }
     }
 }
 

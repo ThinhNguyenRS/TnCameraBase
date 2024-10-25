@@ -13,7 +13,7 @@ import CoreData
 var globalCamera: TnCameraProxyParams!
 
 extension View {
-    var cameraProxy: TnCameraProxyProtocol {
+    var cameraProxy: TnCameraProtocol {
         get {
             globalCamera.cameraProxy
         }

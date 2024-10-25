@@ -73,30 +73,25 @@ public struct TnCameraAppView: View, TnLoggable {
 }
 
 extension TnCameraAppView: TnCameraDelegate {
-    public func tnCamera(_ cameraProxy: TnCameraProxyProtocol, captured: TnCameraPhotoOutput) {
+    public func tnCamera(_ cameraProxy: TnCameraProtocol, captured: TnCameraPhotoOutput) {
         DispatchQueue.main.async {
             capturedImage = UIImage(data: captured.photoData)
         }
         delegate?.tnCamera(cameraProxy, captured: captured)
     }
     
-    public func tnCamera(_ cameraProxy: TnCameraProxyProtocol, status: TnCameraStatus) {
+    public func tnCamera(_ cameraProxy: TnCameraProtocol, status: TnCameraStatus) {
         guard self.status != status else { return }
         
         DispatchQueue.main.async {
             logDebug("status changed", status)
             self.status = status
         }
-        
-        if master {
-            logDebug("send status")
-            cameraProxy.send(msgType: .getSettingsResponse, value: TnCameraSettingsValue(settings: nil, status: status, network: nil))
-        }
 
         delegate?.tnCamera(cameraProxy, status: status)
     }
     
-    public func tnCamera(_ cameraProxy: TnCameraProxyProtocol, settings: TnCameraSettings) {
+    public func tnCamera(_ cameraProxy: TnCameraProtocol, settings: TnCameraSettings) {
         DispatchQueue.main.async {
             logDebug("settings changed")
             self.settings = settings
@@ -104,9 +99,6 @@ extension TnCameraAppView: TnCameraDelegate {
         
         if master {
             Task {
-                logDebug("send settings")
-                cameraProxy.send(msgType: .getSettingsResponse, value: TnCameraSettingsValue(settings: settings, status: nil, network: nil))
-                
                 try? TnCameraProxyLoader.shared.saveSettings(settings)
             }
         }
@@ -114,7 +106,7 @@ extension TnCameraAppView: TnCameraDelegate {
         delegate?.tnCamera(cameraProxy, settings: settings)
     }
     
-    public func tnCamera(_ cameraProxy: TnCameraProxyProtocol, output: CIImage?) {
+    public func tnCamera(_ cameraProxy: TnCameraProtocol, output: CIImage?) {
         delegate?.tnCamera(cameraProxy, output: output)
     }
 }

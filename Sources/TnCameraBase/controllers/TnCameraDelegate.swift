@@ -10,8 +10,8 @@ import CoreImage
 
 // MARK: TnCameraDelegate
 public protocol TnCameraDelegate {
-    func tnCamera(_ cameraProxy: TnCameraProxyProtocol, captured: TnCameraPhotoOutput)
-    func tnCamera(_ cameraProxy: TnCameraProxyProtocol, status: TnCameraStatus)
-    func tnCamera(_ cameraProxy: TnCameraProxyProtocol, settings: TnCameraSettings)
-    func tnCamera(_ cameraProxy: TnCameraProxyProtocol, output: CIImage?)
+    func tnCamera(_ cameraProxy: TnCameraProtocol, captured: TnCameraPhotoOutput)
+    func tnCamera(_ cameraProxy: TnCameraProtocol, status: TnCameraStatus)
+    func tnCamera(_ cameraProxy: TnCameraProtocol, settings: TnCameraSettings)
+    func tnCamera(_ cameraProxy: TnCameraProtocol, output: CIImage?)
 }

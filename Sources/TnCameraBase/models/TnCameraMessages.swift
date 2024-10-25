@@ -61,34 +61,6 @@ extension TnMessageData {
     }
 }
 
-// MARK: TnTransportableProtocol
-extension TnTransportableProtocol {
-    public func send(msgType: TnCameraMessageType) {
-        Task {
-            try await self.send(typeCode: msgType.rawValue)
-        }
-    }
-
-    public func send<T: Codable>(msgType: TnCameraMessageType, value: T) {
-        Task {
-            try await self.send(typeCode: msgType.rawValue, value: value)
-        }
-    }
-    
-    public func solveMsgValue<TMessageValue: Codable>(msgData: TnMessageData, handler: (TMessageValue) -> Void) {
-        if let msg: TnMessageValue<TMessageValue> = msgData.toObject(decoder: decoder) {
-            handler(msg.value)
-        }
-    }
-}
-
-// MARK: TnMessageValue
-extension TnMessageValue {
-    public init(_ messageType: TnCameraMessageType, _ value: T) {
-        self.init(messageType.rawValue, value)
-    }
-}
-
 // MARK: TnCameraZoomFactorValue
 public struct TnCameraZoomFactorValue: Codable {
     public let value: CGFloat
