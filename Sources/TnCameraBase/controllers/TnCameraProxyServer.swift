@@ -17,9 +17,6 @@ public class TnCameraProxyServer: TnLoggable {
     private let cameraService: TnCameraService
     
     private let network: TnNetworkServer
-    private var networkCommon: TnNetworkConnection? = nil
-    private var networkStreaming: TnNetworkConnection? = nil
-
     private let ble: TnBluetoothServer
     
     private var status: TnCameraStatus = .none
@@ -93,7 +90,7 @@ extension TnCameraProxyServer {
 @available(iOS 17.0, *)
 extension TnCameraProxyServer {
     private var canEncoding: Bool {
-        status == .started && networkStreaming != nil
+        status == .started
     }
     
     private func listenEncoding() {
@@ -101,7 +98,7 @@ extension TnCameraProxyServer {
         videoEncoder.listen(packetHandler: { [self] packet in
             if canEncoding {
                 try await tnDoCatchAsync(name: "send encoded packet") { [self] in
-                    try await networkStreaming?.send(data: packet)
+                    try await network.send(data: packet, to: ["streaming"])
                 }
             }
         })
@@ -240,9 +237,9 @@ extension TnCameraProxyServer {
     }
     
     func send(data: Data) {
-        if let networkCommon {
+        if network.hasConnection(name: "common") {
             Task {
-                try await networkCommon.send(data: data)
+                try await network.send(data: data, to: ["common"])
             }
         } else if data.count < 2000 {
             ble.send(data: data)
@@ -416,18 +413,8 @@ extension TnCameraProxyServer: TnNetworkDelegateServer {
     }
 
     public func tnNetworkDisconnected(_ server: TnNetworkServer, connection: TnNetworkConnection, error: Error?) {
-        if connection.name == "streaming" {
-            networkStreaming = nil
-        } else if connection.name == "common" {
-            networkCommon = nil
-        }
     }
 
     public func tnNetworkAccepted(_ server: TnNetworkServer, connection: TnNetworkConnection) {
-        if connection.name == "streaming" {
-            networkStreaming = connection
-        } else if connection.name == "common" {
-            networkCommon = connection
-        }
     }
 }
