@@ -146,7 +146,8 @@ extension TnCameraProxyServer {
         case .getSettings:
             // response settings
             send(msgType: .getSettingsResponse,
-                 value: TnCameraSettingsValue(settings: settings, status: status, network: network.hostInfo)
+                 value: TnCameraSettingsValue(settings: settings, status: status, network: network.hostInfo),
+                 useBle: true
             )
 
 //        case .getImage:
@@ -244,23 +245,23 @@ extension TnCameraProxyServer {
         ble.encoder
     }
     
-    func send(data: Data) {
-        if network.hasConnection(name: "common") {
+    func send(data: Data, useBle: Bool = false) {
+        if (useBle || !network.hasConnection(name: "common")) && data.count < 2000 {
+            ble.send(data: data)
+        } else {
             Task {
                 try await network.send(data: data, to: ["common"])
             }
-        } else if data.count < 2000 {
-            ble.send(data: data)
         }
     }
     
-    func send(msgType: TnCameraMessageType) {
-        self.send(data: msgType.rawValue.toData())
+    func send(msgType: TnCameraMessageType, useBle: Bool = false) {
+        self.send(data: msgType.rawValue.toData(), useBle: useBle)
     }
 
-    func send<TMessageValue: Codable>(msgType: TnCameraMessageType, value: TMessageValue) {
+    func send<TMessageValue: Codable>(msgType: TnCameraMessageType, value: TMessageValue, useBle: Bool = false) {
         if let data = try? TnMessageValue.from(msgType, value).toData(encoder: encoder) {
-            self.send(data: data)
+            self.send(data: data, useBle: useBle)
         }
     }
     
