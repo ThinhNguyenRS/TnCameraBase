@@ -294,6 +294,7 @@ extension TnCameraProxyClient {
     
     private func listenStreaming() {
         guard let stream = networkStreaming?.receiveStream.stream else { return }
+        send(msgType: .invalidateVideoEncoder)        
         Task {
             for await data in stream {
                 self.decodePacket(packet: data)
