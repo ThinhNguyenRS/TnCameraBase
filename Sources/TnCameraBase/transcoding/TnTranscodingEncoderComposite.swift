@@ -39,12 +39,10 @@ public class TnTranscodingEncoderComposite: TnLoggable {
         }
     }
 
-    public func encode(_ ciImage: CIImage?) {
+    public func encode(_ pixelBuffer: CVPixelBuffer) {
         // just queue to the stream
-        if let pixelBuffer = ciImage?.pixelBuffer {
-            Task {
-                inputStreamer.yield(pixelBuffer)
-            }
+        Task {
+            inputStreamer.yield(pixelBuffer)
         }
     }
     
