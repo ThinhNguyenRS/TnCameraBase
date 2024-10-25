@@ -596,14 +596,20 @@ extension TnCameraService {
         guard let currentCiImage, status == .started, !isSettingsChanging else { return nil }
         return currentCiImage.jpegData(scale: settings.transporting.scale, compressionQuality: settings.transporting.compressQuality)
     }
-
+    
     private func setImage(_ ciImage: CIImage) async {
         self.currentCiImage = ciImage
     }
     
     public func listenImage(handler: @escaping (CIImage) async throws -> Void ) async throws {
-        for await ciImage in $currentCiImage.filter({ $0 != nil}).values {
+        for await ciImage in $currentCiImage.filter({ $0 != nil && self.status == .started }).values {
             try await handler(ciImage!)
+        }
+    }
+    
+    public func listenImage(handler: @escaping (CIImage) -> Void ) async {
+        for await ciImage in $currentCiImage.filter({ $0 != nil && self.status == .started }).values {
+            handler(ciImage!)
         }
     }
 }
