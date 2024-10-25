@@ -13,15 +13,16 @@ public class TnTranscodingEncoder: TnLoggable {
     private var compressionSession: VTCompressionSession? = nil
     private var outputSize: CGSize? = nil
     private let config: TnTranscodingEncoderConfig
-    private let streamer: TnAsyncStreamer<CMSampleBuffer>
+    
+    private let imageStreamer: TnAsyncStreamer<CMSampleBuffer>
 
     public init(config: TnTranscodingEncoderConfig) {
         self.config = config
-        streamer = .init()
+        imageStreamer = .init()
     }
 
-    public var stream: AsyncStream<CMSampleBuffer> {
-        streamer.stream
+    public var imageStream: AsyncStream<CMSampleBuffer> {
+        imageStreamer.stream
     }
 
     public func invalidate() {
@@ -66,7 +67,7 @@ public class TnTranscodingEncoder: TnLoggable {
         }
         
         if let sampleBuffer = try await compressionSession.encodeFrame(pixelBuffer, presentationTimeStamp: presentationTimeStamp, duration: duration) {
-            streamer.yield(sampleBuffer)
+            imageStreamer.yield(sampleBuffer)
         }
     }
     

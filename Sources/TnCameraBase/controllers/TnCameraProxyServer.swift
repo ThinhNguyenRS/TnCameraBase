@@ -96,21 +96,13 @@ extension TnCameraProxyServer {
     private func listenEncoding() {
         // listen encoding packet
         videoEncoder.listen(packetHandler: { [self] packet in
-            if canEncoding {
-                try await tnDoCatchAsync(name: "send encoded packet") { [self] in
-                    try? await network.send(data: packet, to: ["streaming"])
-                }
-            }
+            try? await network.send(data: packet, to: ["streaming"])
         })
 
         // listen image to encoding, passive just encode, async
         Task {
             try await cameraService.listenImage { [self] ciImage in
-                if canEncoding {
-                    try await tnDoCatchAsync(name: "encode image") { [self] in
-                        try? await videoEncoder.encode(ciImage)
-                    }
-                }
+                try? await videoEncoder.encode(ciImage)
             }
         }
     }

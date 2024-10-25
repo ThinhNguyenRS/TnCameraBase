@@ -9,24 +9,19 @@ import Foundation
 import VideoToolbox
 import TnIosBase
 
-
 public class TnTranscodingDecoder: TnLoggable {
     private let config: TnTranscodingDecoderConfig
-    private let streamer: TnAsyncStreamer<CMSampleBuffer>
+    private let imageStreamer: TnAsyncStreamer<CVImageBuffer>
     private var decompressionSession: VTDecompressionSession? = nil
     public private(set) var formatDescription: CMFormatDescription? = nil
-    private lazy var outputQueue = DispatchQueue(
-        label: "\(String(describing: Self.self)).output",
-        qos: .userInitiated
-    )
 
     public init(config: TnTranscodingDecoderConfig) {
         self.config = config
-        streamer = .init()
+        imageStreamer = .init(newest: 5)
     }
 
-    public var stream: AsyncStream<CMSampleBuffer> {
-        streamer.stream
+    public var imageStream: AsyncStream<CVImageBuffer> {
+        imageStreamer.stream
     }
 
     public func invalidate() {
@@ -50,14 +45,14 @@ public class TnTranscodingDecoder: TnLoggable {
             decompressionSession = try createDecompressionSession()
         }        
         let sampleBufferOut = try await decompressionSession!.decodeFrame(sampleBuffer)
-        outputQueue.sync {
-            streamer.yield(sampleBufferOut)
+        if let imageBuffer = sampleBufferOut.imageBuffer {
+            imageStreamer.yield(imageBuffer)
         }
     }
 
     private func createDecompressionSession() throws -> VTDecompressionSession {
         guard let formatDescription else {
-            throw TnTranscodingError.general(message: "Format description is nil")
+            throw TnTranscodingError.noFormatDescription
         }
         let session = try VTDecompressionSession.create(
             formatDescription: formatDescription,

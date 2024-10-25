@@ -11,13 +11,13 @@ import TnIosBase
 
 public class TnTranscodingEncoderAdaptor: TnLoggable {
     private let encoder: TnTranscodingEncoder
-    private let streamer: TnAsyncStreamer<Data> = .init()
+    private let packetStreamer: TnAsyncStreamer<Data> = .init()
     
     public init(encoder: TnTranscodingEncoder) {
         self.encoder = encoder
         
         Task { [weak self] in
-            for await sampleBuffer in encoder.stream {
+            for await sampleBuffer in encoder.imageStream {
                 guard let self else { return }
                 let sampleAttachments = CMSampleBufferGetSampleAttachmentsArray(
                     sampleBuffer,
@@ -96,12 +96,12 @@ public class TnTranscodingEncoderAdaptor: TnLoggable {
                     offset += Int(naluLength.bigEndian)
                 }
                 
-                streamer.yield(elementaryStream)
+                packetStreamer.yield(elementaryStream)
             }
         }
     }
 
-    public var stream: AsyncStream<Data> {
-        streamer.stream
+    public var packetStream: AsyncStream<Data> {
+        packetStreamer.stream
     }
 }

@@ -22,11 +22,9 @@ public class TnTranscodingDecoderComposite: TnLoggable {
     @discardableResult
     public func listen(sampleHandler: @escaping TnTranscodingImageHandler) -> Task<Void, Error> {
         Task { [self] in
-            for await sampleBuffer in decoder.stream {
-                if let imageBuffer = sampleBuffer.imageBuffer {
-                    let ciImage = CIImage(cvImageBuffer: imageBuffer)
-                    await sampleHandler(ciImage)
-                }
+            for await imageBuffer in decoder.imageStream {
+                let ciImage = CIImage(cvImageBuffer: imageBuffer)
+                await sampleHandler(ciImage)
             }
         }
     }
