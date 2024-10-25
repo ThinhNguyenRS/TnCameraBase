@@ -49,15 +49,15 @@ public final class TnTranscodingDecoderAdaptor: TnLoggable {
         for nalu in data.split(separator: HEVCNALU.startCode).map({ HEVCNALU(data: Data($0)) }) {
             if nalu.isVPS {
                 vps = nalu.data
-                logDebug("got vps")
+//                logDebug("got vps")
             } else if nalu.isSPS {
                 sps = nalu.data
-                logDebug("got sps")
+//                logDebug("got sps")
             } else if nalu.isPPS {
                 pps = nalu.data
-                logDebug("got pps")
+//                logDebug("got pps")
             } else if nalu.isPFrame || nalu.isIFrame {
-                logDebug("got iframe/pframe")
+//                logDebug("got iframe/pframe")
                 if nalu.isIFrame, let vps, let sps, let pps {
                     let formatDescription = try CMVideoFormatDescription(hevcParameterSets: [vps, sps, pps])
                     try decoder.setFormatDescription(formatDescription)
