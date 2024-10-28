@@ -97,7 +97,7 @@ public class TnTranscodingEncoderAdaptor: TnLoggable {
                 }
                 
                 packetStreamer.yield(elementaryStream)
-                logDebug("yield packet")
+//                logDebug("yield packet")
             }
         }
     }
