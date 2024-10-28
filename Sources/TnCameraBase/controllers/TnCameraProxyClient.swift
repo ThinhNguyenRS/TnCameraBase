@@ -65,6 +65,7 @@ extension TnCameraProxyClient {
         Task {
             for await packet in stream {
                 do {
+                    logDebug("got packet, decode it")
                     try await self.videoDecoder.decode(packet: packet)
                 } catch {
                     self.send(msgType: .invalidateVideoEncoder)

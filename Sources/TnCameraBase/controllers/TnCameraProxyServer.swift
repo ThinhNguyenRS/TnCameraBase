@@ -100,6 +100,7 @@ extension TnCameraProxyServer {
         // listen encoding packet
         logDebug("listen encoded image ...")
         videoEncoder.listen(packetHandler: { [self] packet in
+            logDebug("got packet, send it")
             try? await network.send(data: packet, to: ["streaming"])
         })
 
