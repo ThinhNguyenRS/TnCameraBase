@@ -101,14 +101,12 @@ extension TnCameraProxyServer {
 
         logDebug("listen image and encode to packet ...")
         Task {
-            await cameraService.listenImage { [self] ciImage in
-                Task.detached { [self] in
-                    do {
-                        try await videoEncoder.encode(ciImage.pixelBuffer!)
-                    } catch {
-                        logDebug("encode image to packet error", error)
-                        videoEncoder.invalidate()
-                    }
+            try await cameraService.listenImage { [self] ciImage in
+                do {
+                    try await videoEncoder.encode(ciImage.pixelBuffer!)
+                } catch {
+                    logDebug("encode image to packet error", error)
+                    videoEncoder.invalidate()
                 }
             }
         }
