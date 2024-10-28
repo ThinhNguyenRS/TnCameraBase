@@ -26,6 +26,7 @@ public class TnTranscodingEncoderComposite: TnLoggable {
                 logDebug("process packet ...")
                 try await packetHandler(packet)
             }
+            logDebug("listen packet !")
         }
     }
 
