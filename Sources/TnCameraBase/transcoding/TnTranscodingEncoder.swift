@@ -18,7 +18,7 @@ public class TnTranscodingEncoder: TnLoggable {
 
     public init(config: TnTranscodingEncoderConfig) {
         self.config = config
-        imageStreamer = .init(newest: 10)
+        imageStreamer = .init()
     }
 
     public var imageStream: AsyncStream<CMSampleBuffer> {
