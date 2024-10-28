@@ -126,14 +126,11 @@ extension VTCompressionSession {
                 frameProperties: nil,
                 infoFlagsOut: &infoFlagsOut,
                 outputHandler: { status, _, sampleBuffer in
-                    if let error = TnTranscodingError(status: status) {
-                        continuation.resume(throwing: error)
-                    } else {
+                    if status == noErr {
                         continuation.resume(returning: sampleBuffer)
                     }
                 }
             )
-            
             if let error = TnTranscodingError(status: status) {
                 continuation.resume(throwing: error)
             }
