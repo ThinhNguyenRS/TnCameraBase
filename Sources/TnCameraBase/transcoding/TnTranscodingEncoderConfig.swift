@@ -102,11 +102,11 @@ extension TnTranscodingEncoderConfig {
     /// Ultra-low-latency conferencing and cloud gaming (cases where every millisecond counts).
     /// Also set expectedFrameRate to real-time frame rate if possible
     public static let `default` = Self(
-        codecType: .hevc,
-        realTime: true,
-        maximizePowerEfficiency: true,
-        prioritizeSpeed: true,
-        enableLowLatencyRateControl: true
+        codecType: .hevc
+//        realTime: true,
+//        maximizePowerEfficiency: true,
+//        prioritizeSpeed: true,
+//        enableLowLatencyRateControl: true
     )
 }
 
