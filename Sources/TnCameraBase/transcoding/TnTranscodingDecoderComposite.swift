@@ -14,8 +14,8 @@ public class TnTranscodingDecoderComposite: TnLoggable {
     private let decoder: TnTranscodingDecoder
     private let adaptor: TnTranscodingDecoderAdaptor
 
-    public init() {
-        self.decoder = TnTranscodingDecoder(config: .init(/*realTime: true, */ /*enableHardware: true*/))
+    public init(config: TnTranscodingDecoderConfig) {
+        self.decoder = TnTranscodingDecoder(config: config)
         self.adaptor = TnTranscodingDecoderAdaptor(decoder: decoder, isH264: false)
     }
     

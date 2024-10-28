@@ -26,7 +26,7 @@ public class TnCameraProxyClient: NSObject, ObservableObject, TnLoggable {
     private var settings: TnCameraSettings? = nil
     private var status: TnCameraStatus = .none
     
-    private let videoDecoder = TnTranscodingDecoderComposite()
+    private var videoDecoder: TnTranscodingDecoderComposite = .init(config: .default)
     
     public init(bleInfo: TnNetworkBleInfo, transportingInfo: TnNetworkTransportingInfo) {
         self.transportingInfo = transportingInfo
@@ -64,6 +64,16 @@ extension TnCameraProxyClient {
                 } catch {
                     self.send(msgType: .invalidateVideoEncoder)
                 }
+            }
+        }
+    }
+    
+    private func listenStreaming() {
+        guard let stream = networkStreaming?.receiveStream.stream else { return }
+        send(msgType: .invalidateVideoEncoder)
+        Task {
+            for await data in stream {
+                self.decodePacket(packet: data)
             }
         }
     }
@@ -288,16 +298,6 @@ extension TnCameraProxyClient {
         Task {
             for await data in stream {
                 self.solveMsg(data: data)
-            }
-        }
-    }
-    
-    private func listenStreaming() {
-        guard let stream = networkStreaming?.receiveStream.stream else { return }
-        send(msgType: .invalidateVideoEncoder)        
-        Task {
-            for await data in stream {
-                self.decodePacket(packet: data)
             }
         }
     }

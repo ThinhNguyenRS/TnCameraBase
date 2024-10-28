@@ -12,10 +12,8 @@ import TnIosBase
 public class TnTranscodingEncoderComposite: TnLoggable {
     private let encoder: TnTranscodingEncoder
     private let adaptor: TnTranscodingEncoderAdaptor
-        
-    public init() {
-        var config = TnTranscodingEncoderConfig.ultraLowLatency
-        config.enableHardware = true
+
+    public init(config: TnTranscodingEncoderConfig) {
         self.encoder = TnTranscodingEncoder(config: config)
         self.adaptor = TnTranscodingEncoderAdaptor(encoder: encoder)
     }

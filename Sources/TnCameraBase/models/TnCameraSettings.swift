@@ -27,7 +27,7 @@ public struct TnCameraSettings: Codable, TnLoggable {
     public var presets: [AVCaptureSession.Preset] = [.photo, .hd4K3840x2160]
     public var preset: AVCaptureSession.Preset = .hd4K3840x2160
     public var cameraPosition: AVCaptureDevice.Position = .back
-
+    
     public var cameraType: AVCaptureDevice.DeviceType = .builtInTripleCamera /*.builtInWideAngleCamera*/ /*.builtInUltraWideCamera*/
     public var cameraTypes: [AVCaptureDevice.DeviceType] = []
     
@@ -62,7 +62,7 @@ public struct TnCameraSettings: Codable, TnLoggable {
     public var exposureDurationRange: ClosedRange<Double> = .zero ... .zero
     public var isoSupported = false
     public var isoRange: ClosedRange<Float> = 0...0
-
+    
     public var exposure: TnCameraExposureValue = .init()
     
     
@@ -84,5 +84,14 @@ public struct TnCameraSettings: Codable, TnLoggable {
     public var transporting: TnCameraTransportingValue = .init()
     
     public var capturing: TnCameraCapturingValue = .init()
+    
+    public var videoEncoderConfig: TnTranscodingEncoderConfig = .init(
+        codecType: .hevc,
+        realTime: true, maximizePowerEfficiency: true, enableLowLatencyRateControl: true
+    )
+    
+    public var videoDecoderConfig: TnTranscodingDecoderConfig = .init(
+        realTime: true, maximizePowerEfficiency: true
+    )
 }
 

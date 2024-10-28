@@ -74,7 +74,7 @@ public class TnTranscodingEncoder: TnLoggable {
     private func createCompressionSession() throws -> VTCompressionSession {
         let session = try VTCompressionSession.create(
             size: outputSize!,
-            codecType: config.codecType,
+            codecType: config.codecType.toCodecType(),
             encoderSpecification: config.encoderSpecification
         )
         config.apply(to: session)

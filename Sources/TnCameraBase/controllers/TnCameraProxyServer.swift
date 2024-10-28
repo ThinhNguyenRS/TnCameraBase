@@ -25,16 +25,16 @@ public class TnCameraProxyServer: TnLoggable {
     public private(set) var albums: [String] = []
 
     public var delegate: TnCameraDelegate? = nil
-    private let videoEncoder: TnTranscodingEncoderComposite = TnTranscodingEncoderComposite()
+    private var videoEncoder: TnTranscodingEncoderComposite = .init(config: .default)
 
     public init(_ cameraService: TnCameraService, bleInfo: TnNetworkBleInfo, transportingInfo: TnNetworkTransportingInfo) {
         self.cameraService = cameraService
         self.ble = .init(bleInfo: bleInfo, transportingInfo: transportingInfo)
-        guard let address = TnNetworkHelper.getAddressList(for: [.wifi, .cellularBridge, .cellular]).first else {
+
+        guard let ipAddress = TnNetworkHelper.getAddressList(for: [.wifi, .cellularBridge, .cellular]).first else {
             fatalError("Cannot start without network")
         }
-        
-        self.network = .init(hostInfo: .init(host: address.address, port: 1234), delegate: nil, transportingInfo: transportingInfo)
+        self.network = .init(hostInfo: .init(host: ipAddress.address, port: 1234), delegate: nil, transportingInfo: transportingInfo)
         self.network.delegate = self
         self.network.start()
                 
@@ -75,6 +75,9 @@ extension TnCameraProxyServer {
                 settingsHandler: { [self] settings in
                     logDebug("settings changed")
                     self.settings = settings
+                    
+                    
+                    videoEncoder = TnTranscodingEncoderComposite(config: settings.videoEncoderConfig)
                     
                     // send settings
                     self.send(msgType: .getSettingsResponse, value: TnCameraSettingsValue(settings: settings, status: nil, network: nil))
