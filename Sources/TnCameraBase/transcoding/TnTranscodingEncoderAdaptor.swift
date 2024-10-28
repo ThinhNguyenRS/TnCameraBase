@@ -96,6 +96,7 @@ public class TnTranscodingEncoderAdaptor: TnLoggable {
                     offset += Int(naluLength.bigEndian)
                 }
                 
+                logDebug("yield packet")
                 packetStreamer.yield(elementaryStream)
             }
         }
