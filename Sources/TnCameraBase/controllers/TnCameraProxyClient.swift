@@ -26,7 +26,7 @@ public class TnCameraProxyClient: NSObject, ObservableObject, TnLoggable {
     private var settings: TnCameraSettings? = nil
     private var status: TnCameraStatus = .none
     
-    private var videoDecoder: TnTranscodingDecoderComposite = .init(config: .default)
+    private let videoDecoder: TnTranscodingDecoderComposite = .init(config: .default)
     
     public init(bleInfo: TnNetworkBleInfo, transportingInfo: TnNetworkTransportingInfo) {
         self.transportingInfo = transportingInfo
@@ -59,10 +59,11 @@ extension TnCameraProxyClient {
     
     private func listenStreaming() {
         guard let stream = networkStreaming?.receiveStream.stream else { return }
-        logDebug("listen packet stream ...")
-
         send(msgType: .invalidateVideoEncoder)
+
         Task {
+            logDebug("listen packet stream ...")
+            
             for await packet in stream {
                 do {
                     logDebug("decode packet ...")
@@ -72,6 +73,8 @@ extension TnCameraProxyClient {
                     self.send(msgType: .invalidateVideoEncoder)
                 }
             }
+            
+            logDebug("listen packet stream !")
         }
     }
 }
