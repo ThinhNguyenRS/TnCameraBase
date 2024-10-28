@@ -68,6 +68,7 @@ public class TnTranscodingEncoder: TnLoggable {
         
         if let sampleBuffer = try await compressionSession.encodeFrame(pixelBuffer, presentationTimeStamp: presentationTimeStamp, duration: duration) {
             imageStreamer.yield(sampleBuffer)
+            logDebug("yield sample buffer")
         }
     }
     

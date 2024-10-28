@@ -96,12 +96,12 @@ public class TnTranscodingEncoderAdaptor: TnLoggable {
                     offset += Int(naluLength.bigEndian)
                 }
                 
-                logDebug("yield packet")
                 packetStreamer.yield(elementaryStream)
+                logDebug("yield packet")
             }
         }
     }
-
+    
     public var packetStream: AsyncStream<Data> {
         packetStreamer.stream
     }
