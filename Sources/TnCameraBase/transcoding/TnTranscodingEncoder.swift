@@ -66,10 +66,9 @@ public class TnTranscodingEncoder: TnLoggable {
             CVPixelBufferUnlockBaseAddress(pixelBuffer, CVPixelBufferLockFlags(rawValue: 0))
         }
         
-        if let sampleBuffer = try await compressionSession.encodeFrame(pixelBuffer, presentationTimeStamp: presentationTimeStamp, duration: duration) {
-            imageStreamer.yield(sampleBuffer)
-//            logDebug("yield sample buffer")
-        }
+        let sampleBuffer = try await compressionSession.encodeFrame(pixelBuffer, presentationTimeStamp: presentationTimeStamp, duration: duration)
+        imageStreamer.yield(sampleBuffer)
+        //            logDebug("yield sample buffer")
     }
     
     private func createCompressionSession() throws -> VTCompressionSession {
@@ -115,7 +114,7 @@ extension VTCompressionSession {
         _ pixelBuffer: CVPixelBuffer,
         presentationTimeStamp: CMTime,
         duration: CMTime
-    ) async throws -> CMSampleBuffer? {
+    ) async throws -> CMSampleBuffer {
         var infoFlagsOut = VTEncodeInfoFlags()
         return try await withCheckedThrowingContinuation { continuation in
             let status = VTCompressionSessionEncodeFrame(
@@ -126,7 +125,7 @@ extension VTCompressionSession {
                 frameProperties: nil,
                 infoFlagsOut: &infoFlagsOut,
                 outputHandler: { status, _, sampleBuffer in
-                    if status == noErr {
+                    if status == noErr, let sampleBuffer {
                         continuation.resume(returning: sampleBuffer)
                     }
                 }
