@@ -23,10 +23,9 @@ public class TnTranscodingEncoderComposite: TnLoggable {
         Task { [self] in
             logDebug("listen packet ...")
             for await packet in adaptor.packetStream {
-                logDebug("process packet ...")
                 try await packetHandler(packet)
             }
-            logDebug("listen packet !")
+            logDebug("listen packet finish !")
         }
     }
 
