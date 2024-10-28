@@ -96,16 +96,16 @@ extension TnCameraProxyServer {
     private func listenEncoding() {
         // listen encoding packet
         videoEncoder.listen(packetHandler: { [self] packet in
-            logDebug("send image packet ... ")
+//            logDebug("send image packet ... ")
             try await network.send(data: packet, to: ["streaming"])
         })
 
         logDebug("listen image and encode to packet ...")
         Task {
             try await cameraService.listenImage { [self] ciImage in
-                logDebug("encode image to packet ... ")
+//                logDebug("encode image to packet ... ")
                 try await videoEncoder.encode(ciImage.pixelBuffer!)
-                logDebug("encode image to packet !")
+//                logDebug("encode image to packet !")
             }
         }
     }
