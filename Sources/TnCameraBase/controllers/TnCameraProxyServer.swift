@@ -25,7 +25,7 @@ public class TnCameraProxyServer: TnLoggable {
     public private(set) var albums: [String] = []
 
     public var delegate: TnCameraDelegate? = nil
-    private var videoEncoder: TnTranscodingEncoderComposite = .init(config: .default)
+    private let videoEncoder: TnTranscodingEncoderComposite = .init(config: .default)
 
     public init(_ cameraService: TnCameraService, bleInfo: TnNetworkBleInfo, transportingInfo: TnNetworkTransportingInfo) {
         self.cameraService = cameraService
@@ -75,10 +75,7 @@ extension TnCameraProxyServer {
                 settingsHandler: { [self] settings in
                     logDebug("settings changed")
                     self.settings = settings
-                    
-                    
-                    videoEncoder = TnTranscodingEncoderComposite(config: settings.videoEncoderConfig)
-                    
+                                                            
                     // send settings
                     self.send(msgType: .getSettingsResponse, value: TnCameraSettingsValue(settings: settings, status: nil, network: nil))
 
