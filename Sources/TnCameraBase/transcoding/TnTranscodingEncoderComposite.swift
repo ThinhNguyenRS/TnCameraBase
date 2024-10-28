@@ -22,10 +22,15 @@ public class TnTranscodingEncoderComposite: TnLoggable {
     public func listen(packetHandler: @escaping TnTranscodingPacketHandler) -> Task<Void, Error> {
         Task { [self] in
             logDebug("listen packet ...")
-            for await packet in adaptor.packetStream {
+            var iterator = adaptor.packetStream.makeAsyncIterator()
+            while let packet = await iterator.next() {
                 logDebug("process packet ...")
                 try await packetHandler(packet)
             }
+//            for await packet in adaptor.packetStream {
+//                logDebug("process packet ...")
+//                try await packetHandler(packet)
+//            }
             logDebug("listen packet !")
         }
     }
