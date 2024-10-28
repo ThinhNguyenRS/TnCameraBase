@@ -21,7 +21,9 @@ public class TnTranscodingEncoderComposite: TnLoggable {
     @discardableResult
     public func listen(packetHandler: @escaping TnTranscodingPacketHandler) -> Task<Void, Error> {
         Task { [self] in
+            logDebug("listen packet ...")
             for await packet in adaptor.packetStream {
+                logDebug("process packet ...")
                 try await packetHandler(packet)
             }
         }
