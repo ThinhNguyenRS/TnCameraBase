@@ -51,29 +51,24 @@ public class TnCameraProxyClient: NSObject, ObservableObject, TnLoggable {
 // MARK: encoding
 extension TnCameraProxyClient {
     private func listenEncoding() {
+        logDebug("listen decoded image ...")
         videoDecoder.listen{ [self] ciImage in
             currentCiImage = ciImage
         }
     }
     
-    private func decodePacket(packet: Data) {
+    private func listenStreaming() {
+        guard let stream = networkStreaming?.receiveStream.stream else { return }
+        logDebug("listen packet stream ...")
+
+        send(msgType: .invalidateVideoEncoder)
         Task {
-            try await tnDoCatchAsync(name: "decode image") {
+            for await packet in stream {
                 do {
                     try await self.videoDecoder.decode(packet: packet)
                 } catch {
                     self.send(msgType: .invalidateVideoEncoder)
                 }
-            }
-        }
-    }
-    
-    private func listenStreaming() {
-        guard let stream = networkStreaming?.receiveStream.stream else { return }
-        send(msgType: .invalidateVideoEncoder)
-        Task {
-            for await data in stream {
-                self.decodePacket(packet: data)
             }
         }
     }
