@@ -106,8 +106,10 @@ extension TnCameraProxyServer {
 
         logDebug("listen image and encode ...")
         Task {
-            await cameraService.listenImage { [self] ciImage in
-                try? await videoEncoder.encode(ciImage.pixelBuffer!)
+            try await cameraService.listenImage { [self] ciImage in
+                logDebug("encode image ...")
+                try await videoEncoder.encode(ciImage.pixelBuffer!)
+                logDebug("encode image !")
             }
         }
     }
