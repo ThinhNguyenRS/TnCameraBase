@@ -15,7 +15,7 @@ let package = Package(
             targets: ["TnCameraBase"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/ThinhNguyenRS/TnIosBase", .upToNextMajor(from: "1.0.2")),
+        .package(url: "https://github.com/ThinhNguyenRS/TnIosBase", .upToNextMajor(from: "1.0.3")),
 //        .package(url: "https://github.com/finnvoor/Transcoding", .upToNextMajor(from: "0.0.1")),
     ],
     targets: [
