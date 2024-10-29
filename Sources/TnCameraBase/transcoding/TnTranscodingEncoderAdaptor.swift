@@ -17,7 +17,7 @@ public class TnTranscodingEncoderAdaptor: TnLoggable {
         self.encoder = encoder
         
         Task { [weak self] in
-            for await sampleBuffer in encoder.imageStream {
+            for await sampleBuffer in encoder.sampleStream {
                 guard let self else { return }
                 let sampleAttachments = CMSampleBufferGetSampleAttachmentsArray(
                     sampleBuffer,
