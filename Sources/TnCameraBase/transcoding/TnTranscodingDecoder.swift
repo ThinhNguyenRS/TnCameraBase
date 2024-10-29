@@ -17,7 +17,7 @@ public class TnTranscodingDecoder: TnLoggable {
 
     public init(config: TnTranscodingDecoderConfig) {
         self.config = config
-        imageStreamer = .init()
+        imageStreamer = .init(newest: 5)
     }
 
     public var imageStream: AsyncStream<CVImageBuffer> {

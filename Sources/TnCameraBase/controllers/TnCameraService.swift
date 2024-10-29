@@ -602,24 +602,19 @@ extension TnCameraService {
     }
     
     public func listenImage(handler: @escaping (CIImage) async throws -> Void ) async throws {
-//        $currentCiImage.onReceive { ciImage in
-//            if self.status == .started, let ciImage, ciImage.pixelBuffer != nil {
-//                Task {
-//                    try await handler(ciImage)
-//                }
-//            }
-//        }
-        
         for await ciImage in $currentCiImage.filter({ self.status == .started && $0?.pixelBuffer != nil }).values {
             try await handler(ciImage!)
         }
     }
     
-//    public func listenImage(handler: @escaping (CIImage) -> Void ) async {
-//        for await ciImage in $currentCiImage.filter({ self.status == .started && $0?.pixelBuffer != nil }).values {
-//            handler(ciImage!)
-//        }
-//    }
+    @discardableResult
+    public func listenImage(handler: @escaping (CIImage) async throws -> Void ) -> Task<Void, Error> {
+        Task {
+            for await ciImage in $currentCiImage.filter({ self.status == .started && $0?.pixelBuffer != nil }).values {
+                try await handler(ciImage!)
+            }
+        }
+    }
 }
 
 // MARK: AVCaptureVideoDataOutputSampleBufferDelegate
